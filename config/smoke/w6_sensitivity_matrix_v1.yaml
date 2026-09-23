@@ -1,0 +1,86 @@
+schema_version: 1
+members:
+  - candidate_id: w6-central-v1
+    factor: central
+    level: central
+    overrides: {}
+    allowed_changed_paths: []
+  - candidate_id: w6-ef-low-v1
+    factor: emission_factors
+    level: low
+    overrides: {cffeps: {emission_factor_uncertainty: low}}
+    allowed_changed_paths: [/cffeps/emission_factor_uncertainty]
+    source_mass_group: emission-factor-low
+  - candidate_id: w6-ef-high-v1
+    factor: emission_factors
+    level: high
+    overrides: {cffeps: {emission_factor_uncertainty: high}}
+    allowed_changed_paths: [/cffeps/emission_factor_uncertainty]
+    source_mass_group: emission-factor-high
+  - candidate_id: w6-area-low-v1
+    factor: burned_area
+    level: low
+    overrides: {selection: {area_curve: independent_low_daily_increment_ha}}
+    allowed_changed_paths: [/selection/area_curve]
+    source_mass_group: area-low
+  - candidate_id: w6-area-high-v1
+    factor: burned_area
+    level: high
+    overrides: {selection: {area_curve: independent_high_daily_increment_ha}}
+    allowed_changed_paths: [/selection/area_curve]
+    source_mass_group: area-high
+  - candidate_id: w6-area-early-v1
+    factor: burned_area
+    level: early-timing
+    overrides: {selection: {area_curve: earliest_timing_daily_increment_ha}}
+    allowed_changed_paths: [/selection/area_curve]
+  - candidate_id: w6-area-late-v1
+    factor: burned_area
+    level: late-timing
+    overrides: {selection: {area_curve: latest_timing_daily_increment_ha}}
+    allowed_changed_paths: [/selection/area_curve]
+  - candidate_id: w6-injection-uniform-v1
+    factor: vertical_injection
+    level: uniform-surface-to-top
+    overrides: {cffeps: {vertical_profile_algorithm: uniform_surface_to_cffeps_top_v1}}
+    allowed_changed_paths: [/cffeps/vertical_profile_algorithm]
+  - candidate_id: w6-particles-300k-v1
+    factor: particles
+    level: 300000
+    overrides: {flexpart: {particle_budget_per_species_day: 300000}}
+    allowed_changed_paths: [/flexpart/particle_budget_per_species_day]
+  - candidate_id: w6-threads-1-v1
+    factor: threads
+    level: 1
+    overrides: {flexpart: {threads: 1}}
+    allowed_changed_paths: [/flexpart/threads]
+  - candidate_id: w6-threads-2-v1
+    factor: threads
+    level: 2
+    overrides: {flexpart: {threads: 2}}
+    allowed_changed_paths: [/flexpart/threads]
+  - candidate_id: w6-threads-4-v1
+    factor: threads
+    level: 4
+    overrides: {flexpart: {threads: 4}}
+    allowed_changed_paths: [/flexpart/threads]
+  - candidate_id: w6-deposition-no-wet-v1
+    factor: deposition
+    level: no-wet
+    overrides: {flexpart: {deposition: {wet: false, dry: true, settling: true}}}
+    allowed_changed_paths: [/flexpart/deposition/wet]
+  - candidate_id: w6-deposition-no-dry-v1
+    factor: deposition
+    level: no-dry
+    overrides: {flexpart: {deposition: {wet: true, dry: false, settling: true}}}
+    allowed_changed_paths: [/flexpart/deposition/dry]
+  - candidate_id: w6-deposition-none-v1
+    factor: deposition
+    level: none
+    overrides: {flexpart: {deposition: {wet: false, dry: false, settling: true}}}
+    allowed_changed_paths: [/flexpart/deposition/dry, /flexpart/deposition/wet]
+  - candidate_id: w6-background-p20-v1
+    factor: surface_background
+    level: p20
+    overrides: {observations: {surface_pm25: {central_background: same_utc_hour_20th_percentile}}}
+    allowed_changed_paths: [/observations/surface_pm25/central_background]

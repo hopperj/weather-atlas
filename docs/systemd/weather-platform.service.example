@@ -1,0 +1,27 @@
+[Unit]
+Description=ECCC Weather Model Map Platform
+Documentation=file:///srv/weather-platform/app/docs/operations.md
+Wants=network-online.target
+After=network-online.target docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+User=weather
+Group=weather
+WorkingDirectory=/srv/weather-platform/app
+ExecStartPre=/usr/bin/test -r /srv/weather-platform/app/.env
+ExecStartPre=/usr/bin/docker compose config --quiet
+ExecStart=/usr/bin/docker compose up -d --wait --wait-timeout 300
+ExecStartPost=/usr/bin/docker compose exec -T weather-api python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/ready', timeout=10).read()"
+ExecStartPost=/usr/bin/docker compose exec -T tile-api python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/ready', timeout=10).read()"
+ExecReload=/usr/bin/docker compose up -d --wait --wait-timeout 300
+ExecReload=/usr/bin/docker compose exec -T weather-api python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/ready', timeout=10).read()"
+ExecReload=/usr/bin/docker compose exec -T tile-api python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/ready', timeout=10).read()"
+ExecStop=/usr/bin/docker compose stop
+TimeoutStartSec=600
+TimeoutStopSec=180
+
+[Install]
+WantedBy=multi-user.target

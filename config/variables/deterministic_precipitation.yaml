@@ -1,0 +1,79 @@
+version: 1
+products:
+  rdps:
+    - code: total_precipitation_1h
+      canonical_variable: precipitation
+      level_code: surface
+      source: {producer: RDPS, parameter: Precip-Accum1h, level: Sfc, expected_unit: kg/m^2}
+      canonical_unit: mm
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: precipitation
+      availability: {start_forecast_hour: 1, end_forecast_hour: 84}
+    - code: snowfall_1h
+      canonical_variable: snowfall
+      level_code: surface
+      source: {producer: RDPS, parameter: Snow-Accum1h, level: Sfc, expected_unit: kg/m^2}
+      canonical_unit: mm_water_equivalent
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: snowfall
+      availability: {start_forecast_hour: 1, end_forecast_hour: 84}
+  gdps:
+    - code: total_precipitation_1h
+      canonical_variable: precipitation
+      level_code: surface
+      display_name: Total precipitation · 1 hour
+      source: {producer: GDPS, parameter: Precip-Accum1h, level: Sfc, expected_unit: kg/m^2}
+      canonical_unit: mm
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: precipitation
+      availability: {start_forecast_hour: 1, end_forecast_hour: 144}
+    - code: total_precipitation_3h
+      canonical_variable: precipitation
+      level_code: surface
+      display_name: Total precipitation · 3 hours
+      source: {producer: GDPS, parameter: Precip-Accum3h, level: Sfc, expected_unit: kg/m^2}
+      canonical_unit: mm
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: precipitation
+      availability:
+        start_forecast_hour: 3
+        end_forecast_hour: 168
+        forecast_hour_step: 3
+    - code: snowfall_1h
+      canonical_variable: snowfall
+      level_code: surface
+      source: {producer: GDPS, parameter: Snow-Accum1h, level: Sfc, expected_unit: kg/m^2}
+      canonical_unit: mm_water_equivalent
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: snowfall
+      availability: {start_forecast_hour: 1, end_forecast_hour: 84}

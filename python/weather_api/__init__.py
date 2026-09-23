@@ -1,0 +1,2 @@
+"""Catalogue and application API."""
+

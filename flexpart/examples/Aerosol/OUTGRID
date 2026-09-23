@@ -1,0 +1,22 @@
+!*******************************************************************************
+!                                                                              *
+!      Input file for the Lagrangian particle dispersion model FLEXPART        *
+!                       Please specify your output grid                        *
+!                                                                              *
+! OUTLON0    = GEOGRAPHYICAL LONGITUDE OF LOWER LEFT CORNER OF OUTPUT GRID     *
+! OUTLAT0    = GEOGRAPHYICAL LATITUDE OF LOWER LEFT CORNER OF OUTPUT GRID      *
+! NUMXGRID   = NUMBER OF GRID POINTS IN X DIRECTION (= No. of cells + 1)       *
+! NUMYGRID   = NUMBER OF GRID POINTS IN Y DIRECTION (= No. of cells + 1)       *
+! DXOUT      = GRID DISTANCE IN X DIRECTION                                    *
+! DYOUN      = GRID DISTANCE IN Y DIRECTION                                    *
+! OUTHEIGHTS = HEIGHT OF LEVELS (UPPER BOUNDARY)                               *
+!*******************************************************************************
+&OUTGRID
+ OUTLON0=            0.00,    !-179.0 for ERAI; -178 for CERA; 0.0 for ERA5
+ OUTLAT0=           -90.00,
+ NUMXGRID=            720,     !720 for ERA5; 180 for CERA 
+ NUMYGRID=            360,     !360 for ERA5; 90 for CERA 
+ DXOUT=             0.5,
+ DYOUT=             0.5,
+ OUTHEIGHTS=      100.0,500.0,1000.0
+ /

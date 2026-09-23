@@ -1,0 +1,14 @@
+&SPECIES_PARAMS
+ PSPECIES="PM25_FIRE",        ! Primary fresh wildfire PM2.5 tracer
+ PCRAIN_AERO=1.0,             ! Rain collection efficiency [Grythe et al. (2017)]
+ PCSNOW_AERO=1.0,             ! Snow collection efficiency [Grythe et al. (2017)]
+ PCCN_AERO=0.9,               ! Cloud-condensation-nuclei efficiency [Grythe et al. (2017)]
+ PIN_AERO=0.1,                ! Ice-nuclei efficiency [Grythe et al. (2017)]
+ PDENSITY=1400.0,             ! Fresh biomass-burning aerosol density kg m-3 [Reid et al. (2005)]
+ PDIA=3.0E-07,                ! Accumulation-mode geometric mean diameter, m [Reid et al. (2005)]
+ PDSIGMA=1.7,                 ! Geometric standard deviation [Reid et al. (2005)]
+ /
+! References:
+! Grythe et al. (2017), GMD 10, 1447-1466, doi:10.5194/gmd-10-1447-2017
+! Reid et al. (2005), ACP 5, 799-825, doi:10.5194/acp-5-799-2005
+! Represents primary PM2.5 only; no secondary aerosol chemistry is included.

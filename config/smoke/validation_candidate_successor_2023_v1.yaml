@@ -1,0 +1,78 @@
+schema_version: 1
+candidate_version: w1-2023-successor-central-v1
+area_operator_version: mcd64a1-event-area-v2
+selection:
+  rule: all_burned_area_eligible_events_with_complete_required_inputs
+  area_curve: central_daily_increment_ha
+  country_selection:
+    method: natural_earth_admin0_point_in_polygon
+    admin_a3: CAN
+    dataset_version: 5.1.1
+  require_unique_dominant_detection_fuel: true
+  require_complete_fire_weather_for_every_source_day: true
+source_time:
+  daily_area_allocation: linear_utc_daily_total_conserved_over_active_cffeps_intervals_v1
+  nominal_detection_hour_utc: 12
+  phase_tail_policy: retain_only_phase_mass_released_within_24_hour_transport_window_v1
+  mass_balance_accounting: released_plus_pending_queue_equals_cumulative_consumption_v1
+fire_weather:
+  source: NRCan CWFIS national CFFDRS analysis
+  sampling: nearest_grid_cell_v1
+  date: source_increment_utc_date
+meteorology:
+  source: NOAA GFS global_1p00
+  cycle: source_increment_date_00_utc
+  spatial_interpolation: nearest_grid_point
+  temporal_interpolation: linear_between_three_hour_fields
+  vertical_interpolation: linear_in_log_pressure_to_40_levels
+cffeps:
+  version: "4.1"
+  emission_factor_uncertainty: central
+  species: [PM25, CO, BC]
+  vertical_layer_count: 12
+  vertical_profile_algorithm: cffeps_top_beta_v1
+flexpart:
+  version: "11.1-weatherapp-deposition-switch-v1"
+  species_members: isolated
+  run_hours_per_source_day: 24
+  domain_wgs84:
+    west: -141
+    south: 41
+    east: -52
+    north: 84
+  grid_spacing_degrees: 1.0
+  particle_budget_per_species_day: 150000
+  minimum_particles_per_release: 50
+  maximum_releases: 20000
+  threads: 8
+  base_random_seed: 20260724
+  deposition:
+    wet: true
+    dry: true
+    settling: true
+gfas:
+  version: "1.2"
+  role: diagnostic_inventory_intercomparison
+  temporal_product: 024_hour_rolling_average_at_00_utc
+  bbox_wgs84:
+    west: -141
+    south: 41
+    east: -52
+    north: 84
+observations:
+  tropomi:
+    product: OFFL_L2_AER_LH
+    minimum_qa_value: 0.5
+    maximum_event_distance_km: 50
+    maximum_output_time_difference_minutes: 90
+    observed_quantity: aerosol_mid_height_agl_m
+    model_quantity: pm25_mass_weighted_mean_height_agl_m
+    role: diagnostic_due_to_extinction_mass_operator_mismatch
+  surface_pm25:
+    model_height_m: 50
+    model_units_conversion: ng_m3_to_ug_m3
+    background_window_days: 14
+    central_background: same_utc_hour_median
+    sensitivity_background: same_utc_hour_20th_percentile
+    smoke_day_exclusion: any_frozen_candidate_source_day
+    minimum_model_signal_ug_m3: 0.01

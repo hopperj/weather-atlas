@@ -1,0 +1,8 @@
+
+module purge 
+module load eccodes/2.28.0-gcc9.4 
+export FLEXPART=/home/ignacio/repos/flexpart/src/FLEXPART 
+ 
+#ln -s ../../tests_dev_snapshot/examples/default_examples/paper10.4/test_winds 
+#/home/ignacio/public_html/winds/test_winds
+

@@ -1,0 +1,88 @@
+version: 1
+products:
+  raqdps:
+    - code: pm25_surface
+      canonical_variable: pm25
+      level_code: surface
+      source:
+        producer: RAQDPS
+        parameter: PM2.5
+        level: Sfc
+        expected_unit: kg/m^3
+      canonical_unit: ug/m^3
+      conversion_key: kilograms_per_cubic_metre_to_micrograms_per_cubic_metre
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: pm25
+    - code: pm10_surface
+      canonical_variable: pm10
+      level_code: surface
+      source:
+        producer: RAQDPS
+        parameter: PM10
+        level: Sfc
+        expected_unit: kg/m^3
+      canonical_unit: ug/m^3
+      conversion_key: kilograms_per_cubic_metre_to_micrograms_per_cubic_metre
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: pm10
+    - code: ozone_surface
+      canonical_variable: ozone
+      level_code: surface
+      source:
+        producer: RAQDPS
+        parameter: O3
+        level: Sfc
+        expected_unit: ppb
+      canonical_unit: ppb
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: ozone
+    - code: nitrogen_dioxide_surface
+      canonical_variable: nitrogen_dioxide
+      level_code: surface
+      source:
+        producer: RAQDPS
+        parameter: NO2
+        level: Sfc
+        expected_unit: ppb
+      canonical_unit: ppb
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: nitrogen_dioxide
+    - code: sulfur_dioxide_surface
+      canonical_variable: sulfur_dioxide
+      level_code: surface
+      source:
+        producer: RAQDPS
+        parameter: SO2
+        level: Sfc
+        expected_unit: ppb
+      canonical_unit: ppb
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: sulfur_dioxide

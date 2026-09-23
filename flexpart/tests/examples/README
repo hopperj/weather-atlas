@@ -1,0 +1,45 @@
+0) CONFIGURE EXECUTABLE AND WIND FILES
+
+ln -s  path/to/test_winds .
+
+export FLEXPART=path/to/FLEXPART 
+
+1) CREATE DEFAULT CASE
+
+./set_default_example_10.4.sh
+
+RESULT: 
+options 
+pathnames  
+output 
+
+2) CREATE ADDITIONAL TEST CASES (from default) 
+ 
+./gen_options.sh define_options_1.sh   
+./gen_options.sh define_options_2.sh 
+etc. for single groups 
+or 
+./gen_options_all.sh 
+for all existing tests
+
+RESULT:
+options_decription 
+ 
+./gen_pathnames.sh 
+From existing options, generate output dirs and pathnames 
+
+3) CREATE EXEC RUNS: 
+# need path to suitable executable
+# export FLEXPART=/home/ignacio/repos/flexpart/src/FLEXPART 
+ 
+./gen_batch_jobs_cl.sh $FLEXPART
+Generates run scripts coding executable 
+
+4) RUN JOBS 
+
+#certain modules may be needed for this step in some systems 
+ 
+./run_batch_cl.sh 
+
+
+The process steps can be automated with the makefile

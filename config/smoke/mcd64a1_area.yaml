@@ -1,0 +1,32 @@
+schema_version: 1
+operator_version: mcd64a1-event-area-v1
+product: MCD64A1
+collection: '061'
+grid:
+  projection: MODIS sinusoidal
+  sphere_radius_m: 6371007.181
+  global_upper_left_x_m: -20015109.354
+  global_upper_left_y_m: 10007554.677
+  tile_pixels: 2400
+  pixel_size_m: 463.312716527778
+  connectivity: 8
+quality:
+  require_land_bit: true
+  require_valid_data_bit: true
+  require_burn_date_in_reliable_window: true
+  include_shortened_mapping_period: true
+  include_contextually_relabeled: true
+  high_confidence_excludes_shortened_mapping_period: true
+  high_confidence_excludes_contextually_relabeled: true
+matching:
+  seed_radius_m: 1500
+  event_time_padding_days: 1
+  use_burn_date_uncertainty: true
+  overlapping_pixel_policy: exclude_from_all_events
+  cross_month_duplicate_policy: require_identical_then_deduplicate
+area:
+  calculation: equal_area_projected_pixel_area
+  hectares_per_square_metre: 0.0001
+eligibility:
+  minimum_assigned_pixel_count: 1
+  require_at_least_one_high_confidence_pixel: true

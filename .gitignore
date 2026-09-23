@@ -1,0 +1,169 @@
+# Repository policy: docs/repository-content.md
+# Keep source, tests/fixtures, migrations, project configuration, lockfiles,
+# documentation and app assets. Ignore local/runtime/generated content below.
+
+# Local configuration and secrets; sanitized examples belong in Git.
+.env
+.env.*
+!.env.example
+!.env.*.example
+!.env.sample
+!.env.*.sample
+.envrc
+.netrc
+.cdsapirc
+.adsapirc
+.aws/
+.ssh/
+/secrets/
+*.key
+*.pem
+*.p12
+*.pfx
+*.keystore
+
+# Runtime storage and mounted data. No trailing slash: also ignore symlinks.
+# Anchor these at the root so small tests/data and tests/fixtures stay trackable.
+/data
+/weatherapp_data
+/weather-atlas-data
+/airflow/logs/
+/airflow/airflow.cfg
+/airflow/webserver_config.py
+/logs/
+/backups/
+*.log
+*.log.*
+*.pid
+*.pid.lock
+*.sqlite
+*.sqlite3
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite3-wal
+*.sqlite3-shm
+*.db
+*.db-wal
+*.db-shm
+*.dump
+*.sql.gz
+
+# Python environments, packaging, caches and test output.
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.eggs/
+*.egg-info/
+*.egg
+*.whl
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.pytype/
+.pyre/
+.tox/
+.nox/
+.hypothesis/
+.ipynb_checkpoints/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+junit.xml
+
+# JavaScript dependencies, bundles, build caches and test reports.
+node_modules/
+.npm/
+.pnpm-store/
+.vite/
+.vite-temp/
+.parcel-cache/
+.turbo/
+*.tsbuildinfo
+coverage/
+playwright-report/
+test-results/
+blob-report/
+
+# Build products (do not ignore Makefiles, Dockerfiles or compiler sources).
+build/
+dist/
+.build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+cmake-build-*/
+*.o
+*.obj
+*.a
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+*.dSYM/
+*.sif
+/cffeps/bin/
+/cffeps/tests/fixtures/minimal-output.csv
+/cffeps/**/*.mod
+/cffeps/**/*.smod
+/flexpart/**/*.mod
+/flexpart/**/*.smod
+/flexpart/src/FLEXPART
+/flexpart/src/FLEXPART_MPI
+/flexpart/src/FLEXPART_BIN
+/flexpart/src/FLEXPART_ETA
+/flexpart/src/FLEXPART_ETA_BIN
+
+# Downloaded source archives: extracted model source and licenses stay in Git.
+/flexpart/*.tar.gz
+/flexpart/*.tar.xz
+/cffeps/upstream/*.tar.gz
+
+# Large scientific datasets and generated model runs; retain suite code/reports.
+/flexpart/options/oh_fields/*.nc
+/flexpart/tests/regression_suite/baselines/
+/flexpart/tests/regression_suite/benchmarks/
+/flexpart/tests/regression_suite/candidates/
+/flexpart/tests/regression_suite/work/
+
+# HYSPLIT is an optional research archive, not an application dependency.
+# Its public checkouts are separate Git repositories; retain provenance in README.
+# Never accidentally publish the separately licensed/gated model distribution.
+/hysplit/code/
+/hysplit/model/source/
+/hysplit/model/distributions/
+
+# Downloaded reference-paper libraries; retain authored docs and reading indexes.
+/flexpart/docs/papers/*.pdf
+/flexpart/docs/manuals/*.pdf
+/hysplit/docs/papers/*.pdf
+/hysplit/docs/manuals/*.pdf
+
+# Temporary files, local editor state and OS metadata.
+/tmp/
+/temp/
+/temporary/
+.tmp/
+.cache/
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/tasks.json
+!.vscode/launch.json
+.DS_Store
+._*
+.AppleDouble/
+.LSOverride
+.nfs*
+Thumbs.db
+Desktop.ini

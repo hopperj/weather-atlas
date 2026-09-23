@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "verification_id": "november-2025-mcd64a1-central-v2-verification-2026-07-23",
+  "created_at": "2026-07-23T20:28:30Z",
+  "experiment_interval": {
+    "start": "2025-11-10",
+    "end_inclusive": "2025-12-01"
+  },
+  "protocol": {
+    "id": "cffeps-flexpart-external-validation-2026-07-22-v1",
+    "path": "docs/smoke-validation-protocol.md",
+    "sha256": "fc8801b7bcc768dd28b2cca38e6fc770988f96f6ebf839d2e8ea2f129ad46342",
+    "thresholds_path": "config/smoke/validation.yaml",
+    "thresholds_sha256": "2b789afafb1739cc49d42f9216f8cdd72e416de14da6e08fec1fc84475c31727"
+  },
+  "candidate": {
+    "id": "november-2025-mcd64a1-central-v2",
+    "configuration_path": "config/smoke/validation_candidate_v2.yaml",
+    "configuration_sha256": "3a9832b6be385ff5a4e7f1368de5c05af6e0265c0fc9c96697ef982713951285",
+    "run_manifest_path": "/Volumes/BigMrStorage/weatherapp_data/weather/derived/smoke/validation/experiments/gfas-v1.2-2025-11-10_2025-12-01/candidates/november-2025-mcd64a1-central-v2/attempt-001/manifest.json",
+    "run_manifest_sha256": "c008b18d52b6dbe494eb1f6bcf6792dd99bde2d6dcb65960038d3e7c7c793fd9",
+    "input_manifest_sha256": "fb08a49907457503ee3a9389fc00cac24a5443b1660d92b2d406be85b6da2d8e",
+    "emissions_sha256": "30128dc48e94bb1406f837e3b47c47d265f6db15899f96de7fd5a4fd7983a74e",
+    "status": "complete",
+    "wall_time_seconds": 569.133
+  },
+  "component_results": {
+    "software_regression": {
+      "status": "passed",
+      "pytest": {
+        "passed": 204,
+        "skipped": 19,
+        "skip_reason": "PostgreSQL integration tests require WEATHER_TEST_DATABASE_URL"
+      },
+      "cffeps_golden_cases_passed": 10,
+      "fbp_sensitivity_cases_passed": 6,
+      "changed_file_lint": "passed",
+      "dependency_lock": "passed"
+    },
+    "mcd64a1_burned_area": {
+      "status": "component_passed_design_failed",
+      "summary_path": "/Volumes/BigMrStorage/weatherapp_data/weather/derived/smoke/validation/experiments/gfas-v1.2-2025-11-10_2025-12-01/mcd64a1/mcd64a1-event-area-v1/mcd64a1-area-summary.json",
+      "summary_sha256": "946fbc49e15a02057a937b0bf9f32ec615d534e99f5685f50a5a6be1fed2ee72",
+      "event_areas_sha256": "7cb7de0338e4707dcdad566e8bfe39d0f054c07c032d12c3ac2df13810a53b9f",
+      "granule_count": 46,
+      "qa_accepted_interval_pixel_count": 282,
+      "ambiguous_pixels_excluded": 2,
+      "eligible_event_count": 4,
+      "strata": {
+        "weak": 2,
+        "moderate": 2,
+        "major": 0
+      },
+      "target_per_stratum": 3,
+      "population_design_passed": false
+    },
+    "cffeps_source_generation": {
+      "status": "passed",
+      "event_count": 4,
+      "event_day_count": 10,
+      "total_burned_area_hectares": 407.8514792630635,
+      "all_daily_area_conserved": true,
+      "maximum_relative_fuel_mass_difference": 0.006360752478608912,
+      "maximum_allowed_relative_fuel_mass_difference": 0.05,
+      "emitted_mass_kg": {
+        "PM25": 543.3726778470285,
+        "CO": 3291.5845866934333,
+        "BC": 18.286587096857918
+      }
+    },
+    "flexpart_transport": {
+      "status": "passed",
+      "verification_path": "/Volumes/BigMrStorage/weatherapp_data/weather/derived/smoke/validation/experiments/gfas-v1.2-2025-11-10_2025-12-01/candidates/november-2025-mcd64a1-central-v2/attempt-001/verification/candidate-output-verification.json",
+      "verification_sha256": "60e7260bbe3962596aa23b3ee911dbacd206941fcb6a1e3b8123095029930c7a",
+      "member_count": 24,
+      "source_day_count": 8,
+      "particle_count": 3600000,
+      "release_count": 16560,
+      "hourly_fields_per_member": 24,
+      "height_levels": 9,
+      "all_completion_markers_present": true,
+      "all_concentrations_finite_nonnegative_and_nonzero": true,
+      "all_concentration_hashes_match": true,
+      "all_member_seeds_unique": true,
+      "release_mass_matches_emissions": true
+    },
+    "gfas_inventory_diagnostic": {
+      "status": "failed",
+      "acceptance_capable": false,
+      "counts_toward_acceptance": false,
+      "manifest_path": "/Volumes/BigMrStorage/weatherapp_data/weather/derived/smoke/validation/experiments/gfas-v1.2-2025-11-10_2025-12-01/candidates/november-2025-mcd64a1-central-v2/attempt-001/evaluation/gfas/manifest.json",
+      "manifest_sha256": "917efe5ddb6b893f55ba5c6dea4848b72dcb20959cd8a8f9e6f8f0b7e52bde67",
+      "pair_count_per_species": 375,
+      "cffeps_positive_cell_days": 10,
+      "gfas_positive_cell_days": 366,
+      "metrics": {
+        "PM25": {
+          "normalized_mean_bias": -0.9999598945217947,
+          "pearson_correlation": -0.03392220218322109,
+          "fraction_within_factor_two": 0.0,
+          "criteria_passed": false
+        },
+        "CO": {
+          "normalized_mean_bias": -0.9999708815556272,
+          "pearson_correlation": -0.03451846098524654,
+          "fraction_within_factor_two": 0.0,
+          "criteria_passed": false
+        },
+        "BC": {
+          "normalized_mean_bias": -0.9999697976305011,
+          "pearson_correlation": -0.034750595375474515,
+          "fraction_within_factor_two": 0.0,
+          "criteria_passed": false
+        }
+      },
+      "interpretation": "The domain-wide GFAS active union contains 366 positive cell-days but the independently area-supported candidate contains only 10 positive source cell-days from four events. Event-coverage incompleteness is therefore a dominant, known contribution to the gross discrepancy. This diagnostic does not test FLEXPART transport."
+    },
+    "misr_plume_height": {
+      "status": "not_run",
+      "acceptance_capable": true,
+      "required_minimum_pairs": 10,
+      "reason": "No quality-screened MISR plume polygons matched to the eligible events are present."
+    },
+    "naps_smoke_enhancement": {
+      "status": "not_run",
+      "acceptance_capable": true,
+      "required_minimum_station_hours": 100,
+      "reason": "Hourly 2025 NAPS station observations and the preregistered smoke-background pair set are not present. The available integrated 24-hour reference-method archive cannot satisfy the hourly operator."
+    },
+    "uncertainty_and_sensitivity": {
+      "status": "not_run",
+      "remaining": [
+        "low and high species emission factors",
+        "low and high defensible burned-area realizations",
+        "alternative mass-conserving injection profiles",
+        "at least two particle counts",
+        "one-thread versus multithread stochastic comparison",
+        "median versus 20th-percentile NAPS background",
+        "with versus without wet and dry deposition"
+      ]
+    },
+    "independent_scientific_review": {
+      "status": "not_signed",
+      "required_roles": [
+        "wildfire-emissions scientist",
+        "air-quality scientist"
+      ]
+    },
+    "scheduled_cycle_evidence": {
+      "status": "not_run",
+      "completed_cycles": 0,
+      "required_cycles": 4
+    }
+  },
+  "overall_decision": {
+    "computational_chain_verified": true,
+    "scientific_acceptance_passed": false,
+    "production_submission_unlock_supported": false,
+    "reason": "The central source and transport chain is reproducible and internally valid, but the event design lacks a major fire, the GFAS diagnostic fails with a known coverage mismatch, the independent MISR and NAPS gates have not run, the required sensitivities and expert sign-off remain incomplete, and no scheduled-cycle evidence exists."
+  },
+  "excluded_predecessor_attempts": [
+    {
+      "candidate": "november-2025-mcd64a1-central-v1",
+      "attempt": "attempt-001",
+      "status": "operator_stopped_after_successful_pilot"
+    },
+    {
+      "candidate": "november-2025-mcd64a1-central-v1",
+      "attempt": "attempt-002",
+      "status": "invalidated_by_source_unit_verification"
+    },
+    {
+      "candidate": "november-2025-mcd64a1-central-v1",
+      "attempt": "attempt-003",
+      "status": "invalidated_by_daily_area_conservation_check"
+    }
+  ]
+}

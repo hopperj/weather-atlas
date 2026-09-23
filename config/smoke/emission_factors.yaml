@@ -1,0 +1,37 @@
+schema_version: 2
+registry_version: cffeps-firework-2026-01
+effective_date: '2026-01-01'
+units: g_species_per_kg_dry_fuel
+scientific_status: validation_only
+review:
+  status: pending_independent_review
+  required_roles: [wildfire_emissions_scientist, air_quality_scientist]
+  reviewed_by: []
+  change_control: new_registry_version_required_after_approval
+scope:
+  primary_emissions_only: true
+  fuel_basis: dry_fuel_consumed
+  combustion_phases: [flaming, smoldering, residual]
+species:
+  PM25:
+    citation: CFFEPS 4.1 cffeps_speciations_mod.f90; FireWork v2.0, Pavlovic et al. 2016
+    doi: 10.5194/gmd-12-3283-2019
+    phases:
+      flaming: {low: 11.0, central: 13.60, high: 17.0}
+      smoldering: {low: 18.0, central: 23.20, high: 30.0}
+      residual: {low: 27.0, central: 34.53, high: 45.0}
+  CO:
+    citation: CFFEPS 4.1 cffeps_speciations_mod.f90; FireWork v2.0
+    doi: 10.5194/gmd-12-3283-2019
+    phases:
+      flaming: {low: 67.0, central: 83.0, high: 104.0}
+      smoldering: {low: 108.0, central: 135.0, high: 169.0}
+      residual: {low: 198.0, central: 248.0, high: 310.0}
+  BC:
+    citation: Andreae 2019, Emission of trace gases and aerosols from biomass burning
+    doi: 10.5194/acp-19-8523-2019
+    phases:
+      flaming: {low: 0.20, central: 0.50, high: 0.90}
+      smoldering: {low: 0.20, central: 0.40, high: 0.80}
+      residual: {low: 0.10, central: 0.30, high: 0.60}
+fallback: reject

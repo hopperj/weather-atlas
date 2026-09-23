@@ -1,0 +1,17 @@
+&portable_cffeps
+  profile_path = 'tests/fixtures/minimal-profiles.txt'
+  output_path = 'tests/fixtures/minimal-output.csv'
+  fueltype_index = 2
+  detection_julian = 183
+  detection_hhmm = 0
+  nsteps = 3
+  lat = 45.0
+  lon = -63.0
+  ffmc = 92.0
+  dmc = 45.0
+  dc = 320.0
+  estarea_ha = 100.0
+  elevation_m = 100.0
+  cffeps_fire_shape = 'weighted'
+  cffeps_fire_type = 'dry'
+/

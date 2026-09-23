@@ -1,0 +1,44 @@
+version: 1
+code: rdps
+provider: eccc
+kind: forecast
+enabled: true
+adapter: rdps
+source_producers: [RDPS]
+domains:
+  - code: north_america
+    name: Regional rotated latitude-longitude grid
+    resolution: 10km
+    grid: RLatLon0.09
+    # The live 2026-07-17 Datamart GRIB2 product reports Ni=1140, Nj=1045.
+    grid_width: 1140
+    grid_height: 1045
+run_hours_utc: [0, 6, 12, 18]
+forecast_hours:
+  start: 0
+  end: 84
+  step: 1
+discovery:
+  mode: https_listing
+  base_url: https://dd.weather.gc.ca/
+  today_path: today/model_rdps/{resolution}/{run_hour}/{forecast_hour}/
+  archive_path: >-
+    {run_date}/WXO-DD/model_rdps/{resolution}/{run_hour}/{forecast_hour}/
+  operational_mode: amqps_required
+  late_arrival_grace_minutes: 240
+  retry_window_hours: 12
+limits:
+  maximum_parallel_downloads: 4
+  maximum_objects_per_manual_run: 64
+  minimum_free_bytes: 10737418240
+retention:
+  raw_days: 30
+  processed_days: 365
+  retain_forever: true
+visibility:
+  required_field_codes: [air_temperature_2m]
+estimates:
+  processed_to_raw_ratio: 1.15
+variable_config_files:
+  - variables/deterministic_atmospheric.yaml
+  - variables/deterministic_precipitation.yaml

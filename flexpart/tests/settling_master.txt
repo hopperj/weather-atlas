@@ -1,0 +1,74 @@
+                lon:	mean abs: 1.97740594e+01	max abs: 3.07020264e+01
+            lon ETA:	mean abs: 1.97740094e+01	max abs: 3.07033691e+01
+             lon_av:	mean abs: 1.97848031e+01	max abs: 3.05876732e+01
+         lon_av ETA:	mean abs: 1.97847625e+01	max abs: 3.05888042e+01
+                lat:	mean abs: 3.48925750e+01	max abs: 5.04721527e+01
+            lat ETA:	mean abs: 3.48925312e+01	max abs: 5.04734192e+01
+             lat_av:	mean abs: 3.49040125e+01	max abs: 5.04243584e+01
+         lat_av ETA:	mean abs: 3.49039750e+01	max abs: 5.04254761e+01
+                  z:	mean abs: 4.84617813e+01	max abs: 1.31528992e+02
+              z ETA:	mean abs: 4.85208813e+01	max abs: 1.31314911e+02
+               z_av:	mean abs: 4.86865781e+01	max abs: 1.26583099e+02
+           z_av ETA:	mean abs: 4.87389781e+01	max abs: 1.26397697e+02
+                 pv:	mean abs: 2.25664551e+00	max abs: 3.21795197e+01
+             pv ETA:	mean abs: 2.24792422e+00	max abs: 3.22219505e+01
+              pv_av:	mean abs: 2.23526914e+00	max abs: 3.22249832e+01
+          pv_av ETA:	mean abs: 2.22550684e+00	max abs: 3.22536697e+01
+                 qv:	mean abs: 3.93889465e-03	max abs: 7.79772364e-03
+             qv ETA:	mean abs: 3.93881683e-03	max abs: 7.79843098e-03
+              qv_av:	mean abs: 3.92801170e-03	max abs: 7.75149744e-03
+          qv_av ETA:	mean abs: 3.92791710e-03	max abs: 7.75184203e-03
+                rho:	mean abs: 1.22830205e+00	max abs: 1.35756588e+00
+            rho ETA:	mean abs: 1.22826748e+00	max abs: 1.35788083e+00
+             rho_av:	mean abs: 1.22791484e+00	max abs: 1.35774064e+00
+         rho_av ETA:	mean abs: 1.22787891e+00	max abs: 1.35802817e+00
+                  T:	mean abs: 2.77977625e+02	max abs: 2.87984100e+02
+              T ETA:	mean abs: 2.77983450e+02	max abs: 2.87999176e+02
+               T_av:	mean abs: 2.78092275e+02	max abs: 2.87903900e+02
+           T_av ETA:	mean abs: 2.78098275e+02	max abs: 2.87903931e+02
+                prs:	mean abs: 9.81952768e+04	max abs: 1.04051203e+05
+            prs ETA:	mean abs: 9.81946432e+04	max abs: 1.04050172e+05
+             prs_av:	mean abs: 9.82031680e+04	max abs: 1.03865070e+05
+         prs_av ETA:	mean abs: 9.82025088e+04	max abs: 1.03864328e+05
+               hmix:	mean abs: 3.74020650e+02	max abs: 1.81797595e+03
+           hmix ETA:	mean abs: 3.74021500e+02	max abs: 1.81805627e+03
+            hmix_av:	mean abs: 3.72722200e+02	max abs: 1.79257666e+03
+        hmix_av ETA:	mean abs: 3.72722425e+02	max abs: 1.79256348e+03
+                tro:	mean abs: 1.12843584e+04	max abs: 1.57277539e+04
+            tro ETA:	mean abs: 1.12843984e+04	max abs: 1.57281152e+04
+             tro_av:	mean abs: 1.12753376e+04	max abs: 1.57058320e+04
+         tro_av ETA:	mean abs: 1.12753728e+04	max abs: 1.57061416e+04
+                 to:	mean abs: 3.23780200e+02	max abs: 1.12426550e+03
+             to ETA:	mean abs: 3.23776725e+02	max abs: 1.12415088e+03
+              to_av:	mean abs: 3.23853500e+02	max abs: 1.11385352e+03
+          to_av ETA:	mean abs: 3.23850750e+02	max abs: 1.11391602e+03
+               m001:	mean abs: 9.87682223e-05	max abs: 9.99999975e-05
+           m001 ETA:	mean abs: 9.86909986e-05	max abs: 9.99999975e-05
+            m_av001:	mean abs: 9.90379214e-05	max abs: 9.99999975e-05
+        m_av001 ETA:	mean abs: 9.89701509e-05	max abs: 9.99999975e-05
+                  u:	mean abs: 2.09955020e+00	max abs: 7.07874107e+00
+              u ETA:	mean abs: 2.10246445e+00	max abs: 7.08939075e+00
+               u_av:	mean abs: 2.10357930e+00	max abs: 7.12824345e+00
+           u_av ETA:	mean abs: 2.10650801e+00	max abs: 7.13930893e+00
+                  v:	mean abs: 3.02053164e+00	max abs: 1.11122770e+01
+              v ETA:	mean abs: 3.02394648e+00	max abs: 1.11222630e+01
+               v_av:	mean abs: 3.05965898e+00	max abs: 1.12192640e+01
+           v_av ETA:	mean abs: 3.06318945e+00	max abs: 1.12289639e+01
+                  w:	mean abs: 2.97905493e-04	max abs: 3.80159984e-03
+              w ETA:	mean abs: 2.97119617e-04	max abs: 3.79439490e-03
+               w_av:	mean abs: 2.96449280e-04	max abs: 3.69339623e-03
+           w_av ETA:	mean abs: 2.96115828e-04	max abs: 3.68707534e-03
+               vset:	mean abs: 3.55857462e-05	max abs: 3.88669905e-05
+           vset ETA:	mean abs: 3.55858743e-05	max abs: 3.88668086e-05
+            vset_av:	mean abs: 3.55930209e-05	max abs: 3.88597255e-05
+        vset_av ETA:	mean abs: 3.55931044e-05	max abs: 3.88595618e-05
+         wetdepo001:	mean abs: 4.61518299e-07	max abs: 3.10084833e-05
+     wetdepo001 ETA:	mean abs: 5.39635122e-07	max abs: 3.10087562e-05
+         drydepo001:	mean abs: 7.70252058e-07	max abs: 4.90112552e-06
+     drydepo001 ETA:	mean abs: 7.69361248e-07	max abs: 4.90110233e-06
+ Concentrations:		mean abs: 4.52393320e-05	max abs: 3.61609785e-03
+ Concentrations ETA:	mean abs: 4.52144060e-05	max abs: 3.61609808e-03
+ WET deposition:		mean abs: 6.11802410e-05	max abs: 2.14200709e-02
+ WET deposition ETA:	mean abs: 7.44685328e-05	max abs: 3.03334985e-02
+ DRY deposition:		mean abs: 9.38545093e-05	max abs: 2.49640574e-03
+ DRY deposition ETA:	mean abs: 9.37973320e-05	max abs: 2.47306679e-03

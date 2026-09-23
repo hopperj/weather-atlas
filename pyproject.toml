@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=82"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "weather-platform"
+version = "0.1.0"
+description = "Self-hosted ECCC weather model ingestion and map services"
+requires-python = ">=3.13"
+dependencies = [
+  "cdsapi==0.7.7",
+  "eccodes==2.47.0",
+  "fastapi==0.139.2",
+  "httpx==0.28.1",
+  "netCDF4==1.7.4",
+  "numpy==2.5.1",
+  "pydantic==2.13.4",
+  "prometheus-client==0.25.0",
+  "psycopg[binary,pool]==3.3.4",
+  "pyproj==3.7.2",
+  "PyYAML==6.0.3",
+  "redis==8.0.1",
+  "rio-tiler==9.4.0",
+  "titiler.core==2.0.5",
+  "uvicorn[standard]==0.51.0",
+]
+
+[project.optional-dependencies]
+mcd64a1 = [
+  "pyhdf==0.11.7",
+]
+
+[project.scripts]
+weather-ingest = "weather_ingest.cli:main"
+
+[dependency-groups]
+dev = [
+  "pyhdf==0.11.7",
+  "pytest==9.1.1",
+  "pytest-cov>=7.0.0",
+  "ruff>=0.15.0",
+]
+
+[tool.setuptools]
+package-dir = {"" = "python"}
+
+[tool.setuptools.packages.find]
+where = ["python"]
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+pythonpath = ["python"]
+testpaths = ["tests", "airflow/tests"]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]

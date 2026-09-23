@@ -1,0 +1,21 @@
+{
+  "source": "OpenAlex",
+  "api": "https://api.openalex.org/works",
+  "retrieved_on": "2026-07-20",
+  "query_semantics": "OpenAlex search (full-text search at retrieval time)",
+  "searches": {
+    "FLEXPART": {
+      "query": "FLEXPART",
+      "retrieved_rows": 4309,
+      "core_or_named_application": 292,
+      "fulltext_mention": 4017
+    },
+    "HYSPLIT": {
+      "query": "HYSPLIT",
+      "retrieved_rows": 14017,
+      "core_or_named_application": 404,
+      "fulltext_mention": 13613
+    }
+  },
+  "combined_deduplicated_rows": 17629
+}

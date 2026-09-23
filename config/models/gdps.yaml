@@ -1,0 +1,54 @@
+version: 1
+code: gdps
+provider: eccc
+kind: forecast
+enabled: true
+adapter: gdps
+source_producers: [GDPS]
+domains:
+  - code: global
+    name: Global latitude-longitude grid
+    resolution: 15km
+    grid: LatLon0.15
+    grid_width: 2400
+    grid_height: 1201
+run_hours_utc: [0, 12]
+forecast_hours:
+  segments:
+    - start: 0
+      end: 84
+      step: 1
+    - start: 87
+      end: 240
+      step: 3
+discovery:
+  mode: https_listing
+  base_url: https://dd.weather.gc.ca/
+  today_path: today/model_gdps/{resolution}/{run_hour}/{forecast_hour}/
+  archive_path: >-
+    {run_date}/WXO-DD/model_gdps/{resolution}/{run_hour}/{forecast_hour}/
+  operational_mode: amqps_required
+  late_arrival_grace_minutes: 300
+  retry_window_hours: 18
+  # GDPS publishes 00Z and 12Z cycles progressively. Sarracenia receives each
+  # object immediately; this bounded reconciliation pass drains and repairs the
+  # catalogue every 15 minutes while a cycle is arriving.
+  reconciliation_schedule: "*/15 * * * *"
+  maximum_objects_per_run: 128
+limits:
+  maximum_parallel_downloads: 4
+  maximum_objects_per_manual_run: 64
+  # Docker Desktop reports the container-visible allocation, not the free
+  # capacity of the host archive volume. Keep a conservative 10 GiB reserve.
+  minimum_free_bytes: 10737418240
+retention:
+  raw_days: 30
+  processed_days: 365
+  retain_forever: true
+visibility:
+  required_field_codes: [air_temperature_2m]
+estimates:
+  processed_to_raw_ratio: 1.15
+variable_config_files:
+  - variables/deterministic_atmospheric.yaml
+  - variables/deterministic_precipitation.yaml

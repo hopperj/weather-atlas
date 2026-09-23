@@ -1,0 +1,10 @@
+schema_version: 1
+scenario_name: operational_latest_atlantic_canada
+description: Feature-gated Atlantic Canada research smoke forecast
+bbox: [-70.0, 40.0, -52.0, 55.0]
+species: [PM25, CO, BC]
+uncertainty: central
+grid_spacing_degrees: 0.5
+particle_budget: 300000
+random_seed: 20260722
+fire_weather_mode: automatic_cwfis

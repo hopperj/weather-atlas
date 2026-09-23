@@ -1,0 +1,64 @@
+schema_version: 1
+protocol_id: cffeps-flexpart-successor-holdout-2026-v1
+status: frozen
+holdout_output_opened: false
+selection_firewall:
+  observed_magnitudes_used_for_selection: false
+  model_output_used_for_selection: false
+  reference_inventory_used_to_seed_model: false
+bootstrap:
+  event_seed: 2026072601
+  event_station_seed: 2026072602
+  repetitions: 2000
+evaluations:
+  w2_gfas_source:
+    primary_unit: grid_cell_day
+    species: [PM25, CO, BC]
+    minimum_pairs: 20
+    normalized_mean_bias: {minimum: -0.75, maximum: 2.0}
+    pearson_correlation: {minimum: 0.30}
+    fraction_within_factor_two: {minimum: 0.25}
+    operators:
+      central: domain_active_union_v1
+      like_for_like: independent_event_support_v1
+      sensitivity: independent_event_support_chebyshev_one_cell_v1
+  w3_vertical_plume:
+    primary_unit: fire_overpass
+    minimum_pairs: 10
+    mean_bias_m: {minimum: -1000, maximum: 1000}
+    root_mean_square_error_m: {maximum: 2000}
+    pearson_correlation: {minimum: 0.40}
+    observation_operator: misr_minx_wind_corrected_median_agl_v1
+    model_operator: flexpart_polygon_area_linear_time_mass_weighted_agl_v1
+    maximum_time_offset_minutes: 90
+    upper_statistic: misr_p95_vs_flexpart_95pct_mass_top
+  w4_surface_pm25:
+    primary_unit: final_naps_station_hour
+    minimum_pairs: 100
+    normalized_mean_bias: {minimum: -0.30, maximum: 0.30}
+    normalized_mean_absolute_error: {maximum: 0.50}
+    pearson_correlation: {minimum: 0.40}
+    observation_operator: naps_same_utc_hour_median_background_v1
+    sensitivity_background: naps_same_utc_hour_p20_background_v1
+    background_window_days_each_side: 14
+    minimum_background_values: 7
+    model_operator: flexpart_0_50m_containing_cell_exact_interval_end_v1
+    minimum_model_signal_ug_m3: 0.01
+invalidation:
+  permitted:
+    - corrupt_or_checksum_mismatched_input
+    - missing_preregistered_input
+    - software_or_infrastructure_failure_before_valid_output
+    - whole_output_verification_failure
+  prohibited:
+    - poor_model_performance
+    - unfavourable_observation
+    - post_hoc_operator_change
+    - post_hoc_event_or_station_removal
+claims:
+  permitted:
+    - Results apply to the frozen cohorts, operators, release, and uncertainty cases.
+    - Central failures remain failures even when a sensitivity passes.
+  prohibited:
+    - Scientific acceptance before every gate and both final reviews pass.
+    - Operational or public-health fitness beyond the evaluated domains and periods.

@@ -1,0 +1,7 @@
+# FROM docker.io/mambaorg/micromamba:latest
+FROM ghcr.io/mamba-org/micromamba:latest
+# There is no specific version that does not work, so we use the latest at 3.9
+LABEL maintainer="Flexpart Developers"
+# Install dependencies
+RUN micromamba install -y -n base -c conda-forge python==3.9.* netcdf4 numpy pandas scipy && \
+    micromamba clean --all --yes

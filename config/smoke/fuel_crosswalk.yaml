@@ -1,0 +1,22 @@
+schema_version: 1
+crosswalk_version: cwfis-fbp-v1
+fallback: reject
+rules:
+  C1: C1
+  C2: C2
+  C3: C3
+  C4: C4
+  C5: C5
+  C6: C6
+  C7: C7
+  D1: D1
+  D2: D1
+  M1: M1
+  M2: M2
+  M3: M3
+  M4: M4
+  S1: S1
+  S2: S2
+  S3: S3
+  O1A: O1a
+  O1B: O1b

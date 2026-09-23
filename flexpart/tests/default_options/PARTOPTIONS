@@ -1,0 +1,42 @@
+***************************************************************************************************************
+*                                                                                                             *
+*      Input file for the Lagrangian particle dispersion model FLEXPART                                       *
+*                           Please select which fields you would like to print in the partoutput files        *
+*                                                                                                             *
+***************************************************************************************************************
+&PARTOPTIONS
+  LONGITUDE=              .true., ! 
+  LONGITUDE_AVERAGE=      .true., !
+  LATITUDE=               .true., !
+  LATITUDE_AVERAGE=       .true., !
+  HEIGHT=                 .true., !
+  HEIGHT_AVERAGE=         .true., !
+  PV=                     .true., !
+  PV_AVERAGE=             .true., !
+  QV=                     .true., !
+  QV_AVERAGE=             .true., !
+  DENSITY=                .true., !
+  DENSITY_AVERAGE=        .true., !
+  TEMPERATURE=            .true., !
+  TEMPERATURE_AVERAGE=    .true., !
+  PRESSURE=               .true., !
+  PRESSURE_AVERAGE=       .true., !
+  MIXINGHEIGHT=           .true., !
+  MIXINGHEIGHT_AVERAGE=   .true., !
+  TROPOPAUSE=             .true., !
+  TROPOPAUSE_AVERAGE=     .true., !
+  TOPOGRAPHY=             .true., !
+  TOPOGRAPHY_AVERAGE=     .true., !
+  MASS=                   .true., !
+  MASS_AVERAGE=           .true., !
+  U=                      .true., !
+  U_AVERAGE=              .true., !
+  V=                      .true., !
+  V_AVERAGE=              .true., !
+  W=                      .true., !
+  W_AVERAGE=              .true., !
+  VSETTLING=              .true., !
+  VSETTLING_AVERAGE=      .true., !
+  WETDEPOSITION=          .true., !
+  DRYDEPOSITION=          .true.,
+  /

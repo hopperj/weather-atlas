@@ -1,0 +1,48 @@
+schema_version: 2
+threshold_version: smoke-validation-2026-current-year-v1
+protocol_id: cffeps-flexpart-external-validation-2026-07-24-v3
+protocol_path: docs/smoke-validation-protocol-2026-v3-amendment.md
+frozen_at: '2026-07-24T12:56:13Z'
+# CFFEPS finite-window queue-accounting amendment only; all evaluation gates
+# are unchanged from validation_2026.yaml.
+evaluations:
+  gfas_inventory:
+    assessment_role: diagnostic_inventory_intercomparison
+    acceptance_capable: false
+    reference_source: CAMS GFAS v1.4.2 analysis fire-emission flux product
+    units: kilograms species per matched UTC grid-cell day
+    criteria:
+      pair_count: {minimum: 20}
+      normalized_mean_bias: {minimum: -0.75, maximum: 2.0}
+      pearson_correlation: {minimum: 0.3}
+      fraction_within_factor_two: {minimum: 0.25}
+  tropomi_aerosol_mid_height:
+    assessment_role: diagnostic_vertical_intercomparison
+    acceptance_capable: false
+    reference_source: Sentinel-5P TROPOMI OFFL L2 AER_LH aerosol_mid_height
+    units: metres above local ground
+    criteria:
+      pair_count: {minimum: 20}
+      mean_bias: {minimum: -1500, maximum: 1500}
+      root_mean_square_error: {maximum: 2500}
+      pearson_correlation: {minimum: 0.3}
+  airnow_pm25:
+    assessment_role: provisional_independent_surface_observation_test
+    acceptance_capable: false
+    reference_source: AirNow hourly raw PM2.5 observations
+    units: micrograms per cubic metre smoke enhancement
+    criteria:
+      pair_count: {minimum: 100}
+      normalized_mean_bias: {minimum: -0.30, maximum: 0.30}
+      normalized_mean_absolute_error: {maximum: 0.50}
+      pearson_correlation: {minimum: 0.40}
+  aqs_pm25:
+    assessment_role: provisional_regulatory_surface_observation_test
+    acceptance_capable: false
+    reference_source: US EPA AQS hourly PM2.5 88101 and 88502
+    units: micrograms per cubic metre smoke enhancement
+    criteria:
+      pair_count: {minimum: 100}
+      normalized_mean_bias: {minimum: -0.30, maximum: 0.30}
+      normalized_mean_absolute_error: {maximum: 0.50}
+      pearson_correlation: {minimum: 0.40}

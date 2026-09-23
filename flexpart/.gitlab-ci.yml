@@ -1,0 +1,267 @@
+stages:
+  - images
+  - build
+  - test
+  - compare
+  - container
+
+variables:
+  # could be changed to depending on the containers available
+  IMAGE_TAG: "latest"
+  # 9 or 8 assume the latest of the major version
+  # 9.1 or 8.2 is more specific
+  OS_VERSION: "9"
+  PY_VERSION: "3.9"
+
+base:
+  stage: images
+  image: quay.io/podman/stable
+  rules:
+    - changes:
+      - tests/Dockerfile
+    - if: '$CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME == "development"'
+  script:
+    - podman build -t "registry.phaidra.org/flexpart/flexpart/rockylinux${OS_VERSION}:$(date +"v%Y.%m")" -t "registry.phaidra.org/flexpart/flexpart/rockylinux${OS_VERSION}:${IMAGE_TAG}" --build-arg RL_RELEASE=$OS_VERSION -f ./tests/Dockerfile
+    - podman login registry.phaidra.org -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+    - podman push "registry.phaidra.org/flexpart/flexpart/rockylinux${OS_VERSION}:${IMAGE_TAG}"
+    - podman push "registry.phaidra.org/flexpart/flexpart/rockylinux${OS_VERSION}:$(date +"v%Y.%m")"
+
+post:
+  stage: images
+  image: quay.io/podman/stable
+  rules:
+    - changes: 
+      - tests/Dockerfile.python
+    - if: '$CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_REF_NAME == "development"'
+  script:
+    - podman build -t "registry.phaidra.org/flexpart/flexpart/python${PY_VERSION}:$(date +"v%Y.%m")" -t "registry.phaidra.org/flexpart/flexpart/python${PY_VERSION}:${IMAGE_TAG}" -f ./tests/Dockerfile.python
+    - podman login registry.phaidra.org -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+    - podman push "registry.phaidra.org/flexpart/flexpart/python${PY_VERSION}:$(date +"v%Y.%m")" 
+    - podman push "registry.phaidra.org/flexpart/flexpart/python${PY_VERSION}:${IMAGE_TAG}"
+
+rocky-build:
+  stage: build
+  image: registry.phaidra.org/flexpart/flexpart/rockylinux${OS_VERSION}:${IMAGE_TAG}
+  rules:
+    - changes:
+        - src/*
+        - tests/*
+    - if: '$CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"'
+  script:
+    - export FC=gfortran
+    - export LIBRARY_PATH=/usr/lib64:/usr/local/lib64
+    - export CPATH=/usr/include:/usr/local/include:/usr/lib64/gfortran/modules
+    - codes_info -v
+    - nc-config --version
+    - nf-config --version
+    - h5dump --version
+    - make -j -C src -f makefile_gfortran eta=no arch=x86-64
+    - make -j -C src -f makefile_gfortran arch=x86-64
+  artifacts:
+    when: on_success
+    paths:
+      - ./src/FLEXPART
+      - ./src/FLEXPART_ETA
+    expire_in: 30 mins
+
+setup:
+  stage: test
+  image: registry.phaidra.org/flexpart/flexpart/rockylinux${OS_VERSION}:${IMAGE_TAG}
+  needs:
+    - rocky-build
+  artifacts:
+    paths:
+      - tests/testdata/
+    expire_in: 30 min
+    when: on_success
+  script:
+    - mkdir tests/testdata/
+    - wget -r -nH --cut-dirs=2 --no-parent --reject="index.html*" --accept="EC2009*" -P tests/testdata/ "https://webdata.wolke.img.univie.ac.at/flexpart/"
+
+options-test:
+  image: registry.phaidra.org/flexpart/flexpart/rockylinux${OS_VERSION}:${IMAGE_TAG}
+  stage: test
+  needs:
+    - rocky-build
+    - setup
+
+  script:
+    - ulimit -s unlimited
+    - bash ./tests/run_default_options_test.sh
+  artifacts:
+    when: on_success
+    paths:
+      - ./tests/output_settling
+      - ./tests/output_bkw
+      - ./tests/output_settling_eta
+      - ./tests/output_bkw_eta
+    expire_in: 10 mins
+
+nests-test:
+  image: registry.phaidra.org/flexpart/flexpart/rockylinux${OS_VERSION}:${IMAGE_TAG}
+  stage: test
+  when: manual
+  needs:
+    - rocky-build
+    - setup
+
+  script:
+    - ulimit -s unlimited
+    - bash ./tests/run_nests_test.sh
+  artifacts:
+    when: on_success
+    paths:
+      - ./tests/output_nests
+    expire_in: 10 mins
+
+openmp-simulation:
+  stage: test
+  image: registry.phaidra.org/flexpart/flexpart/rockylinux${OS_VERSION}:${IMAGE_TAG}
+  needs:
+    - rocky-build
+    - setup
+
+  script:
+    - ulimit -s unlimited
+    - bash ./tests/run_openmp_test.sh
+
+  artifacts:
+    when: on_success
+    paths:
+      - ./tests/output_omp1
+      - ./tests/output_omp32
+      - ./tests/output_omp1_eta
+      - ./tests/output_omp32_eta
+    expire_in: 10 mins
+
+etex-simulation:
+  stage: test
+  image: registry.phaidra.org/flexpart/flexpart/rockylinux${OS_VERSION}:${IMAGE_TAG}
+  when: manual
+  needs:
+    - rocky-build
+    - setup
+
+  script:
+    - wget -r -nH --cut-dirs=2 --no-parent --reject="index.html*" --accept="EC1994*" -P tests/testdata/ "https://webdata.wolke.img.univie.ac.at/flexpart/"
+    - ulimit -s unlimited
+    - bash ./tests/run_etex_test.sh
+
+  artifacts:
+    when: on_success
+    paths:
+      - ./tests/output_etex
+    expire_in: 10 mins
+
+settling-test:
+  image: registry.phaidra.org/flexpart/flexpart/python${PY_VERSION}:${IMAGE_TAG}
+  stage: compare
+  needs:
+    - job: options-test
+      artifacts: true
+  script:
+    - cd ./tests/
+    - python3 ./settling_test.py
+  artifacts:
+    when: always
+    paths:
+      - ./tests/settling_test.txt
+    expire_in: never
+
+bkw-test:
+  image: registry.phaidra.org/flexpart/flexpart/python${PY_VERSION}:${IMAGE_TAG}
+  stage: compare
+  needs:
+    - job: options-test
+      artifacts: true
+  script:
+    - cd ./tests/
+    - python3 ./bkw_test.py
+  artifacts:
+    when: always
+    paths:
+      - ./tests/bkw_test.txt
+    expire_in: never
+
+openmp-test:
+  image: registry.phaidra.org/flexpart/flexpart/python${PY_VERSION}:${IMAGE_TAG}
+  stage: compare
+  needs:
+    - job: openmp-simulation
+      artifacts: true
+  script:
+    - cd ./tests/
+    - python3 ./openmp_test.py
+
+etex-test:
+  image: registry.phaidra.org/flexpart/flexpart/python${PY_VERSION}:${IMAGE_TAG}
+  stage: compare
+  needs:
+    - job: etex-simulation
+      artifacts: true
+  script:
+    - cd ./tests/
+    - python3 ./etex_test.py
+  artifacts:
+    when: on_success
+    paths:
+      - ./tests/etex_test.txt
+    expire_in: never
+
+documentation:
+  image: registry.phaidra.org/imgw/computer-resources:latest
+  stage: build
+  rules:
+    - changes: 
+      - documentation/**/*
+    - if: '$CI_COMMIT_REF_NAME == "master"'
+  script:
+    - cd ./documentation && mkdocs build -c --verbose
+    - sshpass -p "$WOLKE_PASSWORD" rsync -autv --delete -e "ssh -o StrictHostKeyChecking=no" /tmp/cr-site/* "$WOLKE_USER@wolke.img.univie.ac.at:/var/www/flexpart/docs"
+
+ford:
+  image: docker.io/library/python:3.10-alpine
+  stage: build
+  rules:
+    - changes:
+      - src/*
+    - if: '$CI_COMMIT_REF_NAME == "master"'
+  script:
+    - apk add --update --no-cache openssh sshpass rsync
+    - pip install --no-cache-dir ford
+    - |
+      cat > project.md <<EOF
+      ---
+      project: FLEXPART
+      author: FLEXPART community
+      ---
+
+      This is an automated documentation build from the Fortran source code.
+      EOF
+    - ford project.md -o ./ford
+    - sshpass -p "$WOLKE_PASSWORD" rsync -autv --delete -e "ssh -o StrictHostKeyChecking=no" ./ford/* "$WOLKE_USER@wolke.img.univie.ac.at:/var/www/flexpart/ford"
+
+
+flexpart:
+  stage: container
+  image: quay.io/podman/stable
+  when: manual
+  variables:
+    MAJOR_VERSION: "v11"
+  script:
+    - podman build -t "registry.phaidra.org/flexpart/flexpart/flexpart${MAJOR_VERSION}-${CI_COMMIT_REF_NAME}-${OS_VERSION}:${CI_COMMIT_SHA:0:8}" --build-arg COMMIT=${CI_COMMIT_SHA:0:8} --build-arg OS_VERSION=${OS_VERSION} --build-arg IMAGE_TAG=${IMAGE_TAG} -f ./containers/Dockerfile .
+    - podman login registry.phaidra.org -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD 
+    - podman push "registry.phaidra.org/flexpart/flexpart/flexpart${MAJOR_VERSION}-${CI_COMMIT_REF_NAME}-${OS_VERSION}:${CI_COMMIT_SHA:0:8}"
+    - podman push "registry.phaidra.org/flexpart/flexpart/flexpart${MAJOR_VERSION}-${CI_COMMIT_REF_NAME}-${OS_VERSION}:${CI_COMMIT_SHA:0:8}" "registry.phaidra.org/flexpart/flexpart/flexpart${MAJOR_VERSION}-${CI_COMMIT_REF_NAME}-${OS_VERSION}:${IMAGE_TAG}"
+
+flexpart-legacy:
+  stage: container
+  image: quay.io/podman/stable
+  when: manual
+  variables:
+    MAJOR_VERSION: "v10"
+  script:
+    - podman build -t "registry.phaidra.org/flexpart/flexpart/flexpart${MAJOR_VERSION}-master-8:latest"  -f ./containers/Dockerfile.v10.4 .
+    - podman login registry.phaidra.org -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD 
+    - podman push "registry.phaidra.org/flexpart/flexpart/flexpart${MAJOR_VERSION}-master-8:latest"
+  

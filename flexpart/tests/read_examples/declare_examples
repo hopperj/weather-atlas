@@ -1,0 +1,109 @@
+#!/bin/bash
+
+
+#group 1 (6+2*1=8) IOUT=3 double output
+#declare -a  examples1=('1-1_1' '1-2_2' '1-3_3' '1-4_3')
+#declare -a  units1=('conc' 'pptv' 'conc' 'pptv')
+#declare -a  examples1=('1-1' '1-2' '1-3' '1-3' '1-5')
+#declare -a  examples1=('1-1_1' '1-2_2' '1-3_3' '1-3_3' '1-5_5')
+#declare -a  examples1=('1-1_1' '1-2_2' '1-3_3' '1-3_3' '1-5_5' '1-5_9' '1-5_10' '1-5_11')
+#declare -a  units1=('conc' 'pptv' 'conc' 'pptv' 'conc')
+declare -a examples1=('1-1_1' '1-2_2' '1-3_3' '1-3_3' '1-5_5' '1-6_9' '1-7_10' '1-8_11')
+declare -a    units1=('conc'  'pptv'  'conc'  'pptv'  'conc'   'conc'     'pptv'      'pptv')
+declare -a   format1=('cm'    'cm'    'cm'    'cm'    'cm'     'nc'    'nc'     'nc')
+declare -a   filens1=('cm'    'cm'    'cm'    'cm'    'cm'     'grid_conc_20120101060000.nc'    'grid_conc_20120101060000.nc'     'grid_conc_20120101060000.nc')
+
+#group 2
+#declare -a  examples2=('2-1_bwd' '2-2_bwd5')
+#declare -a  units2=('time' 'time')
+#group 2 (3)
+declare -a  examples2=('2-1_bwd' '2-2_bwd5' '2-3_bwd_nc')
+declare -a  units2=('time' 'time' 'time')
+declare -a  format2=('cm' 'cm' 'nc')
+declare -a  filens2=('cm' 'cm' 'grid_time_20120101120000.nc')
+
+
+#group 3 (3)
+declare -a  examples3=('3-part1' '3-part2' '3-part_bwd1')
+#declare -a  examples3=('3-1_part' '3-2_part_end' '3-3_part_bwd')
+#declare -a  units3=('part' 'part' 'part')
+declare -a  units3=('20120101100000' 'end' '20120101080000')
+declare -a  format3=('part' 'part' 'part')
+declare -a  filens3=('part' 'part' 'part')
+
+
+#group 4 (6)
+declare -a examples4=('4-1_ind_1_2' '4-2_ind_2_1' '4-3_ind_2_2' '4-4_bwd_ind_1_2' '4-5_bwd_ind_2_1' '4-6_bwd_ind_2_2' )
+declare -a    units4=('conc'         'conc'        'conc'        'time'           'time'            'time')
+declare -a   format4=('cm' 'cm' 'cm' 'cm' 'cm' 'cm')
+declare -a   filens4=('cm' 'cm' 'cm' 'cm' 'cm' 'cm')
+
+
+#group 5 (4)
+#declare -a  examples5=('5-1_specNO' '5-2_specAERO-TRACE' '5-3_specCO' '5-4_specBC' '5-5_bwd_specNO' )
+#declare -a     units5=('conc'       'conc'               'conc'       'conc'       'time')
+declare -a  examples5=('5-1_specNO' '5-2_specCO' '5-3_specAERO-TRACE' '5-4_specBC' )
+declare -a  units5=('conc' 'conc' 'conc'  'conc')
+declare -a    format5=('cm' 'cm' 'cm' 'cm')
+declare -a    filens5=('cm' 'cm' 'cm' 'cm')
+
+#group 6 (6)
+declare -a  examples6=('6-1_nested' '6-2_nested_mr'  '6-3_nested_bwd' '6-4_nested_nc' '6-5_nested_mr_nc' '6-6_nested_bwd_nc')
+declare -a  units6=('conc' 'pptv'  'time'  'conc' 'pptv' 'time')
+#declare -a  examples6=('6-1_nested' '6-2_nested_bwd' '6-3_nested1' '6-4_nested1_bwd' )
+#declare -a     units6=('conc'        'time'           'conc'        'time')
+declare -a    format6=('cm' 'cm' 'cm' 'nc' 'nc' 'nc')
+declare -a    filens6=('cm' 'cm' 'cm' 'grid_conc_20120101060000_nest.nc' 'grid_conc_20120101060000.nc' 'grid_time_20120101120000_nest.nc')
+
+#group 7 (1)
+declare -a  examples7=('7-1_DOMAINFILL')
+declare -a  units7=('conc')
+declare -a  format7=('cm')
+declare -a  filens7=('cm')
+
+
+#group 8 (3)
+#options_8-1_init_cond/
+#options_8-2_init_cond_surf/
+#options_8-3_init_cond_ind_2_1/
+#options_8-4_init_cond_ind_1_2/
+#options_8-5_init_cond_ind_2_2/
+#declare -a  examples8=('8-1_init_cond' '8-2_init_cond_surf' '8-3_init_cond_ind_2_1' '8-4_init_cond_ind_1_2' '8-5_init_cond_ind_2_2' )
+#declare -a  units8=('time' 'time' 'time'  'time' 'time')
+declare -a  examples8=('8-1_init_cond' '8-2_init_cond_surf' '8-3_init_cond_ind_2_1' )
+#declare -a  examples8=('8-1_init_cond' '8-2_init_cond_ind_1_2'  '8-3_init_cond_surf' )
+declare -a  units8=('time' 'time' 'time' )
+declare -a  format8=('cm' 'cm' 'cm')
+declare -a  filens8=('cm' 'cm' 'cm')
+
+#suffix=_8-1_init_cond
+#suffix=_8-2_init_cond_surf
+#suffix=_8-3_init_cond_ind_2_1
+
+#group 9 (2)
+#output_9-1_CBLFLAG/
+#output_9-2_CBLFLAG_bwd/
+declare -a  examples9=('9-1_CBLFLAG' '9-2_CBLFLAG_bwd')
+declare -a  units9=('conc' 'time')
+declare -a  format9=('cm' 'cm')
+declare -a  filens9=('cm' 'cm')
+
+#group 10 (2)
+declare -a  examples10=('10-1_bwd_ind_1_3' '10-2_bwd_ind_1_4')
+declare -a  units10=('wetdep' 'drydep')
+declare -a  filens10=('cm' 'cm')
+declare -a  format10=('cm' 'cm')
+#declare -a  format10=('cmd' 'cmd')
+
+#group 11 (1)
+declare -a  examples11=('11-1_Volc')
+declare -a  units11=('conc')
+declare -a  format11=('cm')
+declare -a  filens11=('cm')
+
+
+
+#examples=("${examples1[@]}" "${examples2[@]}" "${examples4[@]}" "${examples5[@]}" "${examples6[@]}" "${examples7[@]}" "${examples8[@]}" "${examples9[@]}")
+#   units=("${units1[@]}"    "${units2[@]}"    "${units4[@]}"    "${units5[@]}"    "${units6[@]}"    "${units7[@]}"    "${units8[@]}"    "${units9[@]}" )
+
+

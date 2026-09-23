@@ -1,0 +1,8 @@
+{
+  "station_ids": ["CAAW", "CABB", "CABR", "CACP", "CACQ", "CADN", "CYHZ", "CWSS", "CYYG", "CYFC", "CYQM", "CYYT"],
+  "maximum_stations": 128,
+  "maximum_report_bytes": 262144,
+  "maximum_inbox_reports": 500,
+  "minimum_free_bytes": 1073741824,
+  "history_hours": 6
+}

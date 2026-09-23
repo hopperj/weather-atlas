@@ -1,0 +1,12 @@
+
+configure the path to netcdf in makefile
+and build
+
+make 
+
+equivalent to 
+
+make printgrid
+make printgrid_netcdf
+make printpart
+

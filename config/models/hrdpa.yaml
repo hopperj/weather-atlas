@@ -1,0 +1,53 @@
+version: 1
+code: hrdpa
+provider: eccc
+kind: analysis
+enabled: true
+adapter: hrdpa
+source_producers: [HRDPA, HRDPA-Prelim]
+source_formats: [grib2]
+domains:
+  - code: continental
+    name: Pan-Canadian high-resolution precipitation-analysis grid
+    resolution: 2.5km
+    grid: RLatLon0.0225
+    grid_width: 2538
+    grid_height: 1288
+run_hours_utc: [0, 6, 12, 18]
+# Analysis products have no forecast lead. Zero is the transport's PT0H marker;
+# the filename timestamp is the accumulation valid/end time.
+forecast_hours:
+  start: 0
+  end: 0
+  step: 1
+analysis_timing:
+  reference_time_semantics: valid_time
+  interval_end_semantics: reference_time
+  accumulations:
+    - hours: 6
+      valid_hours_utc: [0, 6, 12, 18]
+    - hours: 24
+      valid_hours_utc: [6, 12]
+discovery:
+  mode: https_listing
+  base_url: https://dd.weather.gc.ca/
+  today_path: today/model_hrdpa/{resolution}/{run_hour}/
+  archive_path: >-
+    {run_date}/WXO-DD/model_hrdpa/{resolution}/{run_hour}/
+  operational_mode: amqps_required
+  late_arrival_grace_minutes: 480
+  retry_window_hours: 18
+limits:
+  maximum_parallel_downloads: 2
+  maximum_objects_per_manual_run: 8
+  minimum_free_bytes: 10737418240
+retention:
+  raw_days: 30
+  processed_days: 180
+  retain_forever: true
+visibility:
+  required_field_codes: [precipitation_6h_preliminary]
+estimates:
+  processed_to_raw_ratio: 1.15
+variable_config_files:
+  - variables/precipitation_analysis.yaml

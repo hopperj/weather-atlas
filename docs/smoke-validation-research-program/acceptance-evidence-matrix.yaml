@@ -1,0 +1,240 @@
+schema_version: 1
+program_id: cffeps-flexpart-acceptance-program-v1
+created_at: '2026-07-24'
+status: in_progress
+starting_assessment:
+  status: not_accepted
+  path: /Volumes/BigMrStorage/weatherapp_data/weather/derived/smoke/validation/experiments/gfas-v1.4.2-2026-03-19_2026-05-31/candidates/march-may-2026-mcd64a1-central-v4/attempt-001/verification/scientific-acceptance-status-v2.json
+rules:
+  future_holdout_output_opened: false
+  production_unlock_authorized: false
+  prior_failed_results_are_immutable: true
+  calibration_must_use_separate_training_data: true
+workstreams:
+  representative_event_population:
+    id: W1
+    status: in_progress_pending_gfas_retrieval_and_independent_review
+    started_at: '2026-07-24'
+    research_notebook: progress/2026-07-24-input-only-cohort-inventory.md
+    current_evidence:
+      input_only_inventory_sha256: 916b1757e464d6c55e7c2fef94a74b510cc9a0bb3ec0d4c8419ed038aff24f4a
+      no_output_access_audit_sha256: 1ac449f2d1e4ec1c9c0adcc3a94ef964b52dfb497156519d6e50dd3904decbdb
+      firem3_2023_archive_sha256: e5475a66f76fd7a4fe6d8643d955761aeda0cdcffcbf7b39954e3e1dcc9a5334
+      firem3_2023_summary_sha256: 99c2a8c1dbf7b99727fec859897b07c1fdfba714dccd4ac51485a4020bd64a06
+      firem3_2023_product_period_status: local_complete
+      firem3_2023_perimeters_sha256: 787e398652ac6e35a2ecb5af2238c6cb06dc2729836d32466254efbd53bacda2
+      firem3_2023_perimeter_features: 1144
+      burned_area_2023_cmr_manifest_sha256: a788790a1d2fe4045840f0f77abf1b323393dcad440e8e4cea27cc55a2a81066
+      mcd64a1_v061_catalogued_granules: 138
+      vnp64a1_v002_catalogued_granules: 203
+      mcd64a1_v061_download_manifest_sha256: c5e15ca8d09b54ef6851ca051163c127589831b3b186cc2fdd995d353bcc1362
+      mcd64a1_v061_downloaded_granules: 138
+      vnp64a1_v002_download_manifest_sha256: 052a8ec90364a36588ff2e4ea78a81032cd2a167590e6a4be4a159cf15312763
+      vnp64a1_v002_downloaded_granules: 203
+      burned_area_pixels_downloaded: true
+      final_naps_pm25_2023_sha256: 9d87fd544c88bb42aa16aac092838e75bff65a624ffc670e6563a9adc036535a
+      surface_ledger_sha256: 30dbfefe3210ec78702768f9eba84c264e531e97cf3243c0ce8fe06ddee10cd0
+      surface_ledger_station_count: 231
+      surface_ledger_candidate_valid_hours: 951598
+      vertical_ledger_sha256: e77132958ee94c18e730f269b8391f6b8322b1e710975d81fbc4266b1b7f4b6c
+      vertical_ledger_independent_overpasses: 16
+      vertical_ledger_raw_minx_files: 114
+      source_event_snapshot_complete: true
+      source_event_count: 464
+      source_detection_count: 556111
+      source_events_sha256: 5de50a7f23a9abdca8fd3b9c21b05613476c87a4a49caa02f63b92802a77d358
+      source_event_report_sha256: c67f9e2074037845856109281d841a7c12b8d2ddc7faa25fb0f5a394135ee92d
+      mcd64a1_event_areas_sha256: 2a18e14bb2757775aa0f0c0c7f37aaf85e78ac55c7d5d22f6232f331716f61f4
+      burned_area_eligible_events: 54
+      burned_area_eligible_weak_events: 30
+      burned_area_eligible_moderate_events: 19
+      burned_area_eligible_major_events: 5
+      area_strata_design_passed: true
+      source_candidate_ledger_sha256: 69940bc97e74792a0aefd4a3e23e4728c1c6dc9686da96875f9ac229f1e5ca40
+      retained_source_events: 9
+      reserve_source_events: 6
+      retained_source_strata: {weak: 3, moderate: 3, major: 3}
+      retained_source_ecozones: 6
+      retained_source_fuel_families: 3
+      source_gfas_ledger_complete: false
+      historical_meteorology_complete: true
+      historical_gfs_ledger_sha256: 1331d36e1f0b8a3e20e9a165f85889225afed98edeb4d2c1e181dc917d72c3fc
+      historical_gfs_cycles: 102
+      historical_gfs_files: 918
+      historical_gfs_bytes: 40927328307
+      w1_progress_manifest_sha256: de80750bd88dfd46d6156b6d3004412e530a4f1db1f45a7d8417149997e895c4
+      gfas_v1_4_2_2023_portal_status: unavailable_outside_rolling_archive
+      gfas_v1_2_2023_ads_status: token_authenticated_retrieval_pending
+      no_performance_selection_reviewer_signed: false
+      event_level_inventory_complete: true
+    depends_on: []
+    acceptance_evidence:
+      weak_events_minimum: 3
+      moderate_events_minimum: 3
+      major_events_minimum: 3
+      ecozones_minimum: 2
+      fuel_families_minimum: 2
+      all_required_inputs_complete: true
+  gfas_source_reconciliation:
+    id: W2
+    status: planned
+    depends_on: [W1, W5]
+    acceptance_evidence:
+      original_domain_active_union_retained: true
+      like_for_like_operator_frozen_before_output: true
+      coverage_attribution_mass_closed: true
+      unexplained_gross_discrepancy: false
+  vertical_plume_validation:
+    id: W3
+    status: expanded_candidate_pool_complete_blocked_on_cohort_freeze_transport_and_independent_review
+    started_at: '2026-07-27'
+    research_notebook: progress/2026-07-27-w3-blind-observation-and-causal-emissions.md
+    expanded_research_notebook: progress/2026-07-27-w3-expanded-misr-2017-current.md
+    expanded_publication_update: w3-expanded-misr-publication-update-2026-07-27.md
+    reproduction_runbook: w3-reproduction-runbook-2026-07-27.md
+    artifact_data_dictionary: w3-artifact-data-dictionary-2026-07-27.md
+    current_evidence:
+      independent_plume_overpasses_minimum: 10
+      sample_size_gate_passed: false
+      observation_candidate_shortfall_resolved: true
+      physical_fire_clustering_complete: false
+      central_cohort_frozen: false
+      historical_meteorology_complete_for_central_cohort: false
+      causal_emissions_complete_for_central_cohort: false
+      future_information_exclusion_enforced: true
+      flexpart_outputs_opened_during_observation_qa: false
+      independent_observer_signoff_complete: false
+      formal_execution_permitted: false
+      original_16_case_cohort:
+        analysis_root: /Volumes/BigMrStorage/weatherapp_data/weather/derived/smoke/validation/readiness/cffeps-flexpart-successor-2026-v1/w3-blind-analysis
+        prospective_overpasses: 16
+        height_blind_file_selections: 15
+        frozen_observations: 6
+        causal_source_histories: 14
+        final_causal_cffeps_emission_histories: 13
+        minx_blind_qa_r2_sha256: 6f2ef2890e6f999be47b74f28e7c49e49c9045924c656332673caa7352b8d6dc
+        minx_observation_ledger_r1_sha256: 777c6e5f926b25f15f18357fc61a9ed0c5471b491542d6d04975f7b15db21013
+        minx_extraction_audit_r1_sha256: e0328527bb1317282f196144d8773e2aaf6ac234db7628c09e002013a8700bfd
+        causal_history_ledger_r1_sha256: de50536131b4526b6b49943b73dc52894474a7b6ec83a89449c1fc6f4e76b0d0
+        causal_emission_ledger_r2_sha256: 18c7a97be1c60c8bf724ea1df7e58853179341d093b6840a899b1dee961d6522
+        blinded_readiness_r3_sha256: 73d6ad2319af348417587a68729e16519249bcf4a4e8a39d65122f2c4e818104
+      expanded_candidate_pool:
+        analysis_root: /Volumes/BigMrStorage/weatherapp_data/weather/derived/smoke/validation/cohorts/w3-misr-merlin-2017-current-expanded-v1
+        requested_interval: 2017-01-01/2026-07-27
+        merlin_record_years: [2017, 2018]
+        provider_orbits: 78
+        downloaded_minx_files: 772
+        prospective_fire_overpass_families: 388
+        height_blind_file_selections: 386
+        observation_qualified_candidates: 109
+        firem3_complete_candidates: 109
+        source_area_qualified_candidates: 88
+        source_area_qualified_unique_orbits: 37
+        source_area_qualified_distinct_dates: 34
+        source_area_qualified_area_strata: {weak: 5, moderate: 28, major: 55}
+        selected_bands: {blue: 85, red: 3}
+        candidate_csv_sha256: c5a03a41e5f51753359e08ecf570a706d6a59a81b6bbf1c27c1a4026ded11ffc
+        expanded_vertical_ledger_sha256: b60e63d632ef62b13ba09868c800f019ed2d298a9193cca5fd9cad63fb7a2319
+        expanded_blind_qa_sha256: 13cc373ef3dc97077304bd7514b30d8d78edf859a217cccc8de8bd198e2b406c
+        expanded_extraction_audit_sha256: 614b351ab7970cbe9ad3c3cd9e694f8fd4833c57167af55f3bb7f582eff66e1d
+        expanded_assignment_r2_sha256: ed3250b14fcf64ddc4ed58e530a687948a11949be9ef3a9c52f4fd0937b13b34
+        expanded_candidate_readiness_sha256: e644123a5c0a40cfd487b1581fd26103194399e68f3a28e0abf8ee11a96cbdb1
+      source_snapshot_limitation: workspace_has_no_git_commit; rerun under one immutable source identity before publication
+    depends_on: [W1, W5]
+    acceptance_evidence:
+      independent_plume_overpasses_minimum: 10
+      mean_bias_m_minimum: -1000
+      mean_bias_m_maximum: 1000
+      rmse_m_maximum: 2000
+      pearson_correlation_minimum: 0.4
+  surface_pm25_validation:
+    id: W4
+    status: planned
+    depends_on: [W1, W5]
+    acceptance_evidence:
+      final_naps_station_hours_minimum: 100
+      normalized_mean_bias_minimum: -0.3
+      normalized_mean_bias_maximum: 0.3
+      normalized_mean_absolute_error_maximum: 0.5
+      pearson_correlation_minimum: 0.4
+  thread_deposition_numerics:
+    id: W5
+    status: technical_complete_awaiting_independent_review
+    started_at: '2026-07-24'
+    research_notebook: progress/2026-07-24-thread-deposition-investigation.md
+    current_evidence:
+      baseline_sha256: d5c705e22cbb311432ce69d41d06c48ef90833f67e02ff33e74d846348c03b62
+      thread_reproduction_matrix_sha256: cc5fdfe816c1e17a4e7a37f3e0c9992de9325285ef3f96a78e626e1ad706a1d4
+      one_thread_deterministic_reproduction: true
+      one_thread_replicates: 3
+      one_thread_nonfinite_wet_deposition_values_per_replicate: 2
+      threads_2_4_8_outputs_finite_nonnegative: true
+      internal_nan_counter_sufficient_explanation: false
+      dedicated_wet_scratch_diagnostic_manifest_sha256: 97cd7a94ccbd875e24f8c94af120868bc22b1fb372ae422e1ffda5e1d076c011
+      dedicated_wet_scratch_hypothesis_supported: false
+      cbl_grid_causal_trace_manifest_sha256: a6cae7b9407bbce09e9936db6aead9283060d9325ea7aeb6b883dc285179217e
+      first_output_contamination_path_identified: true
+      failed_cbl_recovery_identified: true
+      zero_skew_recovery_hypothesis_tested: true
+      upstream_causal_correction_verified: true
+      causal_intervention_build_manifest_sha256: bf3a8a3e4d92a53906f1b78669d67583d5617c31f37cdabd71ff516f2d91b81f
+      causal_intervention_thread_matrix_sha256: 750c4796e83444ee61ae8e6784f412e071b318ddbc0efe27efcf44efda0f0c70
+      causal_intervention_threads_1_2_4_8_finite_nonnegative: true
+      causal_intervention_one_thread_replicates: 3
+      production_source_sha256: 11e8d37cd8d819b4a7d09a30a855c9d24b575ba8413f2e5c1daa819245526ad9
+      production_meter_executable_sha256: 49569d43ed33ec5fa15843ecbb946aa966853d0ffd07fd7a6d1d20448b9a8ed0
+      production_eta_executable_sha256: 8852db3f43b686ce10234a2665bede7be335b1202db75740a98be6ad6fbac6ae
+      relevant_compact_regression_cases_passed: 22
+      full_compact_regression_cases_required: 22
+      full_compact_regression_suite_sha256: 71aab348b0a46ec14c3dcb8830b855b690e91b51d47b62c0b5d6645e4912f16e
+      compact_invariant_verification_sha256: 6e4772f9e5f06eda2b94b954c3a7b436fed16d0e77d0107c3219ace9f40fe2bb
+      production_source_corrected: true
+      focused_zero_skew_regression_added: true
+      focused_regression_fails_preserved_pre_fix_source: true
+      full_member_matrix_attempts: 48
+      full_member_matrix_passed_hard_requirements: 48
+      full_member_matrix_hard_failures: 0
+      full_member_matrix_run_manifest_sha256: ac0c7a822283e71e5ee07fdba53d22fd51e623fed9bfe6a465217b27674d43ac
+      full_member_matrix_verification_sha256: 6333f91b36913943d4cdbfa72baae20ecde4f1a9c4a0ac905654fe87383e8c69
+      thread_equivalence_advisory_exceedances: 7
+      thread_equivalence_bound_formally_frozen: false
+      technical_completion_manifest_sha256: c1a47c2b9bddd4b2f8d7b14a200b0784d83ed1235ad431ed4b3911484719c05b
+      independent_numerical_review_signed: false
+      independent_emissions_review_signed: false
+      root_cause_identified: true
+    depends_on: []
+    acceptance_evidence:
+      root_cause_reproduced: true
+      fix_reviewed: false
+      complete_output_regression_added: true
+      thread_matrix_all_finite_nonnegative: true
+  sensitivity_completion:
+    id: W6
+    status: planned
+    depends_on: [W1, W5]
+    acceptance_evidence:
+      meaningful_area_low_central_high: true
+      wet_dry_deposition_factorial_complete: true
+      all_frozen_candidates_whole_output_verified: true
+      unexplained_qualitative_reversal: false
+  independent_scientific_review:
+    id: W7
+    status: planned
+    depends_on: [W2, W3, W4, W6]
+    acceptance_evidence:
+      emissions_scientist_signed: true
+      air_quality_scientist_signed: true
+      blocking_comments_open: 0
+      conflicts_disclosed: true
+  scheduled_shadow_cycles:
+    id: W8
+    status: planned
+    depends_on: [W5, W7]
+    acceptance_evidence:
+      consecutive_cycles_completed_in_window: 4
+      immutable_attempt_manifests: true
+      interactive_or_production_writes_used: false
+final_assessment:
+  status: not_started
+  prerequisite: all_workstreams_complete
+  automatic_unlock_prohibited: true

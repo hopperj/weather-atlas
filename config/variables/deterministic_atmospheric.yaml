@@ -1,0 +1,227 @@
+version: 1
+products:
+  rdps:
+    - code: air_temperature_2m
+      canonical_variable: air_temperature
+      level_code: 2m_agl
+      source: {producer: RDPS, parameter: AirTemp, level: AGL-2m, expected_unit: K}
+      canonical_unit: degC
+      # GDAL's GRIB driver exposes this source band in Celsius (GRIB_UNIT=[C]).
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: temperature
+    - code: relative_humidity_2m
+      canonical_variable: relative_humidity
+      level_code: 2m_agl
+      source: {producer: RDPS, parameter: RelativeHumidity, level: AGL-2m, expected_unit: percent}
+      canonical_unit: percent
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: humidity
+    - code: total_cloud_cover
+      canonical_variable: total_cloud_cover
+      level_code: surface
+      source: {producer: RDPS, parameter: TotalCloudCover, level: Sfc, expected_unit: percent}
+      canonical_unit: percent
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: cloud
+    - code: surface_pressure
+      canonical_variable: surface_pressure
+      level_code: surface
+      source: {producer: RDPS, parameter: Pressure, level: Sfc, expected_unit: Pa}
+      canonical_unit: hPa
+      conversion_key: pascals_to_hectopascals
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: pressure
+    - code: mean_sea_level_pressure
+      canonical_variable: mean_sea_level_pressure
+      level_code: mean_sea_level
+      source: {producer: RDPS, parameter: Pressure, level: MSL, expected_unit: Pa}
+      canonical_unit: hPa
+      conversion_key: pascals_to_hectopascals
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: pressure
+    - code: wind_u_10m
+      canonical_variable: wind_u
+      level_code: 10m_agl
+      source: {producer: RDPS, parameter: WindU, level: AGL-10m, expected_unit: m/s}
+      canonical_unit: m/s
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: wind
+    - code: wind_v_10m
+      canonical_variable: wind_v
+      level_code: 10m_agl
+      source: {producer: RDPS, parameter: WindV, level: AGL-10m, expected_unit: m/s}
+      canonical_unit: m/s
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: wind
+    - code: wind_gust_10m
+      canonical_variable: wind_gust
+      level_code: 10m_agl
+      source: {producer: RDPS, parameter: WindGust, level: AGL-10m, expected_unit: m/s}
+      canonical_unit: m/s
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: wind
+  gdps:
+    - code: air_temperature_2m
+      canonical_variable: air_temperature
+      level_code: 2m_agl
+      source: {producer: GDPS, parameter: AirTemp, level: AGL-2m, expected_unit: K}
+      canonical_unit: degC
+      # GDAL's GRIB driver exposes this source band in Celsius (GRIB_UNIT=[C]).
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: temperature
+    - code: relative_humidity_2m
+      canonical_variable: relative_humidity
+      level_code: 2m_agl
+      source: {producer: GDPS, parameter: RelativeHumidity, level: AGL-2m, expected_unit: percent}
+      canonical_unit: percent
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: humidity
+    - code: total_cloud_cover
+      canonical_variable: total_cloud_cover
+      level_code: surface
+      source: {producer: GDPS, parameter: TotalCloudCover, level: Sfc, expected_unit: percent}
+      canonical_unit: percent
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: cloud
+    - code: surface_pressure
+      canonical_variable: surface_pressure
+      level_code: surface
+      source: {producer: GDPS, parameter: Pressure, level: Sfc, expected_unit: Pa}
+      canonical_unit: hPa
+      conversion_key: pascals_to_hectopascals
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: pressure
+    - code: mean_sea_level_pressure
+      canonical_variable: mean_sea_level_pressure
+      level_code: mean_sea_level
+      source: {producer: GDPS, parameter: Pressure, level: MSL, expected_unit: Pa}
+      canonical_unit: hPa
+      conversion_key: pascals_to_hectopascals
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: pressure
+    - code: wind_u_10m
+      canonical_variable: wind_u
+      level_code: 10m_agl
+      source: {producer: GDPS, parameter: WindU, level: AGL-10m, expected_unit: m/s}
+      canonical_unit: m/s
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: wind
+    - code: wind_v_10m
+      canonical_variable: wind_v
+      level_code: 10m_agl
+      source: {producer: GDPS, parameter: WindV, level: AGL-10m, expected_unit: m/s}
+      canonical_unit: m/s
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: wind
+    - code: wind_speed_10m
+      canonical_variable: wind_speed
+      level_code: 10m_agl
+      source: {producer: GDPS, parameter: WindSpeed, level: AGL-10m, expected_unit: m/s}
+      canonical_unit: m/s
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: wind_speed
+    - code: wind_gust_10m
+      canonical_variable: wind_gust
+      level_code: 10m_agl
+      source: {producer: GDPS, parameter: WindGust, level: AGL-10m, expected_unit: m/s}
+      canonical_unit: m/s
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: wind

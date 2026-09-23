@@ -1,0 +1,29 @@
+FC = gfortran
+FFLAGS ?= -O2 -g -fbacktrace -fcheck=bounds -ffree-line-length-none
+UPSTREAM := upstream/cffeps-4.1/src/cffeps4_f90
+BUILD := build
+BIN := bin/weatherapp-cffeps
+
+SOURCES := \
+	$(UPSTREAM)/cffeps_mod.f90 \
+	$(UPSTREAM)/cffeps_emissions_mod.f90 \
+	$(UPSTREAM)/cffeps_plumes_mod.f90 \
+	$(UPSTREAM)/cffeps_fbp_mod.f90 \
+	$(UPSTREAM)/cffeps_procalc.f90 \
+	$(UPSTREAM)/cffeps_energy.f90 \
+	$(UPSTREAM)/cffeps_calc.f90 \
+	src/weatherapp_cffeps_driver.f90
+
+.PHONY: all clean smoke
+
+all: $(BIN)
+
+$(BIN): $(SOURCES)
+	mkdir -p $(BUILD) bin
+	$(FC) $(FFLAGS) -J$(BUILD) -I$(BUILD) $(SOURCES) -o $(BIN)
+
+smoke: $(BIN)
+	$(BIN) tests/fixtures/minimal.nml
+
+clean:
+	rm -rf $(BUILD) $(BIN) tests/fixtures/minimal-output.csv

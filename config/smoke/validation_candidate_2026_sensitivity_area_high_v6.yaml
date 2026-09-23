@@ -1,0 +1,6 @@
+schema_version: 1
+base_config: validation_candidate_2026_v4.yaml
+overrides:
+  candidate_version: march-may-2026-mcd64a1-area-high-confidence-v6
+  selection:
+    area_curve: high_confidence_daily_increment_ha

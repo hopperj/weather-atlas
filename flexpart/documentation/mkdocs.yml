@@ -1,0 +1,44 @@
+site_name: Flexpart
+# default is ./site/
+# could change this to /var/www/html/docs
+site_dir: "/tmp/cr-site/"
+site_url: https://flexpart_manual.com/
+# site_dir: "/var/www/html/documentation/general/"
+#docs_dir: "docs/"
+repo_url: https://gitlab.phaidra.org/flexpart/flexpart
+repo_name: IMGW/Flexpart
+# this makes relative links  valid
+use_directory_urls: false
+theme:
+  name: readthedocs
+
+plugins:
+#  - tags
+  - search
+extra_javascript:
+     - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+     - https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML
+markdown_extensions:
+    - smarty
+    - toc:
+        permalink: True
+    - codehilite:
+    - attr_list
+    - pymdownx.arithmatex:
+        generic: true
+    # - pymdownx.caret
+    # - pymdownx.mark
+    # - pymdownx.tilde
+nav:
+  - 'index.md'
+  - 'building.md'
+  - 'configuration.md'
+  - 'LCM.md'
+  - 'running.md'
+  - 'output.md'
+  - 'transport.md'
+  - 'evolution.md'
+  - 'examples.md'
+  - 'containers.md'
+  - 'troubleshooting.md'
+

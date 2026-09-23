@@ -1,0 +1,10 @@
+{
+  "bounds": [-69.0, 41.0, -52.0, 50.0],
+  "width": 2048,
+  "height": 1536,
+  "lookback_hours": 3,
+  "max_new_frames_per_product": 4,
+  "minimum_free_bytes": 21474836480,
+  "maximum_archive_bytes": 107374182400,
+  "products": ["radar_rain", "satellite_natural", "satellite_ir"]
+}

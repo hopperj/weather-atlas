@@ -1,0 +1,38 @@
+schema_version: 2
+threshold_version: smoke-validation-v2-preregistered-2026-07-22
+protocol_id: cffeps-flexpart-external-validation-2026-07-22-v1
+protocol_path: docs/smoke-validation-protocol.md
+frozen_at: '2026-07-23T02:12:27Z'
+# Frozen before inspecting candidate output for the November 2025 experiment.
+# Any change requires a new threshold_version and a protocol amendment.
+evaluations:
+  gfas_inventory:
+    assessment_role: diagnostic_inventory_intercomparison
+    acceptance_capable: false
+    reference_source: CAMS GFAS v1.2 daily analysis fire-emission flux product
+    units: kilograms species per matched UTC grid-cell day
+    criteria:
+      pair_count: {minimum: 20}
+      normalized_mean_bias: {minimum: -0.75, maximum: 2.0}
+      pearson_correlation: {minimum: 0.3}
+      fraction_within_factor_two: {minimum: 0.25}
+  misr_plume_height:
+    assessment_role: independent_observation_acceptance_test
+    acceptance_capable: true
+    reference_source: NASA ASDC MISR Canadian and Alaskan Wildfire Smoke plume heights
+    units: metres above ground level
+    criteria:
+      pair_count: {minimum: 10}
+      mean_bias: {minimum: -1000, maximum: 1000}
+      root_mean_square_error: {maximum: 2000}
+      pearson_correlation: {minimum: 0.4}
+  naps_pm25:
+    assessment_role: independent_observation_acceptance_test
+    acceptance_capable: true
+    reference_source: Environment and Climate Change Canada NAPS hourly PM2.5 observations
+    units: micrograms per cubic metre smoke enhancement
+    criteria:
+      pair_count: {minimum: 100}
+      normalized_mean_bias: {minimum: -0.30, maximum: 0.30}
+      normalized_mean_absolute_error: {maximum: 0.50}
+      pearson_correlation: {minimum: 0.40}

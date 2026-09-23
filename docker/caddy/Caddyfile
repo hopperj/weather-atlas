@@ -1,0 +1,64 @@
+{
+    admin off
+    # Use Let's Encrypt explicitly for public names; Caddy manages renewals.
+    acme_ca https://acme-v02.api.letsencrypt.org/directory
+}
+
+# Legacy HTTP links only redirect; no application routes are served here.
+# The fixed hostname prevents untrusted Host headers from choosing the target.
+:80 {
+    redir https://{$CADDY_SITE_ADDRESS}{uri} 308
+}
+
+https://{$CADDY_SITE_ADDRESS} {
+    encode zstd gzip
+
+    header {
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Permissions-Policy "camera=(), microphone=(), geolocation=()"
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        -Server
+    }
+
+    handle /api/* {
+        reverse_proxy weather-api:8000
+    }
+
+    handle /health/* {
+        reverse_proxy weather-api:8000
+    }
+
+    @api_docs path /docs /docs/* /redoc /redoc/* /openapi.json
+    handle @api_docs {
+        reverse_proxy weather-api:8000
+    }
+
+    handle /tiles/* {
+        reverse_proxy tile-cache:80
+    }
+
+    handle {
+        reverse_proxy frontend:80
+    }
+
+    log {
+        output stdout
+        format filter {
+            wrap json
+            fields {
+                request>uri query {
+                    delete latitude
+                    delete longitude
+                    delete bbox
+                    delete west
+                    delete south
+                    delete east
+                    delete north
+                }
+                request>headers>Referer delete
+            }
+        }
+    }
+}

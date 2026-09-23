@@ -1,0 +1,170 @@
+version: 1
+products:
+  hrdpa:
+    - code: precipitation_6h_preliminary
+      canonical_variable: precipitation
+      level_code: surface
+      source: {producer: HRDPA-Prelim, parameter: APCP-Accum6h, level: Sfc, expected_unit: kg/m^2}
+      canonical_unit: mm
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: precipitation
+      analysis: {accumulation_hours: 6, revision: preliminary}
+      source_band: 1
+    - code: precipitation_6h_final
+      canonical_variable: precipitation
+      level_code: surface
+      source: {producer: HRDPA, parameter: APCP-Accum6h, level: Sfc, expected_unit: kg/m^2}
+      canonical_unit: mm
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: precipitation
+      analysis: {accumulation_hours: 6, revision: final}
+      source_band: 1
+    - code: precipitation_24h_preliminary
+      canonical_variable: precipitation
+      level_code: surface
+      source: {producer: HRDPA-Prelim, parameter: APCP-Accum24h, level: Sfc, expected_unit: kg/m^2}
+      canonical_unit: mm
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: precipitation
+      analysis: {accumulation_hours: 24, revision: preliminary}
+      source_band: 1
+    - code: precipitation_24h_final
+      canonical_variable: precipitation
+      level_code: surface
+      source: {producer: HRDPA, parameter: APCP-Accum24h, level: Sfc, expected_unit: kg/m^2}
+      canonical_unit: mm
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: precipitation
+      analysis: {accumulation_hours: 24, revision: final}
+      source_band: 1
+  rdpa:
+    - code: precipitation_6h_preliminary
+      canonical_variable: precipitation
+      level_code: surface
+      source: {producer: RDPA-Prelim, parameter: APCP-Accum6h, level: Sfc, expected_unit: kg/m^2}
+      canonical_unit: mm
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: precipitation
+      analysis: {accumulation_hours: 6, revision: preliminary}
+      source_band: 1
+    - code: precipitation_6h_final
+      canonical_variable: precipitation
+      level_code: surface
+      source: {producer: RDPA, parameter: APCP-Accum6h, level: Sfc, expected_unit: kg/m^2}
+      canonical_unit: mm
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: precipitation
+      analysis: {accumulation_hours: 6, revision: final}
+      source_band: 1
+    - code: precipitation_24h_preliminary
+      canonical_variable: precipitation
+      level_code: surface
+      source: {producer: RDPA-Prelim, parameter: APCP-Accum24h, level: Sfc, expected_unit: kg/m^2}
+      canonical_unit: mm
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: precipitation
+      analysis: {accumulation_hours: 24, revision: preliminary}
+      source_band: 1
+    - code: precipitation_24h_final
+      canonical_variable: precipitation
+      level_code: surface
+      source: {producer: RDPA, parameter: APCP-Accum24h, level: Sfc, expected_unit: kg/m^2}
+      canonical_unit: mm
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: precipitation
+      analysis: {accumulation_hours: 24, revision: final}
+      source_band: 1
+  hrepa:
+    - code: precipitation_6h_ensemble
+      canonical_variable: precipitation
+      level_code: surface
+      source: {producer: HREPA, parameter: Precip-Accum06h, level: Sfc, expected_unit: kg/m^2}
+      canonical_unit: mm
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: precipitation
+      analysis: {accumulation_hours: 6, revision: ensemble_members}
+      source_band: 1
+    - code: precipitation_6h_percentile_25
+      canonical_variable: precipitation
+      level_code: surface
+      source: {producer: HREPA, parameter: Precip-Accum06h-Pct25, level: Sfc, expected_unit: kg/m^2}
+      canonical_unit: mm
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: precipitation
+      analysis: {accumulation_hours: 6, revision: percentile_25}
+      source_band: 1
+    - code: precipitation_6h_percentile_75
+      canonical_variable: precipitation
+      level_code: surface
+      source: {producer: HREPA, parameter: Precip-Accum06h-Pct75, level: Sfc, expected_unit: kg/m^2}
+      canonical_unit: mm
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: precipitation
+      analysis: {accumulation_hours: 6, revision: percentile_75}
+      source_band: 1

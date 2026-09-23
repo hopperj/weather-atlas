@@ -1,0 +1,446 @@
+name: weather-platform
+
+x-airflow-common: &airflow-common
+  image: ${WEATHER_AIRFLOW_IMAGE_NAME:-weather-platform-airflow:dev}
+  build:
+    context: .
+    dockerfile: docker/airflow/Dockerfile
+    args:
+      AIRFLOW_BASE_IMAGE: ${AIRFLOW_IMAGE_NAME:-apache/airflow:3.3.0}
+  env_file: .env
+  environment: &airflow-common-env
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__CORE__PARALLELISM: "4"
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://weather_airflow:${AIRFLOW_DB_PASSWORD}@postgres/weather_airflow
+    AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY:-}
+    AIRFLOW__API_AUTH__JWT_SECRET: ${AIRFLOW_JWT_SECRET}
+    AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-api-server:8080/execution/
+    AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: "true"
+    WEATHER_CONFIG_ROOT: /opt/weather/config
+    WEATHER_DATA_ROOT: /srv/weather-platform/data
+    WEATHER_SQL_ROOT: /opt/weather/database/queries
+    WEATHER_DATABASE_URL: postgresql://weather_ingest:${WEATHER_INGEST_PASSWORD}@postgres/weather_app
+    _PIP_ADDITIONAL_REQUIREMENTS: ""
+  volumes:
+    - ./airflow/dags:/opt/airflow/dags:ro
+    - ${WEATHERAPP_DATA_DIR:-./weatherapp_data}/airflow/logs:/opt/airflow/logs
+    - ./airflow/plugins:/opt/airflow/plugins:ro
+    - ./config:/opt/weather/config:ro
+    - ${WEATHER_DATA_DIR:-./weatherapp_data/weather}:/srv/weather-platform/data
+  user: "${AIRFLOW_UID:-50000}:0"
+  depends_on:
+    postgres:
+      condition: service_healthy
+
+services:
+  storage-init:
+    image: ${STORAGE_INIT_IMAGE:-alpine:3.22}
+    restart: "no"
+    user: "0:0"
+    environment:
+      AIRFLOW_UID: ${AIRFLOW_UID:-50000}
+    volumes:
+      - ${WEATHERAPP_DATA_DIR:-./weatherapp_data}:/storage
+    command:
+      - /bin/sh
+      - -ec
+      - |
+        mkdir -p \
+          /storage/postgres \
+          /storage/redis \
+          /storage/weather/raw \
+          /storage/weather/staging \
+          /storage/weather/processed \
+          /storage/weather/derived \
+          /storage/weather/quarantine \
+          /storage/weather/cache \
+          /storage/weather/temporary \
+          /storage/weather/amqp/inbox \
+          /storage/airflow/logs \
+          /storage/sarracenia/cache \
+          /storage/caddy/data \
+          /storage/caddy/config \
+          /storage/tile-cache \
+          /storage/prometheus \
+          /storage/grafana \
+          /storage/backups/postgres
+        chown "$${AIRFLOW_UID}:0" \
+          /storage/weather \
+          /storage/weather/raw \
+          /storage/weather/staging \
+          /storage/weather/processed \
+          /storage/weather/derived \
+          /storage/weather/quarantine \
+          /storage/weather/cache \
+          /storage/weather/temporary \
+          /storage/weather/amqp \
+          /storage/weather/amqp/inbox \
+          /storage/airflow \
+          /storage/airflow/logs \
+          /storage/sarracenia \
+          /storage/sarracenia/cache
+        chown 101:101 /storage/tile-cache
+        chown 65534:65534 /storage/prometheus
+        chown 472:0 /storage/grafana
+        chmod 0770 \
+          /storage/weather \
+          /storage/weather/raw \
+          /storage/weather/staging \
+          /storage/weather/processed \
+          /storage/weather/derived \
+          /storage/weather/quarantine \
+          /storage/weather/cache \
+          /storage/weather/temporary \
+          /storage/weather/amqp \
+          /storage/weather/amqp/inbox \
+          /storage/airflow \
+          /storage/airflow/logs \
+          /storage/sarracenia \
+          /storage/sarracenia/cache \
+          /storage/caddy \
+          /storage/caddy/data \
+          /storage/caddy/config \
+          /storage/tile-cache \
+          /storage/prometheus \
+          /storage/grafana \
+          /storage/backups \
+          /storage/backups/postgres
+
+  reverse-proxy:
+    image: caddy:2.10.2-alpine
+    restart: unless-stopped
+    ports:
+      - "${APP_BIND_ADDRESS:-0.0.0.0}:${APP_PORT:-8080}:80"
+      - "${APP_BIND_ADDRESS:-0.0.0.0}:${HTTPS_PORT:-8443}:443"
+    environment:
+      CADDY_SITE_ADDRESS: ${CADDY_SITE_ADDRESS:?Set CADDY_SITE_ADDRESS to the public HTTPS hostname}
+    volumes:
+      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ${WEATHERAPP_DATA_DIR:-./weatherapp_data}/caddy/data:/data
+      - ${WEATHERAPP_DATA_DIR:-./weatherapp_data}/caddy/config:/config
+    depends_on:
+      storage-init:
+        condition: service_completed_successfully
+      weather-api:
+        condition: service_healthy
+      tile-api:
+        condition: service_healthy
+      tile-cache:
+        condition: service_healthy
+      frontend:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  weather-api:
+    build:
+      context: .
+      dockerfile: docker/api/Dockerfile
+    restart: unless-stopped
+    environment:
+      WEATHER_SERVICE_NAME: weather-api
+      WEATHER_DATABASE_URL: postgresql://weather_api:${WEATHER_API_PASSWORD}@postgres/weather_app
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      WEATHER_DATA_ROOT: /srv/weather-platform/data
+      WEATHER_SQL_ROOT: /app/database/queries
+      WEATHER_LAYER_TOKEN_SECRET: ${WEATHER_LAYER_TOKEN_SECRET}
+      WEATHER_LAYER_TOKEN_TTL_SECONDS: ${WEATHER_LAYER_TOKEN_TTL_SECONDS:-86400}
+      WEATHER_SAMPLE_CACHE_TTL_SECONDS: ${WEATHER_SAMPLE_CACHE_TTL_SECONDS:-300}
+      WEATHER_SAMPLE_RATE_LIMIT_PER_MINUTE: ${WEATHER_SAMPLE_RATE_LIMIT_PER_MINUTE:-120}
+      SIMULATION_WRITES_ENABLED: ${SIMULATION_WRITES_ENABLED:-false}
+      SMOKE_VALIDATION_RUNS_ENABLED: ${SMOKE_VALIDATION_RUNS_ENABLED:-false}
+      SMOKE_MAX_HORIZON_HOURS: ${SMOKE_MAX_HORIZON_HOURS:-24}
+      SMOKE_MAX_DOMAIN_CELLS: ${SMOKE_MAX_DOMAIN_CELLS:-50000}
+      SMOKE_MAXIMUM_PARTICLES: ${SMOKE_MAXIMUM_PARTICLES:-1000000}
+      SMOKE_MAXIMUM_RELEASES: ${SMOKE_MAXIMUM_RELEASES:-20000}
+      SMOKE_MAX_QUEUED_RUNS: ${SMOKE_MAX_QUEUED_RUNS:-5}
+      SMOKE_RUN_TIMEOUT_SECONDS: ${SMOKE_RUN_TIMEOUT_SECONDS:-10800}
+      SMOKE_MAXIMUM_OUTPUT_BYTES: ${SMOKE_MAXIMUM_OUTPUT_BYTES:-21474836480}
+      SMOKE_MINIMUM_FREE_BYTES: ${SMOKE_MINIMUM_FREE_BYTES:-21474836480}
+      SMOKE_MAXIMUM_STORAGE_BYTES: ${SMOKE_MAXIMUM_STORAGE_BYTES:-549755813888}
+      SMOKE_INTERACTIVE_RETENTION_DAYS: ${SMOKE_INTERACTIVE_RETENTION_DAYS:-30}
+      SMOKE_OPERATIONAL_RETENTION_DAYS: ${SMOKE_OPERATIONAL_RETENTION_DAYS:-14}
+    volumes:
+      - ${WEATHER_DATA_DIR:-./weatherapp_data/weather}:/srv/weather-platform/data:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/live')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  tile-api:
+    build:
+      context: .
+      dockerfile: docker/tiles/Dockerfile
+    restart: unless-stopped
+    environment:
+      WEATHER_SERVICE_NAME: tile-api
+      WEATHER_DATABASE_URL: postgresql://weather_tiles:${WEATHER_TILES_PASSWORD}@postgres/weather_app
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      WEATHER_DATA_ROOT: /srv/weather-platform/data
+      WEATHER_SQL_ROOT: /app/database/queries
+      WEATHER_LAYER_TOKEN_SECRET: ${WEATHER_LAYER_TOKEN_SECRET}
+    volumes:
+      - ${WEATHER_DATA_DIR:-./weatherapp_data/weather}:/srv/weather-platform/data:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/live')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  tile-cache:
+    image: nginx:1.29-alpine
+    restart: unless-stopped
+    volumes:
+      - ./docker/tile-cache/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ${WEATHERAPP_DATA_DIR:-./weatherapp_data}/tile-cache:/var/cache/nginx/weather
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      storage-init:
+        condition: service_completed_successfully
+      tile-api:
+        condition: service_healthy
+
+  postgres:
+    image: ${POSTGRES_IMAGE:-weather-platform-postgis:18-3.6}
+    build:
+      context: .
+      dockerfile: docker/postgres/Dockerfile
+      args:
+        POSTGRES_BASE_IMAGE: ${POSTGRES_BASE_IMAGE:-postgres:18.4-alpine3.23}
+    restart: unless-stopped
+    command: ["postgres", "-c", "listen_addresses=*"]
+    shm_size: 256mb
+    ports:
+      - "127.0.0.1:${POSTGRES_HOST_PORT:-5433}:5432"
+    environment:
+      POSTGRES_USER: weather_admin
+      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD}
+      POSTGRES_DB: postgres
+      AIRFLOW_DB_PASSWORD: ${AIRFLOW_DB_PASSWORD}
+      WEATHER_MIGRATOR_PASSWORD: ${WEATHER_MIGRATOR_PASSWORD}
+      WEATHER_API_PASSWORD: ${WEATHER_API_PASSWORD}
+      WEATHER_TILES_PASSWORD: ${WEATHER_TILES_PASSWORD}
+      WEATHER_INGEST_PASSWORD: ${WEATHER_INGEST_PASSWORD}
+      WEATHER_READONLY_PASSWORD: ${WEATHER_READONLY_PASSWORD}
+      WEATHER_BACKUP_PASSWORD: ${WEATHER_BACKUP_PASSWORD}
+    volumes:
+      - ${WEATHERAPP_DATA_DIR:-./weatherapp_data}/postgres:/var/lib/postgresql
+      - ./docker/postgres/init-databases.sh:/docker-entrypoint-initdb.d/10-init-databases.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U weather_admin -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    depends_on:
+      storage-init:
+        condition: service_completed_successfully
+
+  redis:
+    image: ${REDIS_IMAGE:-redis:7.4-alpine}
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - ${WEATHERAPP_DATA_DIR:-./weatherapp_data}/redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    depends_on:
+      storage-init:
+        condition: service_completed_successfully
+
+  eccc-subscriber:
+    build:
+      context: .
+      dockerfile: docker/sarracenia/Dockerfile
+    restart: unless-stopped
+    environment:
+      XDG_CACHE_HOME: /var/lib/sarracenia/cache
+      XDG_CONFIG_HOME: /etc
+    volumes:
+      - ${WEATHERAPP_DATA_DIR:-./weatherapp_data}/sarracenia:/var/lib/sarracenia
+      - ${WEATHER_DATA_DIR:-./weatherapp_data/weather}:/srv/weather-platform/data
+    healthcheck:
+      test: ["CMD-SHELL", "kill -0 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    depends_on:
+      storage-init:
+        condition: service_completed_successfully
+
+  prometheus:
+    image: ${PROMETHEUS_IMAGE:-prom/prometheus:v3.12.0}
+    profiles: ["observability"]
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=${PROMETHEUS_RETENTION:-30d}
+      - --web.enable-lifecycle
+    ports:
+      - "127.0.0.1:${PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ${WEATHERAPP_DATA_DIR:-./weatherapp_data}/prometheus:/prometheus
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:9090/-/ready"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    depends_on:
+      storage-init:
+        condition: service_completed_successfully
+      weather-api:
+        condition: service_healthy
+      tile-api:
+        condition: service_healthy
+
+  grafana:
+    image: ${GRAFANA_IMAGE:-grafana/grafana:13.1.0}
+    profiles: ["observability"]
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_SERVER_DOMAIN: localhost
+    ports:
+      - "127.0.0.1:${GRAFANA_PORT:-3000}:3000"
+    volumes:
+      - ${WEATHERAPP_DATA_DIR:-./weatherapp_data}/grafana:/var/lib/grafana
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:3000/api/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    depends_on:
+      storage-init:
+        condition: service_completed_successfully
+      prometheus:
+        condition: service_healthy
+
+  airflow-init:
+    <<: *airflow-common
+    command:
+      - bash
+      - -c
+      - |
+        mkdir -p /opt/airflow/logs /opt/airflow/plugins
+        airflow version
+        airflow pools set eccc_downloads 4 "Bounded ECCC source downloads"
+        airflow pools set noaa_gfs_downloads 2 "Bounded NOAA GFS source downloads"
+        airflow pools set nrcan_cwfis_downloads 1 "Bounded NRCan CWFIS downloads"
+        airflow pools set cog_transforms 4 "CPU and temporary-disk bounded COG transforms"
+        airflow pools set flexpart_runs 1 "One bounded FLEXPART smoke simulation at a time"
+    environment:
+      <<: *airflow-common-env
+      _AIRFLOW_DB_MIGRATE: "true"
+      _AIRFLOW_WWW_USER_CREATE: "true"
+      _AIRFLOW_WWW_USER_USERNAME: ${AIRFLOW_ADMIN_USERNAME:-airflow}
+      _AIRFLOW_WWW_USER_PASSWORD: ${AIRFLOW_ADMIN_PASSWORD}
+    restart: "no"
+
+  airflow-api-server:
+    <<: *airflow-common
+    command: api-server
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${AIRFLOW_PORT:-8081}:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/api/v2/monitor/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    depends_on:
+      postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-scheduler:
+    <<: *airflow-common
+    command: scheduler
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "airflow jobs check --job-type SchedulerJob --hostname \"$${HOSTNAME}\""]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    depends_on:
+      postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
+      airflow-api-server:
+        condition: service_healthy
+
+  airflow-dag-processor:
+    <<: *airflow-common
+    command: dag-processor
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "airflow jobs check --job-type DagProcessorJob --hostname \"$${HOSTNAME}\""]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    depends_on:
+      postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-triggerer:
+    <<: *airflow-common
+    command: triggerer
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "airflow jobs check --job-type TriggererJob --hostname \"$${HOSTNAME}\""]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    depends_on:
+      postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-cli:
+    <<: *airflow-common
+    profiles: ["debug"]
+    command: version

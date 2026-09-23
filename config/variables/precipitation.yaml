@@ -1,0 +1,23 @@
+version: 1
+products:
+  hrdps:
+    - code: total_precipitation_1h
+      canonical_variable: precipitation
+      level_code: surface
+      source:
+        producer: HRDPS
+        parameter: APCP-Accum1h
+        level: Sfc
+        expected_unit: kg/m^2
+      canonical_unit: mm
+      conversion_key: identity
+      output_data_type: Float32
+      nodata_value: -9999.0
+      resampling: bilinear
+      download_enabled: true
+      processing_enabled: true
+      display_enabled: true
+      default_style: precipitation
+      availability:
+        start_forecast_hour: 1
+        end_forecast_hour: 48

@@ -1,0 +1,363 @@
+.forecast-page {
+  height: 100dvh;
+  overflow-y: auto;
+  background: #081522;
+  color: #eaf5ff;
+}
+.forecast-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 74px;
+  padding: 16px max(24px, calc((100% - 1440px) / 2));
+  background: #07111d;
+  border-bottom: 1px solid var(--line);
+}
+.forecast-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #f1f9ff;
+  font-weight: 700;
+  font-size: 18px;
+  text-decoration: none;
+}
+.forecast-topbar nav {
+  display: flex;
+  gap: 12px;
+}
+.forecast-topbar nav a,
+.forecast-page button {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 16px;
+  color: #bcd0df;
+  background: transparent;
+  text-decoration: none;
+  font-size: 13px;
+}
+.forecast-topbar nav a[aria-current] {
+  color: var(--cyan);
+  background: #102d38;
+  border-color: #346165;
+}
+.forecast-content {
+  max-width: 1488px;
+  margin: auto;
+  padding: 44px 24px 32px;
+}
+.forecast-intro {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 38px;
+}
+.forecast-intro h1 {
+  font-size: clamp(26px, 3.5vw, 40px);
+  margin-top: 10px;
+}
+.forecast-intro p:not(.eyebrow) {
+  color: #a8bdcc;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.forecast-location {
+  display: grid;
+  gap: 8px;
+  min-width: min(360px, 100%);
+}
+.forecast-location label {
+  font-size: 12px;
+  color: #aec4d3;
+}
+.forecast-other-location {
+  display: grid;
+  gap: 8px;
+  margin: 4px 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #0d202e;
+}
+.forecast-intro p.forecast-selector-hint {
+  max-width: 380px;
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #9eb8c9;
+}
+.forecast-intro p.forecast-selected-location {
+  color: var(--cyan);
+  font-size: 13px;
+}
+.forecast-location select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #38505f;
+  border-radius: 8px;
+  color: #eff9ff;
+  background: #112434;
+  font-size: 13px;
+}
+.forecast-page button {
+  justify-self: end;
+  cursor: pointer;
+}
+.forecast-page button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.forecast-page :focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 4px;
+}
+.forecast-section {
+  margin-bottom: 38px;
+}
+.forecast-section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.forecast-section-heading h2 {
+  font-size: 24px;
+  margin-top: 7px;
+}
+.forecast-section-heading > p {
+  color: #9cb3c4;
+  font-size: 12px;
+  text-align: right;
+}
+.outlook-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(156px, 1fr));
+  overflow-x: auto;
+  gap: 10px;
+  padding: 2px 2px 12px;
+}
+.outlook-day {
+  background: #0f2333;
+  border: 1px solid #243e50;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.outlook-day > header {
+  padding: 16px 14px;
+  border-bottom: 1px solid #294252;
+  background: #162d3b;
+}
+.outlook-day h3 {
+  margin: 0 0 5px;
+  font-size: 15px;
+}
+.outlook-day time {
+  color: #9bb8c7;
+  font:
+    10px 'DM Mono',
+    monospace;
+}
+.outlook-period {
+  padding: 16px 14px;
+}
+.outlook-period + .outlook-period {
+  border-top: 1px solid #294252;
+  background: rgba(0, 0, 0, 0.13);
+}
+.outlook-period h4 {
+  margin: 0 0 14px;
+  color: #a9bfcd;
+  font-size: 11px;
+  font-weight: 500;
+}
+.outlook-temperature {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 28px;
+  font-weight: 600;
+  color: #f3ffff;
+}
+.outlook-temperature small {
+  font-size: 10px;
+  font-weight: 400;
+  color: #90cfc9;
+  text-transform: capitalize;
+}
+.outlook-condition {
+  min-height: 36px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #d0e0eb;
+  margin-bottom: 18px;
+}
+.outlook-period dl {
+  margin: 0;
+  display: grid;
+  gap: 9px;
+}
+.outlook-period dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 11px;
+}
+.outlook-period dt {
+  color: #92afc1;
+}
+.outlook-period dd {
+  margin: 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.forecast-note {
+  font-size: 12px;
+  color: #9eb8c9;
+  line-height: 1.7;
+  max-width: 1000px;
+}
+.forecast-warning {
+  padding: 14px 18px;
+  border: 1px solid #775d2f;
+  border-radius: 8px;
+  background: #2b281e;
+  color: #f1d59f;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.forecast-empty {
+  background: #102233;
+  border: 1px solid #294252;
+  border-radius: 12px;
+  padding: 36px 24px;
+  color: #b3c8d8;
+  line-height: 1.6;
+}
+.hourly-table-scroll {
+  max-height: 680px;
+  overflow: auto;
+  border: 1px solid #2b4455;
+  border-radius: 12px;
+  margin: 18px 0;
+}
+.hourly-forecast-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 12px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.hourly-forecast-table caption {
+  text-align: left;
+  padding: 16px;
+  color: #b5cedc;
+  background: #122735;
+  white-space: normal;
+}
+.hourly-forecast-table th,
+.hourly-forecast-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #1d3446;
+  text-align: right;
+}
+.hourly-forecast-table thead th {
+  position: sticky;
+  top: 0;
+  background: #193343;
+  color: #a4ceda;
+  font-weight: 500;
+  z-index: 1;
+}
+.hourly-forecast-table th:first-child {
+  text-align: left;
+}
+.hourly-forecast-table tbody th {
+  font-weight: 400;
+}
+.hourly-forecast-table tbody tr:nth-child(even) {
+  background: #0e2030;
+}
+.hourly-forecast-table tbody tr:hover {
+  background: #183746;
+}
+.hourly-forecast-table .hourly-day-start > * {
+  border-top: 2px solid #346170;
+}
+.hourly-temperature {
+  font-weight: 700;
+  font-size: 14px;
+  color: #a9efe5;
+}
+.hour-status {
+  font-size: 10px;
+  border-radius: 5px;
+  padding: 4px 7px;
+}
+.hour-status.complete {
+  color: #a9e5d2;
+  background: #143c39;
+}
+.hour-status.partial {
+  color: #e7d7a6;
+  background: #383325;
+}
+.hour-status.missing {
+  color: #b4bccd;
+  background: #253041;
+}
+.hour-run {
+  color: #9db3c4;
+  font-size: 10px;
+}
+.forecast-footer {
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  font-size: 11px;
+  color: #94adbf;
+  line-height: 1.8;
+}
+.forecast-footer a {
+  color: #92dacf;
+}
+.forecast-page-link {
+  color: var(--cyan);
+  padding: 9px 13px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 12px;
+  white-space: nowrap;
+}
+@media (max-width: 760px) {
+  .forecast-topbar {
+    padding: 16px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .forecast-topbar nav a {
+    padding: 8px 10px;
+  }
+  .forecast-content {
+    padding: 26px 16px;
+  }
+  .forecast-intro {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .forecast-section-heading {
+    flex-direction: column;
+    align-items: start;
+  }
+  .forecast-section-heading > p {
+    text-align: left;
+    margin: 0;
+  }
+  .forecast-page-link {
+    font-size: 10px;
+    padding: 8px;
+  }
+}

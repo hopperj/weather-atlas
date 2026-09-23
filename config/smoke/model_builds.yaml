@@ -1,0 +1,19 @@
+schema_version: 1
+models:
+  CFFEPS:
+    version: '4.1'
+    source_sha256: 8aac1918bb4c8897c1e07166939d96d1a3470ddf43dca7d66200e96eed7a503a
+    patch_set_sha256: 8618ed789f66af1618fc7c270632b2d5d26632ae980fa066c970e45b51fe6183
+    toolchain:
+      compiler: gfortran
+      build: Makefile.portable
+      scientific_modules: explicit_fbp_mixture_parameters_v1;phase_rate_unit_normalization_v1
+  FLEXPART:
+    version: '11.1'
+    source_sha256: f01758e7bfc3861b6f0b923666b0f4547fa8ca687921ddc6fb234c79e92564c3
+    patch_set_sha256: 086918c009a3111f3a9e6fd9cbe25f1c191d1169134b5cc5f99552a158b14579
+    toolchain:
+      compiler: gfortran
+      make_target: eta=no arch=generic
+      coordinate_mode: metres
+      random_seed_contract: FLEXPART_RANDOM_SEED/base_plus_species_number_v1

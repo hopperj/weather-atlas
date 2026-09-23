@@ -1,0 +1,36 @@
+#!/bin/bash
+# display in 83 columns
+source ./declare_examples
+
+examples=("${examples1[@]}" "${examples2[@]}" "${examples3[@]}"  "${examples4[@]}"           "${examples5[@]}" "${examples6[@]}" "${examples7[@]}" "${examples8[@]}"            "${examples9[@]}" "${examples10[@]}" "${examples11[@]}")                 
+units=( "${units1[@]}" "${units2[@]}" "${units3[@]}" "${units4[@]}" "${units5[@]}"         "${units6[@]}" "${units7[@]}" "${units8[@]}" "${units9[@]}" "${units10[@]}"       "${units11[@]}")
+formats=("${format1[@]}" "${format2[@]}" "${format3[@]}" "${format4[@]}"                    "${format5[@]}" "${format6[@]}" "${format7[@]}" "${format8[@]}"                    "${format9[@]}" "${format10[@]}" "${format11[@]}")
+
+filens=("${filens1[@]}" "${filens2[@]}" "${filens3[@]}" "${filens4[@]}"                    "${filens5[@]}" "${filens6[@]}" "${filens7[@]}" "${filens8[@]}"                    "${filens9[@]}" "${filens10[@]}" "${filens11[@]}")
+
+# source ./display_examples.sh
+
+#moved to 
+# ./display_examples.sh
+#iend=$(( ${#examples[@]} - 1 ))
+#echo 'iend + 1 = ' $(( iend + 1 )) 
+#for i in `seq 0 $iend`;
+#do 
+#  #echo $i
+#  example=${examples[$i]}
+#  unit=${units[$i]}
+#  format=${formats[$i]}
+
+#  echo $example $unit $format
+#    if [ $unit == "x" ]; then
+#      echo $i '&' "not gridded binary"
+#    else
+#      #echo $printgrid_int $examples_int/output_${example}/ ${unit}
+      #stdout=$($printgrid_int $examples_int/output_1-1/ conc)
+#      stdout=$($printgrid_int $examples_int/output_${example}/ ${unit})
+      #echo $i '&' ${example}: $stdout
+#      echo $i '&' ${example} '&' $stdout '\\'
+#    fi
+#done
+
+#exit

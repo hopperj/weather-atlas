@@ -1,0 +1,13 @@
+schema_version: 1
+species:
+  PM25:
+    flexpart_species: PM25_FIRE
+    display_fields: [wildfire_pm25_surface, wildfire_pm25_column,
+      wildfire_pm25_wet_deposition, wildfire_pm25_dry_deposition]
+  CO:
+    flexpart_species: CO
+    chemistry: none_for_24_hour_mvp
+    display_fields: [wildfire_co_surface]
+  BC:
+    flexpart_species: BC
+    display_fields: [wildfire_bc_surface]

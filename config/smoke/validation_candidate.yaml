@@ -1,0 +1,47 @@
+schema_version: 1
+candidate_version: november-2025-mcd64a1-central-v1
+area_operator_version: mcd64a1-event-area-v1
+selection:
+  rule: all_burned_area_eligible_events
+  require_unique_dominant_detection_fuel: true
+source_time:
+  daily_area_allocation: linear_utc_00_to_24
+  nominal_detection_hour_utc: 12
+fire_weather:
+  source: NRCan CWFIS national CFFDRS analysis
+  sampling: nearest_grid_cell_v1
+  date: source_increment_utc_date
+meteorology:
+  source: NOAA GFS global_1p00
+  cycle: source_increment_date_00_utc
+  spatial_interpolation: nearest_grid_point
+  temporal_interpolation: linear_between_three_hour_fields
+  vertical_interpolation: linear_in_log_pressure_to_40_levels
+cffeps:
+  version: '4.1'
+  emission_factor_uncertainty: central
+  species: [PM25, CO, BC]
+  vertical_layer_count: 12
+flexpart:
+  version: '11.1'
+  species_members: isolated
+  run_hours_per_source_day: 24
+  domain_wgs84:
+    west: -132
+    south: 47
+    east: -118
+    north: 58
+  grid_spacing_degrees: 1.0
+  particle_budget_per_species_day: 150000
+  minimum_particles_per_release: 50
+  maximum_releases: 20000
+  threads: 8
+  base_random_seed: 20260723
+gfas:
+  version: '1.2'
+  role: diagnostic_inventory_intercomparison
+  bbox_wgs84:
+    west: -132
+    south: 47
+    east: -118
+    north: 58

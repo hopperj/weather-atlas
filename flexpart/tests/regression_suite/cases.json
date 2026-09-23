@@ -1,0 +1,578 @@
+{
+  "suite_version": 1,
+  "description": "FLEXPART 11.1 compact-ECMWF scientific and architectural regression matrix",
+  "common_command": {
+    "IBDATE": 20210905,
+    "IBTIME": "000000",
+    "IEDATE": 20210905,
+    "IETIME": "010000",
+    "LOUTSTEP": 3600,
+    "LOUTAVER": 3600,
+    "LOUTSAMPLE": 300,
+    "LOUTRESTART": -1,
+    "LSYNCTIME": 300,
+    "CTL": -5.0,
+    "IFINE": 4,
+    "IOUT": 9,
+    "IPOUT": 0,
+    "LSUBGRID": 0,
+    "LCONVECTION": 0,
+    "LTURBULENCE": 0,
+    "LTURBULENCE_MESO": 0,
+    "LAGESPECTRA": 0,
+    "IPIN": 0,
+    "IOUTPUTFOREACHRELEASE": 0,
+    "IFLUX": 0,
+    "MDOMAINFILL": 0,
+    "IND_SOURCE": 1,
+    "IND_RECEPTOR": 1,
+    "MQUASILAG": 0,
+    "NESTED_OUTPUT": 0,
+    "LNETCDFOUT": 1,
+    "LINIT_COND": 0,
+    "SFC_ONLY": 0,
+    "CBLFLAG": 0,
+    "MAXTHREADGRID": 1,
+    "MAXFILESIZE": 10000,
+    "LOGVERTINTERP": 0,
+    "NXSHIFT": 0
+  },
+  "species_profiles": {
+    "air": [
+      {
+        "number": 24,
+        "source": "tests/smoke_standard/options/SPECIES/SPECIES_024"
+      }
+    ],
+    "aerosol": [
+      {
+        "number": 12,
+        "source": "tests/smoke_standard/options/SPECIES/SPECIES_012"
+      }
+    ],
+    "gas_hno3": [
+      {
+        "number": 5,
+        "source": "options/SPECIES/SPECIES_HNO3"
+      }
+    ],
+    "chemistry_c2h6": [
+      {
+        "number": 6,
+        "source": "options/SPECIES/SPECIES_C2H6"
+      }
+    ],
+    "decay": [
+      {
+        "number": 90,
+        "source": "tests/regression_suite/fixtures/SPECIES_DECAY"
+      }
+    ],
+    "air_aerosol_gas": [
+      {
+        "number": 24,
+        "source": "tests/smoke_standard/options/SPECIES/SPECIES_024"
+      },
+      {
+        "number": 12,
+        "source": "tests/smoke_standard/options/SPECIES/SPECIES_012"
+      },
+      {
+        "number": 5,
+        "source": "options/SPECIES/SPECIES_HNO3"
+      }
+    ]
+  },
+  "release_profiles": {
+    "point_air": [
+      {
+        "start": "000000",
+        "end": "000000",
+        "lon1": 5.0,
+        "lon2": 5.0,
+        "lat1": 50.5,
+        "lat2": 50.5,
+        "z1": 50.0,
+        "z2": 50.0,
+        "zkind": 1,
+        "mass": [1.0],
+        "parts": 20000,
+        "comment": "POINT AIR RELEASE"
+      }
+    ],
+    "point_rain": [
+      {
+        "start": "000000",
+        "end": "000000",
+        "lon1": 4.4,
+        "lon2": 4.4,
+        "lat1": 50.6,
+        "lat2": 50.6,
+        "z1": 20.0,
+        "z2": 100.0,
+        "zkind": 1,
+        "mass": [1.0],
+        "parts": 30000,
+        "comment": "PRECIPITATING-CELL RELEASE"
+      }
+    ],
+    "multispecies_two_release": [
+      {
+        "start": "000000",
+        "end": "000000",
+        "lon1": 5.0,
+        "lon2": 5.0,
+        "lat1": 50.5,
+        "lat2": 50.5,
+        "z1": 50.0,
+        "z2": 50.0,
+        "zkind": 1,
+        "mass": [1.0, 1.0, 1.0],
+        "parts": 3000,
+        "comment": "THREE-SPECIES POINT"
+      },
+      {
+        "start": "000000",
+        "end": "003000",
+        "lon1": 4.4,
+        "lon2": 4.8,
+        "lat1": 50.4,
+        "lat2": 50.8,
+        "z1": 100.0,
+        "z2": 800.0,
+        "zkind": 1,
+        "mass": [2.0, 2.0, 2.0],
+        "parts": 30000,
+        "comment": "THREE-SPECIES RAIN BOX"
+      }
+    ],
+    "two_release_air": [
+      {
+        "start": "000000",
+        "end": "000000",
+        "lon1": 5.0,
+        "lon2": 5.0,
+        "lat1": 50.5,
+        "lat2": 50.5,
+        "z1": 50.0,
+        "z2": 50.0,
+        "zkind": 1,
+        "mass": [1.0],
+        "parts": 15000,
+        "comment": "LOW POINT"
+      },
+      {
+        "start": "001500",
+        "end": "004500",
+        "lon1": 4.6,
+        "lon2": 5.2,
+        "lat1": 50.2,
+        "lat2": 50.8,
+        "z1": 500.0,
+        "z2": 1500.0,
+        "zkind": 1,
+        "mass": [2.0],
+        "parts": 20000,
+        "comment": "ELEVATED BOX"
+      }
+    ],
+    "backward_air": [
+      {
+        "start": "010000",
+        "end": "010000",
+        "lon1": 5.0,
+        "lon2": 5.0,
+        "lat1": 50.5,
+        "lat2": 50.5,
+        "z1": 20.0,
+        "z2": 100.0,
+        "zkind": 1,
+        "mass": [1.0],
+        "parts": 30000,
+        "comment": "BACKWARD RECEPTOR"
+      }
+    ],
+    "backward_aerosol": [
+      {
+        "start": "010000",
+        "end": "010000",
+        "lon1": 4.4,
+        "lon2": 4.4,
+        "lat1": 50.6,
+        "lat2": 50.6,
+        "z1": 20.0,
+        "z2": 100.0,
+        "zkind": 1,
+        "mass": [1.0],
+        "parts": 30000,
+        "comment": "BACKWARD DEPOSITION RECEPTOR"
+      }
+    ],
+    "stress_multispecies": [
+      {
+        "start": "000000",
+        "end": "003000",
+        "lon1": 4.4,
+        "lon2": 5.4,
+        "lat1": 50.0,
+        "lat2": 51.0,
+        "z1": 20.0,
+        "z2": 1800.0,
+        "zkind": 1,
+        "mass": [1.0, 1.0, 1.0],
+        "parts": 200000,
+        "comment": "PARALLEL STRESS BOX"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "name": "01_passive_meter",
+      "description": "Deterministic meter-coordinate advection and NetCDF concentration output",
+      "executable": "FLEXPART",
+      "threads": 1,
+      "species": "air",
+      "releases": "point_air"
+    },
+    {
+      "name": "02_passive_eta",
+      "description": "Deterministic eta-coordinate advection",
+      "executable": "FLEXPART_ETA",
+      "threads": 1,
+      "species": "air",
+      "releases": "point_air"
+    },
+    {
+      "name": "03_gaussian_turbulence",
+      "description": "PBL/free-atmosphere turbulence, convection, mesoscale turbulence, and terrain",
+      "executable": "FLEXPART",
+      "threads": 1,
+      "species": "air",
+      "releases": "point_air",
+      "command": {
+        "LTURBULENCE": 1,
+        "LTURBULENCE_MESO": 1,
+        "LCONVECTION": 1,
+        "LSUBGRID": 1,
+        "CTL": 10.0,
+        "IFINE": 4
+      }
+    },
+    {
+      "name": "04_cbl_turbulence",
+      "description": "Skewed convective-boundary-layer turbulence with fine vertical stepping",
+      "executable": "FLEXPART",
+      "threads": 1,
+      "species": "air",
+      "releases": "point_air",
+      "command": {
+        "LTURBULENCE": 1,
+        "LCONVECTION": 1,
+        "LSUBGRID": 1,
+        "CTL": 10.0,
+        "IFINE": 10,
+        "CBLFLAG": 1
+      }
+    },
+    {
+      "name": "05_all_physics_single_thread",
+      "description": "Three species and two releases with turbulence, convection, wet/dry deposition, settling, fluxes, age spectra, nested/receptor/particle output, and logarithmic interpolation",
+      "executable": "FLEXPART",
+      "threads": 1,
+      "species": "air_aerosol_gas",
+      "releases": "multispecies_two_release",
+      "receptors": true,
+      "command": {
+        "LTURBULENCE": 1,
+        "LTURBULENCE_MESO": 1,
+        "LCONVECTION": 1,
+        "LSUBGRID": 1,
+        "CTL": 10.0,
+        "IFINE": 4,
+        "LAGESPECTRA": 1,
+        "IOUTPUTFOREACHRELEASE": 1,
+        "IFLUX": 1,
+        "NESTED_OUTPUT": 1,
+        "IPOUT": 1,
+        "MAXTHREADGRID": 4,
+        "LOGVERTINTERP": 1
+      }
+    },
+    {
+      "name": "06_all_physics_four_threads",
+      "description": "The exact all-physics input from case 05 under four OpenMP threads",
+      "executable": "FLEXPART",
+      "threads": 4,
+      "species": "air_aerosol_gas",
+      "releases": "multispecies_two_release",
+      "receptors": true,
+      "command": {
+        "LTURBULENCE": 1,
+        "LTURBULENCE_MESO": 1,
+        "LCONVECTION": 1,
+        "LSUBGRID": 1,
+        "CTL": 10.0,
+        "IFINE": 4,
+        "LAGESPECTRA": 1,
+        "IOUTPUTFOREACHRELEASE": 1,
+        "IFLUX": 1,
+        "NESTED_OUTPUT": 1,
+        "IPOUT": 1,
+        "MAXTHREADGRID": 4,
+        "LOGVERTINTERP": 1
+      }
+    },
+    {
+      "name": "07_aerosol_deposition_settling",
+      "description": "Aerosol wet/dry deposition and gravitational settling in a precipitating cell",
+      "executable": "FLEXPART",
+      "threads": 1,
+      "species": "aerosol",
+      "releases": "point_rain",
+      "command": {
+        "LTURBULENCE": 1,
+        "LCONVECTION": 1,
+        "CTL": 10.0,
+        "IPOUT": 1,
+        "IFLUX": 1
+      }
+    },
+    {
+      "name": "08_gas_wet_dry_deposition",
+      "description": "HNO3 gas scavenging and resistance-based dry deposition",
+      "executable": "FLEXPART",
+      "threads": 1,
+      "species": "gas_hno3",
+      "releases": "point_rain",
+      "command": {
+        "LTURBULENCE": 1,
+        "LCONVECTION": 1,
+        "CTL": 10.0,
+        "IPOUT": 1
+      }
+    },
+    {
+      "name": "09_age_flux_multirelease",
+      "description": "Separate release fields, age spectra, fluxes, nested grid, and receptors",
+      "executable": "FLEXPART",
+      "threads": 2,
+      "species": "air",
+      "releases": "two_release_air",
+      "receptors": true,
+      "command": {
+        "LTURBULENCE": 1,
+        "LCONVECTION": 1,
+        "CTL": 10.0,
+        "LAGESPECTRA": 1,
+        "IOUTPUTFOREACHRELEASE": 1,
+        "IFLUX": 1,
+        "NESTED_OUTPUT": 1
+      }
+    },
+    {
+      "name": "10_mixing_ratio_and_concentration",
+      "description": "Combined mass-concentration and volume-mixing-ratio output",
+      "executable": "FLEXPART",
+      "threads": 1,
+      "species": "air",
+      "releases": "point_air",
+      "command": {
+        "IOUT": 11,
+        "LTURBULENCE": 1,
+        "LCONVECTION": 1,
+        "CTL": 10.0
+      }
+    },
+    {
+      "name": "11_plume_trajectory",
+      "description": "Concentration plus plume-centroid trajectory output",
+      "executable": "FLEXPART",
+      "threads": 1,
+      "species": "air",
+      "releases": "two_release_air",
+      "command": {
+        "IOUT": 13,
+        "LTURBULENCE": 1,
+        "LCONVECTION": 1,
+        "CTL": 10.0,
+        "IPOUT": 1
+      }
+    },
+    {
+      "name": "12_backward_residence",
+      "description": "Backward source-receptor residence-time calculation",
+      "executable": "FLEXPART",
+      "threads": 1,
+      "species": "air",
+      "releases": "backward_air",
+      "command": {
+        "LDIRECT": -1,
+        "IOUTPUTFOREACHRELEASE": 1,
+        "LTURBULENCE": 1,
+        "LCONVECTION": 1,
+        "CTL": 10.0
+      }
+    },
+    {
+      "name": "13_backward_wet_deposition",
+      "description": "Backward wet-deposition sensitivity",
+      "executable": "FLEXPART",
+      "threads": 1,
+      "species": "aerosol",
+      "releases": "backward_aerosol",
+      "command": {
+        "LDIRECT": -1,
+        "IND_RECEPTOR": 3,
+        "IOUTPUTFOREACHRELEASE": 1,
+        "LTURBULENCE": 1,
+        "LCONVECTION": 1,
+        "CTL": 10.0
+      }
+    },
+    {
+      "name": "14_backward_dry_deposition",
+      "description": "Backward dry-deposition sensitivity",
+      "executable": "FLEXPART",
+      "threads": 1,
+      "species": "aerosol",
+      "releases": "backward_aerosol",
+      "command": {
+        "LDIRECT": -1,
+        "IND_RECEPTOR": 4,
+        "IOUTPUTFOREACHRELEASE": 1,
+        "LTURBULENCE": 1,
+        "LCONVECTION": 1,
+        "CTL": 10.0
+      }
+    },
+    {
+      "name": "15_quasilagrangian_particles",
+      "description": "Quasi-Lagrangian numbered particles with full particle-property output",
+      "executable": "FLEXPART",
+      "threads": 1,
+      "species": "air",
+      "releases": "two_release_air",
+      "command": {
+        "MQUASILAG": 1,
+        "IPOUT": 1,
+        "LTURBULENCE": 1,
+        "LCONVECTION": 1,
+        "CTL": 10.0
+      }
+    },
+    {
+      "name": "16_radioactive_decay",
+      "description": "A short-lived tracer exercising exponential radioactive/chemical decay",
+      "executable": "FLEXPART",
+      "threads": 1,
+      "species": "decay",
+      "releases": "point_air",
+      "command": {
+        "LTURBULENCE": 1,
+        "LCONVECTION": 1,
+        "CTL": 10.0,
+        "IPOUT": 1
+      }
+    },
+    {
+      "name": "17_oh_chemistry",
+      "description": "C2H6 loss against monthly OH fields plus gas deposition",
+      "executable": "FLEXPART",
+      "threads": 1,
+      "species": "chemistry_c2h6",
+      "releases": "point_rain",
+      "chemistry": true,
+      "command": {
+        "LTURBULENCE": 1,
+        "LCONVECTION": 1,
+        "CTL": 10.0,
+        "IPOUT": 1
+      }
+    },
+    {
+      "name": "18_restart_write",
+      "description": "Write a mid-run particle restart with active stochastic physics",
+      "executable": "FLEXPART",
+      "threads": 1,
+      "species": "air",
+      "releases": "point_air",
+      "command": {
+        "LTURBULENCE": 1,
+        "LCONVECTION": 1,
+        "CTL": 10.0,
+        "LOUTRESTART": 1800
+      }
+    },
+    {
+      "name": "19_restart_read",
+      "description": "Resume case 18 from its 00:30 restart file",
+      "executable": "FLEXPART",
+      "threads": 1,
+      "species": "air",
+      "releases": "point_air",
+      "restart_from": "18_restart_write",
+      "restart_pattern": "restart_20210905003000",
+      "command": {
+        "LTURBULENCE": 1,
+        "LCONVECTION": 1,
+        "CTL": 10.0,
+        "LOUTRESTART": 1800,
+        "IPIN": 1
+      }
+    },
+    {
+      "name": "20_binary_full_physics",
+      "description": "Legacy binary gridded, deposition, flux, and nested-output paths",
+      "executable": "FLEXPART",
+      "threads": 1,
+      "species": "aerosol",
+      "releases": "point_rain",
+      "command": {
+        "LNETCDFOUT": 0,
+        "IOUT": 1,
+        "LTURBULENCE": 1,
+        "LTURBULENCE_MESO": 1,
+        "LCONVECTION": 1,
+        "LSUBGRID": 1,
+        "CTL": 10.0,
+        "LAGESPECTRA": 1,
+        "IFLUX": 1,
+        "NESTED_OUTPUT": 1
+      }
+    },
+    {
+      "name": "21_eta_log_vertical",
+      "description": "Eta-coordinate stochastic transport with logarithmic vertical interpolation",
+      "executable": "FLEXPART_ETA",
+      "threads": 1,
+      "species": "air",
+      "releases": "point_air",
+      "command": {
+        "LTURBULENCE": 1,
+        "LCONVECTION": 1,
+        "CTL": 10.0,
+        "LOGVERTINTERP": 1
+      }
+    },
+    {
+      "name": "22_parallel_stress",
+      "description": "Eight-thread, 200,000-particle multi-species stress case with grid reductions",
+      "executable": "FLEXPART",
+      "threads": 8,
+      "species": "air_aerosol_gas",
+      "releases": "stress_multispecies",
+      "command": {
+        "LTURBULENCE": 1,
+        "LTURBULENCE_MESO": 1,
+        "LCONVECTION": 1,
+        "LSUBGRID": 1,
+        "CTL": 10.0,
+        "IFINE": 4,
+        "LAGESPECTRA": 1,
+        "IFLUX": 1,
+        "NESTED_OUTPUT": 1,
+        "MAXTHREADGRID": 8
+      }
+    }
+  ]
+}

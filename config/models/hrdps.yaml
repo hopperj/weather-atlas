@@ -1,0 +1,43 @@
+version: 1
+code: hrdps
+provider: eccc
+kind: forecast
+enabled: true
+adapter: hrdps
+source_producers: [HRDPS, HRDPS-WEonG]
+domains:
+  - code: continental
+    name: Pan-Canadian continental grid
+    resolution: 2.5km
+    grid: RLatLon0.0225
+    grid_width: 2540
+    grid_height: 1290
+run_hours_utc: [0, 6, 12, 18]
+forecast_hours:
+  start: 0
+  end: 48
+  step: 1
+discovery:
+  mode: https_listing
+  base_url: https://dd.weather.gc.ca/
+  today_path: today/model_hrdps/continental/{resolution}/{run_hour}/{forecast_hour}/
+  archive_path: >-
+    {run_date}/WXO-DD/model_hrdps/continental/{resolution}/{run_hour}/{forecast_hour}/
+  operational_mode: amqps_required
+  late_arrival_grace_minutes: 180
+  retry_window_hours: 12
+limits:
+  maximum_parallel_downloads: 4
+  maximum_objects_per_manual_run: 64
+  minimum_free_bytes: 10737418240
+retention:
+  raw_days: 30
+  processed_days: 180
+  retain_forever: true
+visibility:
+  required_field_codes: [air_temperature_2m]
+estimates:
+  processed_to_raw_ratio: 1.15
+variable_config_files:
+  - variables/atmospheric.yaml
+  - variables/precipitation.yaml

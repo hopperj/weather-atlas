@@ -1,0 +1,28 @@
+model,year,category,title,url
+FLEXPART,1998,validation,Validation of the Lagrangian particle dispersion model FLEXPART against large-scale tracer experiment data,https://doi.org/10.1016/S1352-2310(98)00184-8
+FLEXPART,2004,method,Source-receptor matrix calculation with a Lagrangian particle dispersion model in backward mode,https://doi.org/10.5194/acp-4-51-2004
+FLEXPART,2005,model description,The Lagrangian particle dispersion model FLEXPART version 6.2,https://doi.org/10.5194/acp-5-2461-2005
+FLEXPART,2007,method,Parameterization of convective transport in a Lagrangian particle dispersion model and its evaluation,https://doi.org/10.1175/JAM2470.1
+FLEXPART,2013,variant,FLEXPART-WRF version 3.1,https://doi.org/10.5194/gmd-6-1889-2013
+FLEXPART,2014,inversion,FLEXINVERT: an atmospheric Bayesian inversion framework,https://doi.org/10.5194/gmd-7-2223-2014
+FLEXPART,2016,variant,FLEXPART-NorESM/CAM version 1,https://doi.org/10.5194/gmd-9-4029-2016
+FLEXPART,2017,deposition,Backward source-receptor matrices for deposited mass with FLEXPART 10.2,https://doi.org/10.5194/gmd-10-4605-2017
+FLEXPART,2017,dust,Temporal and spatial variability of Icelandic dust emissions and atmospheric transport,https://doi.org/10.5194/acp-17-10865-2017
+FLEXPART,2018,method,Conservative reconstruction for interpolation of extensive quantities in FLEXPART,https://doi.org/10.5194/gmd-11-2503-2018
+FLEXPART,2018,CTM,Three-dimensional methane distribution with FLEXPART 8-CTM-1.1,https://doi.org/10.5194/gmd-11-4469-2018
+FLEXPART,2019,model description,FLEXPART version 10.4,https://doi.org/10.5194/gmd-12-4955-2019
+FLEXPART,2019,variant,Turbulence scheme in FLEXPART-AROME version 1.2.1,https://doi.org/10.5194/gmd-12-4245-2019
+FLEXPART,2022,variant,FLEXPART-COSMO at 1 km grid resolution,https://doi.org/10.1007/s10546-022-00728-3
+FLEXPART,2024,model description,FLEXPART version 11: improved accuracy efficiency and flexibility,https://doi.org/10.5194/gmd-17-7595-2024
+FLEXPART,2024,variant,FLEXPART with Enviro-HIRLAM meteorological input,https://doi.org/10.1080/20964471.2024.2316320
+HYSPLIT,1992,manual,HY-SPLIT version 3.0 user's guide and model description,https://repository.library.noaa.gov/view/noaa/31300
+HYSPLIT,1997,model description,Description of the HYSPLIT_4 modeling system (NOAA ARL-224),https://www.arl.noaa.gov/wp_arl/wp-content/uploads/documents/reports/arl-224.pdf
+HYSPLIT,1998,model overview,Overview of the HYSPLIT_4 modeling system for trajectories dispersion and deposition,https://www.arl.noaa.gov/documents/reports/MetMag.pdf
+HYSPLIT,1999,manual,HYSPLIT4 user's guide (NOAA ARL-230),https://www.arl.noaa.gov/wp_arl/wp-content/uploads/documents/reports/arl-230.pdf
+HYSPLIT,2007,method,Global Eulerian-module methodology in HYSPLIT 4.9,https://doi.org/10.1016/j.atmosenv.2006.08.052
+HYSPLIT,2013,validation,Evaluation of HYSPLIT STILT and FLEXPART with controlled tracer releases,https://doi.org/10.1175/JAMC-D-13-0125.1
+HYSPLIT,2015,model description,NOAA's HYSPLIT atmospheric transport and dispersion modeling system,https://doi.org/10.1175/BAMS-D-14-00110.1
+HYSPLIT,2015,coupling,Inline coupling of WRF-HYSPLIT,https://doi.org/10.1175/JAMC-D-14-0247.1
+HYSPLIT,2017,data assimilation,Improving volcanic ash predictions by assimilating MODIS retrievals,https://doi.org/10.5194/acp-17-2865-2017
+HYSPLIT,2017,system,Real-time Environmental Applications and Display sYstem (READY),https://doi.org/10.1016/j.envsoft.2017.06.025
+HYSPLIT,2021,method,Incorporating STILT features into HYSPLIT version 5,https://doi.org/10.1175/JAMC-D-20-0158.1

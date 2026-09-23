@@ -1,0 +1,13 @@
+{
+  "component": "CFFEPS",
+  "version": "4.1",
+  "source_url": "https://github.com/jackenvcan/cffeps/archive/refs/tags/v4.1.tar.gz",
+  "release_url": "https://github.com/jackenvcan/cffeps/releases/tag/v4.1",
+  "doi": "10.5281/zenodo.15305591",
+  "archive": "upstream/cffeps-4.1.tar.gz",
+  "archive_sha256": "8aac1918bb4c8897c1e07166939d96d1a3470ddf43dca7d66200e96eed7a503a",
+  "license": "LGPL-2.1-or-later",
+  "upstream_tree_modified": true,
+  "local_scientific_patch": "FBP mixedwood/dead-fir/grass percentages are explicit portable-driver inputs; phase fuel arrays are normalized from upstream 10^-3 metric tonnes per hour storage to labelled metric tonnes per hour; finite-window pending phase queues are exposed for closed mass accounting",
+  "local_patch_set_sha256": "adedc358c618daf8284f1caf377231a26ad3cbb5786e1f4fd2700b3d2453a542"
+}

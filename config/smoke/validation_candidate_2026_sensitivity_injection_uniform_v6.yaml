@@ -1,0 +1,6 @@
+schema_version: 1
+base_config: validation_candidate_2026_v4.yaml
+overrides:
+  candidate_version: march-may-2026-mcd64a1-injection-uniform-v6
+  cffeps:
+    vertical_profile_algorithm: uniform_surface_to_cffeps_top_v1

@@ -1,0 +1,6 @@
+schema_version: 1
+base_config: validation_candidate_2026_v4.yaml
+overrides:
+  candidate_version: march-may-2026-mcd64a1-ef-high-v6
+  cffeps:
+    emission_factor_uncertainty: high

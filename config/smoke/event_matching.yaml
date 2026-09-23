@@ -1,0 +1,8 @@
+schema_version: 1
+algorithm_version: fire-events-v1
+provisional: true
+maximum_time_gap_hours: 36
+maximum_distance_km: 12
+maximum_spread_km_per_hour: 1.5
+compatible_fuel_prefix_length: 1
+ambiguity_distance_ratio: 1.15

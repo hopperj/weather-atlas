@@ -1,0 +1,9 @@
+FP_ecmwf_gfortran*
+*.o
+*_mod.mod
+class_gribfile.mod
+.DS_Store
+output
+FLEXPART
+FLEXPART_MPI
+*.sif

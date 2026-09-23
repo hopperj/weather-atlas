@@ -1,0 +1,44 @@
+version: 1
+code: raqdps
+provider: eccc
+kind: forecast
+enabled: true
+adapter: raqdps
+source_producers: [RAQDPS]
+domains:
+  - code: north_america
+    name: North American air-quality grid
+    resolution: 10km
+    grid: RLatLon0.09
+    grid_width: 729
+    grid_height: 599
+run_hours_utc: [0, 12]
+forecast_hours:
+  start: 0
+  end: 72
+  step: 1
+discovery:
+  mode: https_listing
+  base_url: https://dd.weather.gc.ca/
+  today_path: today/model_raqdps/{resolution}/grib2/{run_hour}/{forecast_hour}/
+  archive_path: >-
+    {run_date}/WXO-DD/model_raqdps/{resolution}/grib2/{run_hour}/{forecast_hour}/
+  operational_mode: amqps_required
+  late_arrival_grace_minutes: 240
+  # Keep the previous 12-hour cycle discoverable while the new cycle is still
+  # publishing, including recovery after an overnight service restart.
+  retry_window_hours: 24
+limits:
+  maximum_parallel_downloads: 4
+  maximum_objects_per_manual_run: 64
+  minimum_free_bytes: 10737418240
+retention:
+  raw_days: 30
+  processed_days: 180
+  retain_forever: true
+visibility:
+  required_field_codes: [pm25_surface]
+estimates:
+  processed_to_raw_ratio: 1.15
+variable_config_files:
+  - variables/air_quality.yaml

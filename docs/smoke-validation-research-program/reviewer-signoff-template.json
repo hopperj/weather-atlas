@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "reviewer_id": "reviewer-controlled-identifier",
+  "reviewer_role": "emissions_plume_science OR air_quality_model_evaluation",
+  "name": "human reviewer name",
+  "affiliation": "reviewer affiliation",
+  "expertise": ["relevant expertise"],
+  "conflict_disclosure": "Specific disclosure, including none if none",
+  "access_limitations": "State any unavailable data, software, or execution access; use none if none",
+  "attribution_and_publication_policy": "Reviewer-authored authorship, acknowledgement, and publication expectations",
+  "stage": "pre_execution OR final",
+  "decision": "Use a decision allowed for the selected stage",
+  "comments": "Reviewer-authored rationale and limitations",
+  "artifact_hashes": {
+    "/absolute/path/from/source-and-build-manifest.json": "exact sha256"
+  },
+  "signed_at_utc": "YYYY-MM-DDTHH:MM:SSZ",
+  "signature_method": "Reviewer-controlled signature or attestation method"
+}

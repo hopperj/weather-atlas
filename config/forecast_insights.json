@@ -1,0 +1,10 @@
+{
+  "provinces": ["NS", "NB", "PE", "NL"],
+  "maximum_regions": 128,
+  "highlight_thresholds": {
+    "temperatureC": 2,
+    "gustKmh": 10,
+    "popPercent": 20,
+    "precipitationMm": 2
+  }
+}

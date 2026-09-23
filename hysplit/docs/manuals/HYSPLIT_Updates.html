@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<!--[if !(IE 6) | !(IE 7) | !(IE 8)  ]><!-->
+<html lang="en-US" class="no-js">
+<!--<![endif]-->
+<head>
+	<meta charset="UTF-8" />
+				<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+			<meta name="theme-color" content="#0525b5"/>	<link rel="profile" href="https://gmpg.org/xfn/11" />
+	<title>HYSPLIT Model Updates &#8211; Air Resources Laboratory</title>
+<meta name='robots' content='max-image-preview:large' />
+<link rel='dns-prefetch' href='//fonts.googleapis.com' />
+<link rel="alternate" type="application/rss+xml" title="Air Resources Laboratory &raquo; Feed" href="https://www.arl.noaa.gov/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Air Resources Laboratory &raquo; Comments Feed" href="https://www.arl.noaa.gov/comments/feed/" />
+<link rel="alternate" title="oEmbed (JSON)" type="application/json+oembed" href="https://www.arl.noaa.gov/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fwww.arl.noaa.gov%2Fhysplit%2Fhysplit-model-updates%2F" />
+<link rel="alternate" title="oEmbed (XML)" type="text/xml+oembed" href="https://www.arl.noaa.gov/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fwww.arl.noaa.gov%2Fhysplit%2Fhysplit-model-updates%2F&#038;format=xml" />
+<style id='wp-img-auto-sizes-contain-inline-css'>
+img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
+/*# sourceURL=wp-img-auto-sizes-contain-inline-css */
+</style>
+<link rel='stylesheet' id='layerslider-css' href='https://www.arl.noaa.gov/wp_arl/wp-content/plugins/LayerSlider/static/layerslider/css/layerslider.css?ver=6.8.4' media='all' />
+<style id='wp-emoji-styles-inline-css'>
+
+	img.wp-smiley, img.emoji {
+		display: inline !important;
+		border: none !important;
+		box-shadow: none !important;
+		height: 1em !important;
+		width: 1em !important;
+		margin: 0 0.07em !important;
+		vertical-align: -0.1em !important;
+		background: none !important;
+		padding: 0 !important;
+	}
+/*# sourceURL=wp-emoji-styles-inline-css */
+</style>
+<style id='classic-theme-styles-inline-css'>
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+/*# sourceURL=/wp-includes/css/classic-themes.min.css */
+</style>
+<style id='global-styles-inline-css'>
+:root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--4-3: 4/3;--wp--preset--aspect-ratio--3-4: 3/4;--wp--preset--aspect-ratio--3-2: 3/2;--wp--preset--aspect-ratio--2-3: 2/3;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--aspect-ratio--9-16: 9/16;--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #FFF;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--color--accent: #0525b5;--wp--preset--color--dark-gray: #111;--wp--preset--color--light-gray: #767676;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgb(6,147,227) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgb(252,185,0) 0%,rgb(255,105,0) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgb(255,105,0) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgb(255, 255, 255), 6px 6px rgb(0, 0, 0);--wp--preset--shadow--crisp: 6px 6px 0px rgb(0, 0, 0);}:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}
+/*# sourceURL=global-styles-inline-css */
+</style>
+
+<link rel='stylesheet' id='sow-image-default-113ccd71f3e6-css' href='https://www.arl.noaa.gov/wp_arl/wp-content/uploads/siteorigin-widgets/sow-image-default-113ccd71f3e6.css?ver=6.9.1' media='all' />
+<link rel='stylesheet' id='the7-font-css' href='https://www.arl.noaa.gov/wp_arl/wp-content/themes/dt-the7/fonts/icomoon-the7-font/icomoon-the7-font.min.css?ver=14.2.1.1' media='all' />
+<link rel='stylesheet' id='the7-awesome-fonts-css' href='https://www.arl.noaa.gov/wp_arl/wp-content/themes/dt-the7/fonts/FontAwesome/css/all.min.css?ver=14.2.1.1' media='all' />
+<link rel='stylesheet' id='the7-awesome-fonts-back-css' href='https://www.arl.noaa.gov/wp_arl/wp-content/themes/dt-the7/fonts/FontAwesome/back-compat.min.css?ver=14.2.1.1' media='all' />
+<link rel='stylesheet' id='the7-Defaults-css' href='https://www.arl.noaa.gov/wp_arl/wp-content/uploads/smile_fonts/Defaults/Defaults.css?ver=6.9.1' media='all' />
+<link rel='stylesheet' id='dt-web-fonts-css' href='https://fonts.googleapis.com/css?family=Roboto:400,500normal,600,700,bold,boldnormal,normal%7CRoboto+Condensed:400,600,700%7COpen+Sans:400,500,500normal,600,700' media='all' />
+<link rel='stylesheet' id='dt-main-css' href='https://www.arl.noaa.gov/wp_arl/wp-content/themes/dt-the7/css/main.min.css?ver=14.2.1.1' media='all' />
+<style id='dt-main-inline-css'>
+body #load {
+  display: block;
+  height: 100%;
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  z-index: 9901;
+  opacity: 1;
+  visibility: visible;
+  transition: all .35s ease-out;
+}
+.load-wrap {
+  width: 100%;
+  height: 100%;
+  background-position: center center;
+  background-repeat: no-repeat;
+  text-align: center;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+  -ms-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -ms-flex-flow: column wrap;
+  flex-flow: column wrap;
+  -ms-flex-pack: center;
+  -ms-justify-content: center;
+  justify-content: center;
+}
+.load-wrap > svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+}
+#load {
+  background: var(--the7-elementor-beautiful-loading-bg,#ffffff);
+  --the7-beautiful-spinner-color2: var(--the7-beautiful-spinner-color,rgba(51,51,51,0.3));
+}
+
+/*# sourceURL=dt-main-inline-css */
+</style>
+<link rel='stylesheet' id='the7-custom-scrollbar-css' href='https://www.arl.noaa.gov/wp_arl/wp-content/themes/dt-the7/lib/custom-scrollbar/custom-scrollbar.min.css?ver=14.2.1.1' media='all' />
+<link rel='stylesheet' id='the7-wpbakery-css' href='https://www.arl.noaa.gov/wp_arl/wp-content/themes/dt-the7/css/wpbakery.min.css?ver=14.2.1.1' media='all' />
+<link rel='stylesheet' id='the7-core-css' href='https://www.arl.noaa.gov/wp_arl/wp-content/plugins/dt-the7-core/assets/css/post-type.min.css?ver=2.7.12' media='all' />
+<link rel='stylesheet' id='the7-css-vars-css' href='https://www.arl.noaa.gov/wp_arl/wp-content/uploads/the7-css/css-vars.css?ver=751b827ddb80' media='all' />
+<link rel='stylesheet' id='dt-custom-css' href='https://www.arl.noaa.gov/wp_arl/wp-content/uploads/the7-css/custom.css?ver=751b827ddb80' media='all' />
+<link rel='stylesheet' id='dt-media-css' href='https://www.arl.noaa.gov/wp_arl/wp-content/uploads/the7-css/media.css?ver=751b827ddb80' media='all' />
+<link rel='stylesheet' id='the7-mega-menu-css' href='https://www.arl.noaa.gov/wp_arl/wp-content/uploads/the7-css/mega-menu.css?ver=751b827ddb80' media='all' />
+<link rel='stylesheet' id='the7-elements-albums-portfolio-css' href='https://www.arl.noaa.gov/wp_arl/wp-content/uploads/the7-css/the7-elements-albums-portfolio.css?ver=751b827ddb80' media='all' />
+<link rel='stylesheet' id='the7-elements-css' href='https://www.arl.noaa.gov/wp_arl/wp-content/uploads/the7-css/post-type-dynamic.css?ver=751b827ddb80' media='all' />
+<link rel='stylesheet' id='style-css' href='https://www.arl.noaa.gov/wp_arl/wp-content/themes/dt-the7/style.css?ver=14.2.1.1' media='all' />
+<script src="https://www.arl.noaa.gov/wp_arl/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js"></script>
+<script src="https://www.arl.noaa.gov/wp_arl/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1" id="jquery-migrate-js"></script>
+<script id="layerslider-greensock-js-extra">
+var LS_Meta = {"v":"6.8.4"};
+//# sourceURL=layerslider-greensock-js-extra
+</script>
+<script src="https://www.arl.noaa.gov/wp_arl/wp-content/plugins/LayerSlider/static/layerslider/js/greensock.js?ver=1.19.0" id="layerslider-greensock-js"></script>
+<script src="https://www.arl.noaa.gov/wp_arl/wp-content/plugins/LayerSlider/static/layerslider/js/layerslider.kreaturamedia.jquery.js?ver=6.8.4" id="layerslider-js"></script>
+<script src="https://www.arl.noaa.gov/wp_arl/wp-content/plugins/LayerSlider/static/layerslider/js/layerslider.transitions.js?ver=6.8.4" id="layerslider-transitions-js"></script>
+<script id="dt-above-fold-js-extra">
+var dtLocal = {"themeUrl":"https://www.arl.noaa.gov/wp_arl/wp-content/themes/dt-the7","passText":"To view this protected post, enter the password below:","moreButtonText":{"loading":"Loading...","loadMore":"Load more"},"postID":"9223","ajaxurl":"https://www.arl.noaa.gov/wp_arl/wp-admin/admin-ajax.php","REST":{"baseUrl":"https://www.arl.noaa.gov/wp-json/the7/v1","endpoints":{"sendMail":"/send-mail"}},"contactMessages":{"required":"One or more fields have an error. Please check and try again.","terms":"Please accept the privacy policy.","fillTheCaptchaError":"Please, fill the captcha."},"captchaSiteKey":"","ajaxNonce":"0705d70401","pageData":{"type":"page","template":"page","layout":null},"themeSettings":{"smoothScroll":"on","lazyLoading":false,"desktopHeader":{"height":300},"ToggleCaptionEnabled":"disabled","ToggleCaption":"Navigation","floatingHeader":{"showAfter":220,"showMenu":false,"height":60,"logo":{"showLogo":true,"html":"","url":"https://www.arl.noaa.gov/"}},"topLine":{"floatingTopLine":{"logo":{"showLogo":false,"html":""}}},"mobileHeader":{"firstSwitchPoint":778,"secondSwitchPoint":0,"firstSwitchPointHeight":60,"secondSwitchPointHeight":60,"mobileToggleCaptionEnabled":"disabled","mobileToggleCaption":"Menu"},"stickyMobileHeaderFirstSwitch":{"logo":{"html":"\u003Cimg class=\" preload-me\" src=\"https://www.arl.noaa.gov/wp_arl/wp-content/uploads/2022/04/noaa-mobile-rgb-2022.jpg\" srcset=\"https://www.arl.noaa.gov/wp_arl/wp-content/uploads/2022/04/noaa-mobile-rgb-2022.jpg 240w, https://www.arl.noaa.gov/wp_arl/wp-content/uploads/2022/04/noaa-mobile-rgb-2022.jpg 240w\" width=\"240\" height=\"81\"   sizes=\"240px\" alt=\"Air Resources Laboratory\" /\u003E"}},"stickyMobileHeaderSecondSwitch":{"logo":{"html":"\u003Cimg class=\" preload-me\" src=\"https://www.arl.noaa.gov/wp_arl/wp-content/uploads/2022/04/noaa-mobile-rgb-2022.jpg\" srcset=\"https://www.arl.noaa.gov/wp_arl/wp-content/uploads/2022/04/noaa-mobile-rgb-2022.jpg 240w, https://www.arl.noaa.gov/wp_arl/wp-content/uploads/2022/04/noaa-mobile-rgb-2022.jpg 240w\" width=\"240\" height=\"81\"   sizes=\"240px\" alt=\"Air Resources Laboratory\" /\u003E"}},"sidebar":{"switchPoint":778},"boxedWidth":"1480px"},"VCMobileScreenWidth":"768"};
+var dtShare = {"shareButtonText":{"facebook":"Share on Facebook","twitter":"Share on X","pinterest":"Pin it","linkedin":"Share on Linkedin","whatsapp":"Share on Whatsapp"},"overlayOpacity":"73"};
+//# sourceURL=dt-above-fold-js-extra
+</script>
+<script src="https://www.arl.noaa.gov/wp_arl/wp-content/themes/dt-the7/js/above-the-fold.min.js?ver=14.2.1.1" id="dt-above-fold-js"></script>
+<script></script><meta name="generator" content="Powered by LayerSlider 6.8.4 - Multi-Purpose, Responsive, Parallax, Mobile-Friendly Slider Plugin for WordPress." />
+<!-- LayerSlider updates and docs at: https://layerslider.kreaturamedia.com -->
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://www.arl.noaa.gov/wp_arl/xmlrpc.php?rsd" />
+<meta name="generator" content="WordPress 6.9.1" />
+<link rel="canonical" href="https://www.arl.noaa.gov/hysplit/hysplit-model-updates/" />
+<link rel='shortlink' href='https://www.arl.noaa.gov/?p=9223' />
+<script async="" type="text/javascript" id="_fed_an_ua_tag" src="https://dap.digitalgov.gov/Universal-Federated-Analytics-Min.js?agency=DOC&amp;subagency=NOAA"></script><script type='text/javascript'>
+				jQuery(document).ready(function($) {
+				var ult_smooth_speed = 480;
+				var ult_smooth_step = 80;
+				$('html').attr('data-ult_smooth_speed',ult_smooth_speed).attr('data-ult_smooth_step',ult_smooth_step);
+				});
+			</script><meta property="og:site_name" content="Air Resources Laboratory" />
+<meta property="og:title" content="HYSPLIT Model Updates" />
+<meta property="og:url" content="https://www.arl.noaa.gov/hysplit/hysplit-model-updates/" />
+<meta property="og:type" content="article" />
+<meta name="generator" content="Powered by WPBakery Page Builder - drag and drop page builder for WordPress."/>
+<meta name="generator" content="Powered by Slider Revolution 6.7.38 - responsive, Mobile-Friendly Slider Plugin for WordPress with comfortable drag and drop interface." />
+<script type="text/javascript" id="the7-loader-script">
+document.addEventListener("DOMContentLoaded", function(event) {
+	var load = document.getElementById("load");
+	if(!load.classList.contains('loader-removed')){
+		var removeLoading = setTimeout(function() {
+			load.className += " loader-removed";
+		}, 300);
+	}
+});
+</script>
+		<link rel="icon" href="https://www.arl.noaa.gov/wp_arl/wp-content/uploads/2022/04/noaa-logo-rgb-2022.jpg" type="image/jpeg" sizes="16x16"/><script>function setREVStartSize(e){
+			//window.requestAnimationFrame(function() {
+				window.RSIW = window.RSIW===undefined ? window.innerWidth : window.RSIW;
+				window.RSIH = window.RSIH===undefined ? window.innerHeight : window.RSIH;
+				try {
+					var pw = document.getElementById(e.c).parentNode.offsetWidth,
+						newh;
+					pw = pw===0 || isNaN(pw) || (e.l=="fullwidth" || e.layout=="fullwidth") ? window.RSIW : pw;
+					e.tabw = e.tabw===undefined ? 0 : parseInt(e.tabw);
+					e.thumbw = e.thumbw===undefined ? 0 : parseInt(e.thumbw);
+					e.tabh = e.tabh===undefined ? 0 : parseInt(e.tabh);
+					e.thumbh = e.thumbh===undefined ? 0 : parseInt(e.thumbh);
+					e.tabhide = e.tabhide===undefined ? 0 : parseInt(e.tabhide);
+					e.thumbhide = e.thumbhide===undefined ? 0 : parseInt(e.thumbhide);
+					e.mh = e.mh===undefined || e.mh=="" || e.mh==="auto" ? 0 : parseInt(e.mh,0);
+					if(e.layout==="fullscreen" || e.l==="fullscreen")
+						newh = Math.max(e.mh,window.RSIH);
+					else{
+						e.gw = Array.isArray(e.gw) ? e.gw : [e.gw];
+						for (var i in e.rl) if (e.gw[i]===undefined || e.gw[i]===0) e.gw[i] = e.gw[i-1];
+						e.gh = e.el===undefined || e.el==="" || (Array.isArray(e.el) && e.el.length==0)? e.gh : e.el;
+						e.gh = Array.isArray(e.gh) ? e.gh : [e.gh];
+						for (var i in e.rl) if (e.gh[i]===undefined || e.gh[i]===0) e.gh[i] = e.gh[i-1];
+											
+						var nl = new Array(e.rl.length),
+							ix = 0,
+							sl;
+						e.tabw = e.tabhide>=pw ? 0 : e.tabw;
+						e.thumbw = e.thumbhide>=pw ? 0 : e.thumbw;
+						e.tabh = e.tabhide>=pw ? 0 : e.tabh;
+						e.thumbh = e.thumbhide>=pw ? 0 : e.thumbh;
+						for (var i in e.rl) nl[i] = e.rl[i]<window.RSIW ? 0 : e.rl[i];
+						sl = nl[0];
+						for (var i in nl) if (sl>nl[i] && nl[i]>0) { sl = nl[i]; ix=i;}
+						var m = pw>(e.gw[ix]+e.tabw+e.thumbw) ? 1 : (pw-(e.tabw+e.thumbw)) / (e.gw[ix]);
+						newh =  (e.gh[ix] * m) + (e.tabh + e.thumbh);
+					}
+					var el = document.getElementById(e.c);
+					if (el!==null && el) el.style.height = newh+"px";
+					el = document.getElementById(e.c+"_wrapper");
+					if (el!==null && el) {
+						el.style.height = newh+"px";
+						el.style.display = "block";
+					}
+				} catch(e){
+					console.log("Failure at Presize of Slider:" + e)
+				}
+			//});
+		  };</script>
+		<style id="wp-custom-css">
+			/*
+You can add your own CSS here.
+
+Click the help icon above to learn more.
+*/		</style>
+		<noscript><style> .wpb_animate_when_almost_visible { opacity: 1; }</style></noscript><style id='wp-block-columns-inline-css'>
+.wp-block-columns{box-sizing:border-box;display:flex;flex-wrap:wrap!important}@media (min-width:782px){.wp-block-columns{flex-wrap:nowrap!important}}.wp-block-columns{align-items:normal!important}.wp-block-columns.are-vertically-aligned-top{align-items:flex-start}.wp-block-columns.are-vertically-aligned-center{align-items:center}.wp-block-columns.are-vertically-aligned-bottom{align-items:flex-end}@media (max-width:781px){.wp-block-columns:not(.is-not-stacked-on-mobile)>.wp-block-column{flex-basis:100%!important}}@media (min-width:782px){.wp-block-columns:not(.is-not-stacked-on-mobile)>.wp-block-column{flex-basis:0;flex-grow:1}.wp-block-columns:not(.is-not-stacked-on-mobile)>.wp-block-column[style*=flex-basis]{flex-grow:0}}.wp-block-columns.is-not-stacked-on-mobile{flex-wrap:nowrap!important}.wp-block-columns.is-not-stacked-on-mobile>.wp-block-column{flex-basis:0;flex-grow:1}.wp-block-columns.is-not-stacked-on-mobile>.wp-block-column[style*=flex-basis]{flex-grow:0}:where(.wp-block-columns){margin-bottom:1.75em}:where(.wp-block-columns.has-background){padding:1.25em 2.375em}.wp-block-column{flex-grow:1;min-width:0;overflow-wrap:break-word;word-break:break-word}.wp-block-column.is-vertically-aligned-top{align-self:flex-start}.wp-block-column.is-vertically-aligned-center{align-self:center}.wp-block-column.is-vertically-aligned-bottom{align-self:flex-end}.wp-block-column.is-vertically-aligned-stretch{align-self:stretch}.wp-block-column.is-vertically-aligned-bottom,.wp-block-column.is-vertically-aligned-center,.wp-block-column.is-vertically-aligned-top{width:100%}
+/*# sourceURL=https://www.arl.noaa.gov/wp_arl/wp-includes/blocks/columns/style.min.css */
+</style>
+<style id='wp-block-group-inline-css'>
+.wp-block-group{box-sizing:border-box}:where(.wp-block-group.wp-block-group-is-layout-constrained){position:relative}
+/*# sourceURL=https://www.arl.noaa.gov/wp_arl/wp-includes/blocks/group/style.min.css */
+</style>
+<style id='wp-block-group-theme-inline-css'>
+:where(.wp-block-group.has-background){padding:1.25em 2.375em}
+/*# sourceURL=https://www.arl.noaa.gov/wp_arl/wp-includes/blocks/group/theme.min.css */
+</style>
+<link rel='stylesheet' id='js_composer_front-css' href='https://www.arl.noaa.gov/wp_arl/wp-content/plugins/js_composer/assets/css/js_composer.min.css?ver=8.7.2' media='all' />
+<style id='core-block-supports-inline-css'>
+.wp-container-core-columns-is-layout-9d6595d7{flex-wrap:nowrap;}
+/*# sourceURL=core-block-supports-inline-css */
+</style>
+<link rel='stylesheet' id='rs-plugin-settings-css' href='//www.arl.noaa.gov/wp_arl/wp-content/plugins/revslider/sr6/assets/css/rs6.css?ver=6.7.38' media='all' />
+<style id='rs-plugin-settings-inline-css'>
+#rs-demo-id {}
+/*# sourceURL=rs-plugin-settings-inline-css */
+</style>
+
+</head>
+<body id="the7-body" class="wp-singular page-template-default page page-id-9223 page-child parent-pageid-8898 wp-embed-responsive wp-theme-dt-the7 the7-core-ver-2.7.12 boxed-layout dt-responsive-on right-mobile-menu-close-icon ouside-menu-close-icon mobile-hamburger-close-bg-enable mobile-hamburger-close-bg-hover-enable  fade-medium-mobile-menu-close-icon fade-medium-menu-close-icon fixed-page-bg srcset-enabled btn-flat custom-btn-color custom-btn-hover-color floating-top-bar sticky-mobile-header top-header first-switch-logo-left first-switch-menu-right second-switch-logo-left second-switch-menu-right right-mobile-menu layzr-loading-on popup-message-style the7-ver-14.2.1.1 dt-fa-compatibility wpb-js-composer js-comp-ver-8.7.2 vc_responsive">
+<!-- The7 14.2.1.1 -->
+<div id="load" class="spinner-loader">
+	<div class="load-wrap"><style type="text/css">
+    [class*="the7-spinner-animate-"]{
+        animation: spinner-animation 1s cubic-bezier(1,1,1,1) infinite;
+        x:46.5px;
+        y:40px;
+        width:7px;
+        height:20px;
+        fill:var(--the7-beautiful-spinner-color2);
+        opacity: 0.2;
+    }
+    .the7-spinner-animate-2{
+        animation-delay: 0.083s;
+    }
+    .the7-spinner-animate-3{
+        animation-delay: 0.166s;
+    }
+    .the7-spinner-animate-4{
+         animation-delay: 0.25s;
+    }
+    .the7-spinner-animate-5{
+         animation-delay: 0.33s;
+    }
+    .the7-spinner-animate-6{
+         animation-delay: 0.416s;
+    }
+    .the7-spinner-animate-7{
+         animation-delay: 0.5s;
+    }
+    .the7-spinner-animate-8{
+         animation-delay: 0.58s;
+    }
+    .the7-spinner-animate-9{
+         animation-delay: 0.666s;
+    }
+    .the7-spinner-animate-10{
+         animation-delay: 0.75s;
+    }
+    .the7-spinner-animate-11{
+        animation-delay: 0.83s;
+    }
+    .the7-spinner-animate-12{
+        animation-delay: 0.916s;
+    }
+    @keyframes spinner-animation{
+        from {
+            opacity: 1;
+        }
+        to{
+            opacity: 0;
+        }
+    }
+</style>
+<svg width="75px" height="75px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+	<rect class="the7-spinner-animate-1" rx="5" ry="5" transform="rotate(0 50 50) translate(0 -30)"></rect>
+	<rect class="the7-spinner-animate-2" rx="5" ry="5" transform="rotate(30 50 50) translate(0 -30)"></rect>
+	<rect class="the7-spinner-animate-3" rx="5" ry="5" transform="rotate(60 50 50) translate(0 -30)"></rect>
+	<rect class="the7-spinner-animate-4" rx="5" ry="5" transform="rotate(90 50 50) translate(0 -30)"></rect>
+	<rect class="the7-spinner-animate-5" rx="5" ry="5" transform="rotate(120 50 50) translate(0 -30)"></rect>
+	<rect class="the7-spinner-animate-6" rx="5" ry="5" transform="rotate(150 50 50) translate(0 -30)"></rect>
+	<rect class="the7-spinner-animate-7" rx="5" ry="5" transform="rotate(180 50 50) translate(0 -30)"></rect>
+	<rect class="the7-spinner-animate-8" rx="5" ry="5" transform="rotate(210 50 50) translate(0 -30)"></rect>
+	<rect class="the7-spinner-animate-9" rx="5" ry="5" transform="rotate(240 50 50) translate(0 -30)"></rect>
+	<rect class="the7-spinner-animate-10" rx="5" ry="5" transform="rotate(270 50 50) translate(0 -30)"></rect>
+	<rect class="the7-spinner-animate-11" rx="5" ry="5" transform="rotate(300 50 50) translate(0 -30)"></rect>
+	<rect class="the7-spinner-animate-12" rx="5" ry="5" transform="rotate(330 50 50) translate(0 -30)"></rect>
+</svg></div>
+</div>
+<div id="page" class="boxed">
+	<a class="skip-link screen-reader-text" href="#content">Skip to content</a>
+
+<div class="masthead classic-header center bg-behind-menu logo-center widgets full-height shadow-mobile-header-decoration small-mobile-menu-icon dt-parent-menu-clickable show-sub-menu-on-hover show-device-logo show-mobile-logo" >
+
+	<div class="top-bar top-bar-line-hide">
+	<div class="top-bar-bg" ></div>
+	<div class="left-widgets mini-widgets"><div class="soc-ico show-on-desktop hide-on-first-switch hide-on-second-switch custom-bg accent-border border-on hover-accent-bg hover-disabled-border  hover-border-off"><a title="Facebook page opens in new window" href="https://www.facebook.com/NOAAResearch/" target="_blank" class="facebook"><span class="soc-font-icon"></span><span class="screen-reader-text">Facebook page opens in new window</span></a><a title="X page opens in new window" href="https://twitter.com/NOAAResearch" target="_blank" class="twitter"><span class="soc-font-icon"></span><span class="screen-reader-text">X page opens in new window</span></a></div></div><div class="right-widgets mini-widgets"><div class="mini-search show-on-desktop near-logo-first-switch near-logo-second-switch animate-search-width custom-icon"><form class="searchform mini-widget-searchform" role="search" method="get" action="https://www.arl.noaa.gov/">
+
+	<div class="screen-reader-text">Search:</div>
+
+	
+		<input type="text" aria-label="Search" class="field searchform-s" name="s" value="" placeholder="Type and hit enter …" title="Search form"/>
+		<a href="" class="search-icon"  aria-label="Search"><i class="the7-mw-icon-search-bold" aria-hidden="true"></i></a>
+
+			<input type="submit" class="assistive-text searchsubmit" value="Go!"/>
+</form>
+</div></div></div>
+
+	<header class="header-bar" role="banner">
+
+		<div class="branding">
+	<div id="site-title" class="assistive-text">Air Resources Laboratory</div>
+	<div id="site-description" class="assistive-text"></div>
+	<a class="" href="https://www.arl.noaa.gov/"><img class=" preload-me" src="https://www.arl.noaa.gov/wp_arl/wp-content/uploads/2021/11/BannerLMN6b.png" srcset="https://www.arl.noaa.gov/wp_arl/wp-content/uploads/2021/11/BannerLMN6b.png 1440w, https://www.arl.noaa.gov/wp_arl/wp-content/uploads/2022/04/noaa-logo-rgb-2022.jpg 361w" width="1440" height="300"   sizes="1440px" alt="Air Resources Laboratory" /><img class="mobile-logo preload-me" src="https://www.arl.noaa.gov/wp_arl/wp-content/uploads/2022/04/noaa-mobile-rgb-2022.jpg" srcset="https://www.arl.noaa.gov/wp_arl/wp-content/uploads/2022/04/noaa-mobile-rgb-2022.jpg 240w, https://www.arl.noaa.gov/wp_arl/wp-content/uploads/2022/04/noaa-mobile-rgb-2022.jpg 240w" width="240" height="81"   sizes="240px" alt="Air Resources Laboratory" /></a><div class="mini-widgets"></div><div class="mini-widgets"></div></div>
+
+		<nav class="navigation">
+
+			<ul id="primary-menu" class="main-nav bg-outline-decoration hover-outline-decoration active-bg-decoration outside-item-remove-margin"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home menu-item-9073 first depth-0"><a href='https://www.arl.noaa.gov/' data-level='1'><span class="menu-item-text"><span class="menu-text">Home</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-8951 has-children depth-0"><a href='https://www.arl.noaa.gov/about/' data-level='1' aria-haspopup='true' aria-expanded='false'><span class="menu-item-text"><span class="menu-text">About</span></span></a><ul class="sub-nav hover-style-bg level-arrows-on" role="group"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15660 first depth-1"><a href='https://www.arl.noaa.gov/about/arl-and-75-years-of-service/' data-level='2'><span class="menu-item-text"><span class="menu-text">History of ARL</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-9229 has-children depth-1"><a href='https://www.arl.noaa.gov/about/arl-divisions/' data-level='2' aria-haspopup='true' aria-expanded='false'><span class="menu-item-text"><span class="menu-text">ARL Divisions</span></span></a><ul class="sub-nav hover-style-bg level-arrows-on" role="group"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9235 first depth-2"><a href='https://www.arl.noaa.gov/about/arl-divisions/arl-asmd/' data-level='3'><span class="menu-item-text"><span class="menu-text">Atmospheric Sciences Modeling Division</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9236 depth-2"><a href='https://www.arl.noaa.gov/about/arl-divisions/arl-atdd/' data-level='3'><span class="menu-item-text"><span class="menu-text">Atmospheric Turbulence and Diffusion Division</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9238 depth-2"><a href='https://www.arl.noaa.gov/about/arl-divisions/sord/' data-level='3'><span class="menu-item-text"><span class="menu-text">Special Operations and Research Division</span></span></a></li> </ul></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-10274 has-children depth-1"><a href='https://www.arl.noaa.gov/about/lab-reviews/' data-level='2' aria-haspopup='true' aria-expanded='false'><span class="menu-item-text"><span class="menu-text">ARL Lab Reviews</span></span></a><ul class="sub-nav hover-style-bg level-arrows-on" role="group"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-10683 first depth-2"><a href='https://www.arl.noaa.gov/about/lab-reviews/2022-lab-review/' data-level='3'><span class="menu-item-text"><span class="menu-text">2022 Lab Review</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9230 depth-2"><a href='https://www.arl.noaa.gov/about/lab-reviews/lab-reviews-june-21-23-2016/' data-level='3'><span class="menu-item-text"><span class="menu-text">2016 Lab Review</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9306 depth-2"><a href='https://www.arl.noaa.gov/about/lab-reviews/laboratory-science-review-may-3-5-2011/' data-level='3'><span class="menu-item-text"><span class="menu-text">2011 Lab Review</span></span></a></li> </ul></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-10416 depth-1"><a href='https://www.arl.noaa.gov/about/arl-leadership/' data-level='2'><span class="menu-item-text"><span class="menu-text">ARL Leadership</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9233 depth-1"><a href='https://www.arl.noaa.gov/about/staff-directory-2/' data-level='2'><span class="menu-item-text"><span class="menu-text">Staff Directory</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17862 depth-1"><a href='https://www.arl.noaa.gov/about/strategic-plans/' data-level='2'><span class="menu-item-text"><span class="menu-text">Strategic Plan</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9776 depth-1"><a href='https://www.arl.noaa.gov/about/contact-us/' data-level='2'><span class="menu-item-text"><span class="menu-text">Contact Us</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9310 depth-1"><a href='https://www.arl.noaa.gov/about/accessibility/' data-level='2'><span class="menu-item-text"><span class="menu-text">Web Accessibility</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-9232 depth-1"><a href='https://www.arl.noaa.gov/about/privacy-policy/' data-level='2'><span class="menu-item-text"><span class="menu-text">Privacy Policy</span></span></a></li> </ul></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-9074 has-children depth-0"><a href='https://www.arl.noaa.gov/news-pubs/' data-level='1' aria-haspopup='true' aria-expanded='false'><span class="menu-item-text"><span class="menu-text">News &#038; Publications</span></span></a><ul class="sub-nav hover-style-bg level-arrows-on" role="group"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-18245 first depth-1"><a href='https://www.arl.noaa.gov/news-pubs/arl-news-stories/' data-level='2'><span class="menu-item-text"><span class="menu-text">Air Resources Lab News</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-18184 depth-1"><a href='https://www.arl.noaa.gov/news-pubs/arl-boundary-briefs/' data-level='2'><span class="menu-item-text"><span class="menu-text">Boundary Briefs</span></span></a></li> <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-18618 depth-1"><a href='https://www.arl.noaa.gov/news-pubs/#:~:text=and%20events.-,Newsletters,-Milestone%20Moments%20%E2%80%93%202025' data-level='2'><span class="menu-item-text"><span class="menu-text">Newsletters</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9247 depth-1"><a href='https://www.arl.noaa.gov/news-pubs/sci-publications/' data-level='2'><span class="menu-item-text"><span class="menu-text">Publications</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9280 depth-1"><a href='https://www.arl.noaa.gov/news-pubs/tech-memos/' data-level='2'><span class="menu-item-text"><span class="menu-text">Tech Memos</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9282 depth-1"><a href='https://www.arl.noaa.gov/news-pubs/data-and-publications-archive/' data-level='2'><span class="menu-item-text"><span class="menu-text">Data and Publications Archive</span></span></a></li> <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-18619 depth-1"><a href='https://www.arl.noaa.gov/wp_arl/wp-content/uploads/2025/01/FY2021-Strategic-Plan-updated-2025.pdf' data-level='2'><span class="menu-item-text"><span class="menu-text">Strategic Plan</span></span></a></li> </ul></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-8953 has-children depth-0"><a href='https://www.arl.noaa.gov/research/' data-level='1' aria-haspopup='true' aria-expanded='false'><span class="menu-item-text"><span class="menu-text">Research</span></span></a><ul class="sub-nav hover-style-bg level-arrows-on" role="group"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9246 first depth-1"><a href='https://www.arl.noaa.gov/research/surface-atmosphere-exchange-home/' data-level='2'><span class="menu-item-text"><span class="menu-text">Surface Atmosphere Exchange</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9242 depth-1"><a href='https://www.arl.noaa.gov/research/atmospheric-transport-and-dispersion/' data-level='2'><span class="menu-item-text"><span class="menu-text">Atmospheric Transport and Dispersion</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9241 depth-1"><a href='https://www.arl.noaa.gov/research/boundary-layer-characterization/' data-level='2'><span class="menu-item-text"><span class="menu-text">Boundary Layer Characterization</span></span></a></li> </ul></li> <li class="menu-item menu-item-type-post_type menu-item-object-page current-page-ancestor menu-item-9075 last depth-0"><a href='https://www.arl.noaa.gov/hysplit/' data-level='1'><span class="menu-item-text"><span class="menu-text">HYSPLIT</span></span></a></li> </ul>
+			
+		</nav>
+
+	</header>
+
+</div>
+<div role="navigation" aria-label="Main Menu" class="dt-mobile-header mobile-menu-show-divider">
+	<div class="dt-close-mobile-menu-icon" aria-label="Close" role="button" tabindex="0"><div class="close-line-wrap"><span class="close-line"></span><span class="close-line"></span><span class="close-line"></span></div></div>	<ul id="mobile-menu" class="mobile-main-nav">
+		<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home menu-item-9073 first depth-0"><a href='https://www.arl.noaa.gov/' data-level='1'><span class="menu-item-text"><span class="menu-text">Home</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-8951 has-children depth-0"><a href='https://www.arl.noaa.gov/about/' data-level='1' aria-haspopup='true' aria-expanded='false'><span class="menu-item-text"><span class="menu-text">About</span></span></a><ul class="sub-nav hover-style-bg level-arrows-on" role="group"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15660 first depth-1"><a href='https://www.arl.noaa.gov/about/arl-and-75-years-of-service/' data-level='2'><span class="menu-item-text"><span class="menu-text">History of ARL</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-9229 has-children depth-1"><a href='https://www.arl.noaa.gov/about/arl-divisions/' data-level='2' aria-haspopup='true' aria-expanded='false'><span class="menu-item-text"><span class="menu-text">ARL Divisions</span></span></a><ul class="sub-nav hover-style-bg level-arrows-on" role="group"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9235 first depth-2"><a href='https://www.arl.noaa.gov/about/arl-divisions/arl-asmd/' data-level='3'><span class="menu-item-text"><span class="menu-text">Atmospheric Sciences Modeling Division</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9236 depth-2"><a href='https://www.arl.noaa.gov/about/arl-divisions/arl-atdd/' data-level='3'><span class="menu-item-text"><span class="menu-text">Atmospheric Turbulence and Diffusion Division</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9238 depth-2"><a href='https://www.arl.noaa.gov/about/arl-divisions/sord/' data-level='3'><span class="menu-item-text"><span class="menu-text">Special Operations and Research Division</span></span></a></li> </ul></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-10274 has-children depth-1"><a href='https://www.arl.noaa.gov/about/lab-reviews/' data-level='2' aria-haspopup='true' aria-expanded='false'><span class="menu-item-text"><span class="menu-text">ARL Lab Reviews</span></span></a><ul class="sub-nav hover-style-bg level-arrows-on" role="group"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-10683 first depth-2"><a href='https://www.arl.noaa.gov/about/lab-reviews/2022-lab-review/' data-level='3'><span class="menu-item-text"><span class="menu-text">2022 Lab Review</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9230 depth-2"><a href='https://www.arl.noaa.gov/about/lab-reviews/lab-reviews-june-21-23-2016/' data-level='3'><span class="menu-item-text"><span class="menu-text">2016 Lab Review</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9306 depth-2"><a href='https://www.arl.noaa.gov/about/lab-reviews/laboratory-science-review-may-3-5-2011/' data-level='3'><span class="menu-item-text"><span class="menu-text">2011 Lab Review</span></span></a></li> </ul></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-10416 depth-1"><a href='https://www.arl.noaa.gov/about/arl-leadership/' data-level='2'><span class="menu-item-text"><span class="menu-text">ARL Leadership</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9233 depth-1"><a href='https://www.arl.noaa.gov/about/staff-directory-2/' data-level='2'><span class="menu-item-text"><span class="menu-text">Staff Directory</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17862 depth-1"><a href='https://www.arl.noaa.gov/about/strategic-plans/' data-level='2'><span class="menu-item-text"><span class="menu-text">Strategic Plan</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9776 depth-1"><a href='https://www.arl.noaa.gov/about/contact-us/' data-level='2'><span class="menu-item-text"><span class="menu-text">Contact Us</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9310 depth-1"><a href='https://www.arl.noaa.gov/about/accessibility/' data-level='2'><span class="menu-item-text"><span class="menu-text">Web Accessibility</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-9232 depth-1"><a href='https://www.arl.noaa.gov/about/privacy-policy/' data-level='2'><span class="menu-item-text"><span class="menu-text">Privacy Policy</span></span></a></li> </ul></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-9074 has-children depth-0"><a href='https://www.arl.noaa.gov/news-pubs/' data-level='1' aria-haspopup='true' aria-expanded='false'><span class="menu-item-text"><span class="menu-text">News &#038; Publications</span></span></a><ul class="sub-nav hover-style-bg level-arrows-on" role="group"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-18245 first depth-1"><a href='https://www.arl.noaa.gov/news-pubs/arl-news-stories/' data-level='2'><span class="menu-item-text"><span class="menu-text">Air Resources Lab News</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-18184 depth-1"><a href='https://www.arl.noaa.gov/news-pubs/arl-boundary-briefs/' data-level='2'><span class="menu-item-text"><span class="menu-text">Boundary Briefs</span></span></a></li> <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-18618 depth-1"><a href='https://www.arl.noaa.gov/news-pubs/#:~:text=and%20events.-,Newsletters,-Milestone%20Moments%20%E2%80%93%202025' data-level='2'><span class="menu-item-text"><span class="menu-text">Newsletters</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9247 depth-1"><a href='https://www.arl.noaa.gov/news-pubs/sci-publications/' data-level='2'><span class="menu-item-text"><span class="menu-text">Publications</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9280 depth-1"><a href='https://www.arl.noaa.gov/news-pubs/tech-memos/' data-level='2'><span class="menu-item-text"><span class="menu-text">Tech Memos</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9282 depth-1"><a href='https://www.arl.noaa.gov/news-pubs/data-and-publications-archive/' data-level='2'><span class="menu-item-text"><span class="menu-text">Data and Publications Archive</span></span></a></li> <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-18619 depth-1"><a href='https://www.arl.noaa.gov/wp_arl/wp-content/uploads/2025/01/FY2021-Strategic-Plan-updated-2025.pdf' data-level='2'><span class="menu-item-text"><span class="menu-text">Strategic Plan</span></span></a></li> </ul></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-8953 has-children depth-0"><a href='https://www.arl.noaa.gov/research/' data-level='1' aria-haspopup='true' aria-expanded='false'><span class="menu-item-text"><span class="menu-text">Research</span></span></a><ul class="sub-nav hover-style-bg level-arrows-on" role="group"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9246 first depth-1"><a href='https://www.arl.noaa.gov/research/surface-atmosphere-exchange-home/' data-level='2'><span class="menu-item-text"><span class="menu-text">Surface Atmosphere Exchange</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9242 depth-1"><a href='https://www.arl.noaa.gov/research/atmospheric-transport-and-dispersion/' data-level='2'><span class="menu-item-text"><span class="menu-text">Atmospheric Transport and Dispersion</span></span></a></li> <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9241 depth-1"><a href='https://www.arl.noaa.gov/research/boundary-layer-characterization/' data-level='2'><span class="menu-item-text"><span class="menu-text">Boundary Layer Characterization</span></span></a></li> </ul></li> <li class="menu-item menu-item-type-post_type menu-item-object-page current-page-ancestor menu-item-9075 last depth-0"><a href='https://www.arl.noaa.gov/hysplit/' data-level='1'><span class="menu-item-text"><span class="menu-text">HYSPLIT</span></span></a></li> 	</ul>
+	<div class='mobile-mini-widgets-in-menu'></div>
+</div>
+
+
+
+<div id="main" class="sidebar-right sidebar-divider-off">
+
+	
+	<div class="main-gradient"></div>
+	<div class="wf-wrap">
+	<div class="wf-container-main">
+
+	
+
+
+	<div id="content" class="content" role="main">
+
+		<div class="wpb_column vc_column_container vc_col-sm-12"><div class="vc_column-inner"><div class="wpb_wrapper">
+	<div class="wpb_text_column wpb_content_element " >
+		<div class="wpb_wrapper">
+			<h3 style="text-align: left; color: #000080;">Highlights of Recent Updates to HYSPLIT</h3>
+
+		</div>
+	</div>
+
+	<div class="wpb_text_column wpb_content_element " >
+		<div class="wpb_wrapper">
+			<h4>April 2025 Revision (v5.4.0)</h4>
+<ul>
+<li>Expand DATEM file format to support either HHHMM or DDHHMM for duration.</li>
+<li>Update advection near poles.</li>
+<li>Update cyclic boundary conditions on global lat-lon grid.</li>
+<li>Add shp_combine, meteogram, meteomap, windgram, and windrose programs.</li>
+<li>Filenames may be set via environment variables.</li>
+<li>Expand TRAJPLOT to use upto 18 colors/symbols.</li>
+<li>Expand ISOCHRON to create plots for RSMC runs.</li>
+<li>Add additional routines for SVG graphics.</li>
+<li>Update HYSPLITPDATA to version 0.3.2.</li>
+<li>Update HYSPLITPLOT to version 0.9.9.</li>
+<li>Add command-line options to CHK_FILE that specifies meteorological data directory and filename.</li>
+<li>Modify PROFILE to print pressure with a digit below the decimal point when the -e option is present.</li>
+<li>Reimplement expanding subgrids.</li>
+<li>Bug fix with particles crossing datelines in the STILT mode.</li>
+<li>Bug fix division-by-zero error in dispersion calculations.</li>
+<li>Bug fix STABPLOT to read VMIXING outputs.</li>
+<li>Bug fix CNLLXY subroutine to handle conversions at the pole.</li>
+<li>Bug fix ISOCHRON with determining time interval.</li>
+<li>Bug fix with writing precipitation rate along a trajectory.</li>
+<li>Bug fix index-out-of-bounds errors.</li>
+<li>Bug fix with time-of-arrival plots.</li>
+<li>Bug fix with converting end-point grid position to true coordinates when computing concentration sums.</li>
+</ul>
+<h4>November 2023 Revision (v5.3.0)</h4>
+<ul>
+<li>Add Freitas plume rise scheme.</li>
+<li>Add the api2arl_v6 converter that reads scaledValueOfFirstFixedSurface for pressure levels.</li>
+<li>Expand the CONCPLOT -c option to take the number of contours.</li>
+<li>Add -c60 and -61 options to CONCPLOT that use intervals of sqrt(10).</li>
+<li>Add +8 option to CONCPLOT for specifying near-min contour level.</li>
+<li>Adjust the wind error flag by checking IDSP and ZICONTROLTF.</li>
+<li>Update HYSPLITPLOT to version 0.9.1.</li>
+<li>Replace STAMEN_TERRAIN and STAMEN_TONER map backgrounds with OPEN_STREET and OPEN_TOPO, respectively.</li>
+<li>Arrays are allocated with zero initial values.</li>
+<li>Updates to api2arl_v5 converter.</li>
+<li>Display message when no plume is drawn.</li>
+<li>Updates to XML generation for KML XSD compliance.</li>
+<li>CONPROB prints an error message when no input files are present.</li>
+<li>CONPROB works with concentration grids of different sizes, provided grid spacings remain the same across concentration grids.</li>
+<li>Updates to PARTICLE.DAT and PARTICLE_STILT.DAT formats.</li>
+<li>Increase the number of vertical levels to 99.</li>
+<li>ARW2ARL -b option can take up to 4 digits.</li>
+<li>Add -d option to CONAVGPD.</li>
+<li>Bug fix with updating internal vertical coordinate after advection.</li>
+<li>Bug fix with updating time averaging wind for backward runs.</li>
+<li>Bug fix with initializing variables for Grell convection.</li>
+<li>Bug fix with plotting vertical projection trajectories.</li>
+<li>Bug fix with creating KML when initial plot frames are empty.</li>
+<li>Bug fix with creating KML for concentration-to-station via GUI.</li>
+<li>Bug fix with extracting station via graphical user interface.</li>
+<li>Bug fix with setting lat lon domains for DATA_DEL.</li>
+<li>Bug fix with clustering trajectories via graphical user interface.</li>
+<li>Bug fix with computing vertical velocity from divergence.</li>
+<li>Use wget instead of ftp when downloading meteorological data files with Windows PC.</li>
+</ul>
+<h4>January 2022 Revision (v5.2.0)</h4>
+<ul>
+<li>Updates to FORTRAN plotting utilities including options for creating SVG rather than Postscript files.</li>
+<li>Option for user-defined vertical levels added.</li>
+<li>Unit testing using cmake added in testing/ctests directory.</li>
+<li>Update to arw2arl converter to allow for soil moisture and soil liquid water to be output.</li>
+<li>Update to vmixing for input/output filenames.</li>
+<li>Update to xtrct_grid to add -s option for skipping level.</li>
+</ul>
+<h4>May 2021 Revision (v5.1.0)</h4>
+<ul>
+<li>Add Sofiev et al. plume rise algorithm.</li>
+<li>Add CESM data2arl, drn2arl, and aer2arl data converters.</li>
+<li>Add insect additional horizontal speed to trajectory calculations.</li>
+<li>Update python dependencies for graphics to work with macOS Big Sur.</li>
+<li>Correct square area emissions for particles.</li>
+</ul>
+<h4>April 2020 Revision (v5.0.0)</h4>
+<ul>
+<li>Inclusion of center of mass trajectory option.</li>
+<li>Updated bdyfiles.</li>
+<li>Integration of python in postprocessing graphic utilities.</li>
+<li>Incorporation of STILT routines, which include: 1) a new vertical interpolation scheme for ARL files derived from the WRF model; 2) a new mixed layer scheme that uses excess temperature for convective cases; 3) a new boundary layer turbulence parameterization option (Hanna, 1982); 4) an option to have the Lagrangian vertical timescale to vary by space and time following Hanna (1982); 5) a more complex vertical timescale that includes a reflection/transmission scheme that preserves well-mixed distributions of particles moving across interfaces; 6) an extreme convection option; 7) the Grell convective scheme utilizing WRF output convective fluxes; 8) an option to have a random initial seed number.</li>
+</ul>
+<h4>September 2019 Revision (v4.2.0)</h4>
+<ul>
+<li>Fixed bug for interpolating TKE and velocity variances for non-WRF inputs in prfsig.f.</li>
+<li>Added support for TKE from WRF-ARW meteorology to be either vertically staggered or unstaggered and improved the vertical interpolation of vertically staggered variables.</li>
+<li>Default namelist parameters KMIX0 from 250 to 150 and VSCALES from 200 to 5.</li>
+<li>Changed how turbulent velocity is initialized. New namelist variable VINIT = 1 (default) initializes turbulent velocity by drawing from distribution; VINIT = 0 initializes turbulent velocity to zero.</li>
+</ul>
+<h4>April 2018 Revision (951)</h4>
+<ul>
+<li>Changed default value of minimum mixed layer depth (KMIX0) from 0 to 25 meters.</li>
+<li>
+<div>Updated arw2arl.f to include a DIF variable for TKE and output all vertically staggered variables at the bottom interfaces.</div>
+</li>
+<li>
+<div></div>
+<div>implemented new weather balloon functionality for trajectories</div>
+</li>
+</ul>
+<h4>February 2018 Revision (927)</h4>
+<ul>
+<li>Permit the use of polar concentration grids for both particles and puffs.</li>
+<li>A polar grid puff computation (#420) was added to the testing script.</li>
+<li>emrise: Corrected bouyancy flux conversion factor (FB). This affects the injection height when heat release is input.</li>
+<li>era52arl: Added conversion program for era52arl in the trunk/data2arl/era52arl subdirectory</li>
+<li>mer2arl: Added conversion program for MERRA (NASA) meteorological data in the trunk/data2arl/mer2arl subdirectory</li>
+<li>cdf2arl: converts NCEP/NCAR Reanalysis data in NetCDF4 file to a HYSPLIT compatible format contains a fix that outputs all emission source origin times and locations and improves memory efficiency for IO</li>
+<li>arw2arl: Correction in converting WRF lat lon projection domains to ARL formatted files</li>
+<li>xtrct_stn: Fixed rotation to Earth coordinates for upper level winds</li>
+<li>api2arl: Modified code in the api2arl directory to use ecCodes library rather than grib_api library.</li>
+</ul>
+<h4>January 2017 Revision (854)</h4>
+<ul>
+<li>Added decay of ground-level deposition amounts for daughter product application</li>
+<li>Corrected the computation of the scan index in the polar grid section in consum</li>
+<li>Added polar grid to con2asc</li>
+<li>Added time interpolation for deposition in consum</li>
+<li>c2datem: added option to use height from DATEM file if available</li>
+<li>Corrected virtual temperature calculation when using meteorological datasets containing RH</li>
+<li>concmbn: &#8211; added option to crop to a concentration value and a multiplier</li>
+<li>&#8211; added minimum grid span (GRDMIN)</li>
+<li>Added density vertical dependency when calculating mixing ratio (ICHEM=6)</li>
+<li>Conmerge: &#8211; allow to process cdump files containing minutes</li>
+<li>&#8211; allow for crossing a year by using tm2min library function</li>
+<li>Added new HYSPTEST program to test model inputs and suggest appropriate changes.</li>
+<li>Conappend &#8211; error checking &#8211; if grids differ, etc.</li>
+<li>Gridplot &#8211; Added source location to plot</li>
+<li>Added inverse modeling executable (lbfgsb) that solves the Transfer Coefficient Matrix for the source term vector</li>
+<li>Added new program ecm2arl that converts ECMWF meteorological data to ARL format (based on grib2arl)</li>
+</ul>
+<h4>February 2016 Revision (804)</h4>
+<ul>
+<li>Added Ganser fall velocity applicable for particles larger than 20 microns</li>
+<li>New option to calculate nuclide daughter products</li>
+<li>Bug fix to allow for multiple vertical line sources</li>
+<li>Corrected longitude span for global grids less than 1 degree</li>
+<li>New concadd option to mask base concentration as a factor of the base concentration</li>
+<li>New concadd option to divide 2 concentration files</li>
+<li>More residence time option in trajectory frequency</li>
+</ul>
+<h4>June 2015 Revision (761)</h4>
+<ul>
+<li>More residence time option in trajectory frequency</li>
+<li>Changed default scavenging coeficients for wet deposition</li>
+<li>Enhanced GoogleEarth output for particle plotting programs</li>
+<li>New option to create polar coordinate concentration grids</li>
+<li>Improved handling around dateline for isochron and grid plot programs</li>
+<li>Revised binary to coefficient matrix program to handle arbitrary start and stop times</li>
+<li>Enhanced vertical mixing when convective available potential energy value exceeded (CAPEMIN)</li>
+<li>Permit emission durations of less than one time step</li>
+<li>New option to create talagrand diagram to process ensembles</li>
+<li>New module to compute decay and deposition of the Foot and Mouth disease virus</li>
+<li>Corrected resuspension subroutine</li>
+<li>Added new land use and terrain height files with 0.5 deg. resolution</li>
+</ul>
+<h4>October 2014 Revision (664)</h4>
+<ul>
+<li>Numerous changes to display programs: concplot, gridplot, timeplot, isochron</li>
+<li>Simplified LINUX compilation by moving NetCDF paths to environment from Makefile</li>
+<li>Options to decay concentrations extracted at a point from the output data file</li>
+<li>A diagnostic option was added (krand=3) to turn off particle mixing</li>
+<li>Option to permit the computation of a multi-release time transfer coefficient in one run</li>
+<li>Revised within-cloud scavenging ratio to use cloud-layer rather than grid-cell depth</li>
+<li>Option to specify within-cloud scavenging as a ratio or time constant (like below-cloud)</li>
+<li>WRF data conversion program now supports input latitude-longitude grids</li>
+<li>Revised point source emission algorithm to deal with sub-time step emission durations</li>
+<li>Forced concentration output to disk when time step jumps over end-of sample time</li>
+</ul>
+<h4>July 2014 Revision (631)</h4>
+<ul>
+<li>WRF-ARW converter modified to compute hourly precipitation when data interval less than 1h</li>
+<li>Improved precision for vertical velocity and precipitation fields when using WRF-ARW</li>
+<li>New diagnostic output file with just WARNING messages when they exist</li>
+<li>Numerous corrections to clustering programs: displaying mean trajectories, dateline issues</li>
+<li>CONTROL and SETUP.CFG files from the internet can now be retrieved with comments after hash</li>
+<li>Bug fix in particle plot routines to avoid displaying deleted particles that have no position</li>
+<li>Numerous corrections to Google Earth conversions: year boundary, clamp to ground,</li>
+<li>Added support for bit-map decoding in the NARR GRIB converter</li>
+<li>Revised conversion of NARR GRIB files to be consistent with NOMADS file name convention</li>
+<li>Numerous bug fixes to GUI scripts: reset button, file name data entry</li>
+<li>Updated time-of-arrival graphical product</li>
+<li>GRIB lat-lon grid conversion program extended to support 0.125 deg resolution</li>
+</ul>
+<h4>March 2014 Revision (577)</h4>
+<ul>
+<li>New option to permit two different particle position files for model initialization:<br />
+one for initial conditions, particles are continued from a previous simulation, and one for<br />
+particle boundary conditions, representing particles emitted during a previous simulation<br />
+over the same time domain as the current simulation.</li>
+<li>Corrected Mercator/Polar-Stereo projection option with WRF-ARW converter</li>
+<li>New option in the particle plotting programs to show color with age or height</li>
+<li>New concplot option to turn off the printing of the maximum and minimum concentrations</li>
+<li>New namelist option to permit particle position output every time step</li>
+<li>Correction to insure different time period meteorological files are defined when on the same grid</li>
+<li>New option to overwrite particle output file rather than append multiple time periods</li>
+<li>MPI versions now support the command line argument as the suffix for the CONTROL and SETUP files</li>
+<li>Corrected backward version of the GEM subroutines to handle multiple meteorology files</li>
+</ul>
+<h4>August 2013 Revision (515)</h4>
+<ul>
+<li>Numerous issues related to producing KML-KMZ output corrected</li>
+<li>Permit the use of an time varying emissions input file with backward simulations</li>
+<li>Revised source-receptor solution menus to solve for time variation of emissions</li>
+<li>New program to create CSV output files which includes model and measurements</li>
+<li>Revised program to compute radiological dose with new GUI menu</li>
+<li>Resolved problems with particle file initialization when number exceeds array limits</li>
+<li>Random number generator defaults based upon particle number (gt 5000 use faster method)</li>
+<li>Modified conversion for animations to properly overwrite background</li>
+<li>Fixed problem with multiple meteorological grids when source not on all of the grids</li>
+<li>Multiple minor GUI changes to conform to September 2013 workshop materials</li>
+</ul>
+
+		</div>
+	</div>
+</div></div></div>
+
+	</div><!-- #content -->
+
+	
+	<aside id="sidebar" class="sidebar solid-bg dt-sticky-sidebar sidebar-shadow-decoration">
+		<div class="sidebar-content widget-divider-off">
+			<section id="nav_menu-17" class="widget widget_nav_menu"><div class="menu-hysplit-container"><ul id="menu-hysplit" class="menu"><li id="menu-item-10846" class="menu-item menu-item-type-post_type menu-item-object-page current-page-ancestor current-page-parent menu-item-10846"><a href="https://www.arl.noaa.gov/hysplit/">About HYSPLIT</a></li>
+<li id="menu-item-9206" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-9206"><a href="https://hysplitbbs.arl.noaa.gov/">HYSPLIT User Forum</a></li>
+<li id="menu-item-9207" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-9207"><a href="https://www.ready.noaa.gov/index.php">READY</a></li>
+<li id="menu-item-12318" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-12318"><a href="https://www.ready.noaa.gov/HYSPLIT.php">Get/Run HYSPLIT</a></li>
+<li id="menu-item-9143" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9143"><a href="https://www.arl.noaa.gov/hysplit/hysplit-workshop/">HYSPLIT Tutorials &#038; Workshop</a></li>
+<li id="menu-item-9227" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-9223 current_page_item menu-item-9227"><a href="https://www.arl.noaa.gov/hysplit/hysplit-model-updates/" aria-current="page">HYSPLIT Model Updates</a></li>
+<li id="menu-item-9140" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9140"><a href="https://www.arl.noaa.gov/hysplit/hysplit-publications-meteorological-data-information/">HYSPLIT Publications &#038; Meteorological Data Information</a></li>
+<li id="menu-item-9141" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9141"><a href="https://www.arl.noaa.gov/hysplit/hysplit-references/">HYSPLIT References</a></li>
+<li id="menu-item-9139" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9139"><a href="https://www.arl.noaa.gov/hysplit/hysplit-inverse-modeling/">HYSPLIT Inverse Modeling</a></li>
+<li id="menu-item-9138" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9138"><a href="https://www.arl.noaa.gov/hysplit/dust/">HYSPLIT Dust</a></li>
+<li id="menu-item-9144" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9144"><a href="https://www.arl.noaa.gov/hysplit/smoke-forecasting/">HYSPLIT-based Smoke Forecasting System</a></li>
+<li id="menu-item-9142" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9142"><a href="https://www.arl.noaa.gov/hysplit/hysplit-smoke-calculation-originated-from-a-prescribed-burn/">HYSPLIT Smoke Calculation</a></li>
+<li id="menu-item-9147" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9147"><a href="https://www.arl.noaa.gov/hysplit/volcanic-ash-model/">HYSPLIT Volcanic Ash Model</a></li>
+<li id="menu-item-10275" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-10275"><a href="https://apps.arl.noaa.gov/">HYSPLIT Locust Forecast</a></li>
+<li id="menu-item-9252" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-9252"><a href="https://www.arl.noaa.gov/hysplit/cmapf-mapping-routines/">CMAPF Mapping Routines</a></li>
+<li id="menu-item-10088" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-10088"><a href="https://www.arl.noaa.gov/hysplit/datem-tracer-evaluation/hysplit-evaluation-results-using-datem/">HYSPLIT Evaluation Results Using DATEM</a></li>
+<li id="menu-item-10087" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-10087"><a href="https://www.arl.noaa.gov/hysplit/datem-tracer-evaluation/datem/">DATEM – Data Archive of Tracer Experiments and Meteorology</a>
+<ul class="sub-menu">
+	<li id="menu-item-10086" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-10086"><a href="https://www.arl.noaa.gov/hysplit/datem-tracer-evaluation/">DATEM Tracer Evaluation</a></li>
+</ul>
+</li>
+</ul></div></section>		</div>
+	</aside><!-- #sidebar -->
+
+
+
+
+			</div><!-- .wf-container -->
+		</div><!-- .wf-wrap -->
+
+	
+	</div><!-- #main -->
+
+	
+
+
+	<!-- !Footer -->
+	<footer id="footer" class="footer solid-bg footer-outline-decoration"  role="contentinfo">
+
+		
+			<div class="wf-wrap">
+				<div class="wf-container-footer">
+					<div class="wf-container">
+						<section id="sow-image-12" class="widget widget_sow-image wf-cell wf-1-4"><div
+			
+			class="so-widget-sow-image so-widget-sow-image-default-113ccd71f3e6"
+			
+		>
+<div class="sow-image-container">
+			<a href="https://www.noaa.gov/"
+					>
+			<img 
+	src="https://www.arl.noaa.gov/wp_arl/wp-content/uploads/2022/04/noaa-emblem-rgb-2022.png" width="100" height="100" sizes="(max-width: 100px) 100vw, 100px" alt="NOAA Logo" decoding="async" loading="lazy" 		class="so-widget-image"/>
+			</a></div>
+
+</div></section><section id="block-3" class="widget widget_block wf-cell wf-1-2">
+<div class="wp-block-group"><div class="wp-block-group__inner-container is-layout-flow wp-block-group-is-layout-flow">
+<div class="wp-block-group"><div class="wp-block-group__inner-container is-layout-flow wp-block-group-is-layout-flow">
+<div class="wp-block-columns is-layout-flex wp-container-core-columns-is-layout-9d6595d7 wp-block-columns-is-layout-flex">
+<div class="wp-block-column is-vertically-aligned-top is-layout-flow wp-block-column-is-layout-flow" style="flex-basis:50%">
+<div class="wp-block-group"><div class="wp-block-group__inner-container is-layout-flow wp-block-group-is-layout-flow"><div class="widget widget_nav_menu"><div class="menu-footer-menu-container"><ul id="menu-footer-menu" class="menu"><li id="menu-item-10991" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-10991"><a href="https://research.noaa.gov/">NOAA Research</a></li>
+<li id="menu-item-10992" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-10992"><a href="https://www.noaa.gov/">NOAA Home</a></li>
+<li id="menu-item-10993" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-10993"><a href="https://www.commerce.gov/">US Dept. of Commerce</a></li>
+</ul></div></div></div></div>
+</div>
+</div>
+</div></div>
+</div></div>
+</section><section id="sow-image-11" class="widget widget_sow-image wf-cell wf-1-4"><div
+			
+			class="so-widget-sow-image so-widget-sow-image-default-113ccd71f3e6"
+			
+		>
+<div class="sow-image-container">
+			<a href="https://www.commerce.gov/"
+					>
+			<img 
+	src="https://www.arl.noaa.gov/wp_arl/wp-content/uploads/2022/04/900px-Seal-of-the-United-States-Department-of-Commerce.png" width="100" height="100" sizes="(max-width: 100px) 100vw, 100px" title="Dept of Commerce Seal" alt="" decoding="async" loading="lazy" 		class="so-widget-image"/>
+			</a></div>
+
+</div></section>					</div><!-- .wf-container -->
+				</div><!-- .wf-container-footer -->
+			</div><!-- .wf-wrap -->
+
+			
+<!-- !Bottom-bar -->
+<div id="bottom-bar" class="solid-bg logo-center">
+    <div class="wf-wrap">
+        <div class="wf-container-bottom">
+
+			
+            <div class="wf-float-right">
+
+				<div class="mini-nav"><ul id="bottom-menu"><li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-10951 first depth-0"><a href='https://www.noaa.gov/protecting-your-privacy' data-level='1'><span class="menu-item-text"><span class="menu-text">Web Privacy</span></span></a></li> <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-10967 depth-0"><a href='https://www.noaa.gov/accessibility' data-level='1'><span class="menu-item-text"><span class="menu-text">Web Accessibility</span></span></a></li> <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-10950 depth-0"><a href='https://www.noaa.gov/disclaimer' data-level='1'><span class="menu-item-text"><span class="menu-text">External Content Disclaimer</span></span></a></li> <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-10966 depth-0"><a href='https://www.noaa.gov/organization/information-technology/freedom-of-information-act' data-level='1'><span class="menu-item-text"><span class="menu-text">FOIA</span></span></a></li> <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-10953 depth-0"><a href='https://sites.google.com/noaa.gov/ohcs/current-event' data-level='1'><span class="menu-item-text"><span class="menu-text">COVID</span></span></a></li> <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-10947 depth-0"><a href='https://www.noaa.gov/inclusion-and-civil-rights' data-level='1'><span class="menu-item-text"><span class="menu-text">EEO</span></span></a></li> <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-10949 depth-0"><a href='https://www.noaa.gov/organization/information-technology/policy-oversight/information-quality' data-level='1'><span class="menu-item-text"><span class="menu-text">Information Quality</span></span></a></li> <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-10948 last depth-0"><a href='https://www.usa.gov/' data-level='1'><span class="menu-item-text"><span class="menu-text">USA.GOV</span></span></a></li> </ul><div class="menu-select"><span class="customSelect1"><span class="customSelectInner">Footer Bar</span></span></div></div><div class="bottom-text-block"><p><CENTER> Website Maintained by ARL | <i class="Defaults-copyright"></i> ARL 2026 <span id="siteseal"><script async type="text/javascript" src="https://seal.godaddy.com/verifySeal?sealID=M02VxNhk8XIvQUt0IoelpD4kKFe6H2QmFmQZ06I84GFq2TSGLtI0KpNYGbBd"></script></span></p>
+</div>
+            </div>
+
+        </div><!-- .wf-container-bottom -->
+    </div><!-- .wf-wrap -->
+</div><!-- #bottom-bar -->
+	</footer><!-- #footer -->
+
+<a href="#" class="scroll-top"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 16 16" style="enable-background:new 0 0 16 16;" xml:space="preserve">
+<path d="M11.7,6.3l-3-3C8.5,3.1,8.3,3,8,3c0,0,0,0,0,0C7.7,3,7.5,3.1,7.3,3.3l-3,3c-0.4,0.4-0.4,1,0,1.4c0.4,0.4,1,0.4,1.4,0L7,6.4
+	V12c0,0.6,0.4,1,1,1s1-0.4,1-1V6.4l1.3,1.3c0.4,0.4,1,0.4,1.4,0C11.9,7.5,12,7.3,12,7S11.9,6.5,11.7,6.3z"/>
+</svg><span class="screen-reader-text">Go to Top</span></a>
+
+</div><!-- #page -->
+
+
+		<script>
+			window.RS_MODULES = window.RS_MODULES || {};
+			window.RS_MODULES.modules = window.RS_MODULES.modules || {};
+			window.RS_MODULES.waiting = window.RS_MODULES.waiting || [];
+			window.RS_MODULES.defered = true;
+			window.RS_MODULES.moduleWaiting = window.RS_MODULES.moduleWaiting || {};
+			window.RS_MODULES.type = 'compiled';
+		</script>
+		<script type="speculationrules">
+{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/wp_arl/wp-*.php","/wp_arl/wp-admin/*","/wp_arl/wp-content/uploads/*","/wp_arl/wp-content/*","/wp_arl/wp-content/plugins/*","/wp_arl/wp-content/themes/dt-the7/*","/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script>
+<script type="text/html" id="wpb-modifications"> window.wpbCustomElement = 1; </script><script src="https://www.arl.noaa.gov/wp_arl/wp-content/themes/dt-the7/js/main.min.js?ver=14.2.1.1" id="dt-main-js"></script>
+<script src="//www.arl.noaa.gov/wp_arl/wp-content/plugins/revslider/sr6/assets/js/rbtools.min.js?ver=6.7.38" defer async id="tp-tools-js"></script>
+<script src="//www.arl.noaa.gov/wp_arl/wp-content/plugins/revslider/sr6/assets/js/rs6.min.js?ver=6.7.38" defer async id="revmin-js"></script>
+<script src="https://www.arl.noaa.gov/wp_arl/wp-content/themes/dt-the7/js/legacy.min.js?ver=14.2.1.1" id="dt-legacy-js"></script>
+<script src="https://www.arl.noaa.gov/wp_arl/wp-content/themes/dt-the7/lib/jquery-mousewheel/jquery-mousewheel.min.js?ver=14.2.1.1" id="jquery-mousewheel-js"></script>
+<script src="https://www.arl.noaa.gov/wp_arl/wp-content/themes/dt-the7/lib/custom-scrollbar/custom-scrollbar.min.js?ver=14.2.1.1" id="the7-custom-scrollbar-js"></script>
+<script src="https://www.arl.noaa.gov/wp_arl/wp-content/plugins/dt-the7-core/assets/js/post-type.min.js?ver=2.7.12" id="the7-core-js"></script>
+<script id="ultimate-vc-addons-smooth-scroll-js-extra">
+var php_vars = {"step":"80","speed":"480"};
+//# sourceURL=ultimate-vc-addons-smooth-scroll-js-extra
+</script>
+<script src="https://www.arl.noaa.gov/wp_arl/wp-content/plugins/Ultimate_VC_Addons/assets/min-js/SmoothScroll.min.js?ver=3.21.3" id="ultimate-vc-addons-smooth-scroll-js"></script>
+<script src="https://www.arl.noaa.gov/wp_arl/wp-content/plugins/js_composer/assets/js/dist/js_composer_front.min.js?ver=8.7.2" id="wpb_composer_front_js-js"></script>
+<script id="wp-emoji-settings" type="application/json">
+{"baseUrl":"https://s.w.org/images/core/emoji/17.0.2/72x72/","ext":".png","svgUrl":"https://s.w.org/images/core/emoji/17.0.2/svg/","svgExt":".svg","source":{"concatemoji":"https://www.arl.noaa.gov/wp_arl/wp-includes/js/wp-emoji-release.min.js?ver=6.9.1"}}
+</script>
+<script type="module">
+/*! This file is auto-generated */
+const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(window._wpemojiSettings=a,"wpEmojiSettingsSupports"),s=["flag","emoji"];function i(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(o,JSON.stringify(t))}catch(e){}}function c(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data);e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0);const a=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data);return t.every((e,t)=>e===a[t])}function p(e,t){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var n=e.getImageData(16,16,1,1);for(let e=0;e<n.data.length;e++)if(0!==n.data[e])return!1;return!0}function u(e,t,n,a){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\udde8\ud83c\uddf6","\ud83c\udde8\u200b\ud83c\uddf6")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!a(e,"\ud83e\u1fac8")}return!1}function f(e,t,n,a){let r;const o=(r="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):document.createElement("canvas")).getContext("2d",{willReadFrequently:!0}),s=(o.textBaseline="top",o.font="600 32px Arial",{});return e.forEach(e=>{s[e]=t(o,e,n,a)}),s}function r(e){var t=document.createElement("script");t.src=e,t.defer=!0,document.head.appendChild(t)}a.supports={everything:!0,everythingExceptFlag:!0},new Promise(t=>{let n=function(){try{var e=JSON.parse(sessionStorage.getItem(o));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+f.toString()+"("+[JSON.stringify(s),u.toString(),c.toString(),p.toString()].join(",")+"));",a=new Blob([e],{type:"text/javascript"});const r=new Worker(URL.createObjectURL(a),{name:"wpTestEmojiSupports"});return void(r.onmessage=e=>{i(n=e.data),r.terminate(),t(n)})}catch(e){}i(n=f(s,u,c,p))}t(n)}).then(e=>{for(const n in e)a.supports[n]=e[n],a.supports.everything=a.supports.everything&&a.supports[n],"flag"!==n&&(a.supports.everythingExceptFlag=a.supports.everythingExceptFlag&&a.supports[n]);var t;a.supports.everythingExceptFlag=a.supports.everythingExceptFlag&&!a.supports.flag,a.supports.everything||((t=a.source||{}).concatemoji?r(t.concatemoji):t.wpemoji&&t.twemoji&&(r(t.twemoji),r(t.wpemoji)))});
+//# sourceURL=https://www.arl.noaa.gov/wp_arl/wp-includes/js/wp-emoji-loader.min.js
+</script>
+<script></script>
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="pswp__bg"></div>
+	<div class="pswp__scroll-wrap">
+		<div class="pswp__container">
+			<div class="pswp__item"></div>
+			<div class="pswp__item"></div>
+			<div class="pswp__item"></div>
+		</div>
+		<div class="pswp__ui pswp__ui--hidden">
+			<div class="pswp__top-bar">
+				<div class="pswp__counter"></div>
+				<button class="pswp__button pswp__button--close" title="Close (Esc)" aria-label="Close (Esc)"></button>
+				<button class="pswp__button pswp__button--share" title="Share" aria-label="Share"></button>
+				<button class="pswp__button pswp__button--fs" title="Toggle fullscreen" aria-label="Toggle fullscreen"></button>
+				<button class="pswp__button pswp__button--zoom" title="Zoom in/out" aria-label="Zoom in/out"></button>
+				<div class="pswp__preloader">
+					<div class="pswp__preloader__icn">
+						<div class="pswp__preloader__cut">
+							<div class="pswp__preloader__donut"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+				<div class="pswp__share-tooltip"></div> 
+			</div>
+			<button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)" aria-label="Previous (arrow left)">
+			</button>
+			<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)" aria-label="Next (arrow right)">
+			</button>
+			<div class="pswp__caption">
+				<div class="pswp__caption__center"></div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

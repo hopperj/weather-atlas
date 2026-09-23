@@ -1,0 +1,16 @@
+schema_version: 1
+maximum_horizon_hours: 24
+allowed_grid_spacing_degrees: [0.25, 0.5, 1.0]
+default_grid_spacing_degrees: 0.5
+maximum_domain_area_degree2: 2500
+maximum_events: 200
+maximum_releases: 20000
+maximum_particles: 1000000
+minimum_particles_per_release: 50
+default_particles: 250000
+maximum_output_bytes: 21474836480
+timeout_seconds: 10800
+threads: 8
+vertical_layers: 12
+operational_enabled: false
+simulation_writes_enabled: false

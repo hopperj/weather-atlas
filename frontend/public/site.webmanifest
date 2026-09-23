@@ -1,0 +1,20 @@
+{
+  "name": "Weather Model Atlas",
+  "short_name": "Weather Atlas",
+  "theme_color": "#07111d",
+  "background_color": "#07111d",
+  "icons": [
+    {
+      "src": "/icons/crimson-sky-v1-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/crimson-sky-v1-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,0 +1,840 @@
+&RECEPTORS
+ RECEPTOR="A01             ",
+ LON=  9.73330021    ,
+ LAT=  47.5000000    ,
+ /
+&RECEPTORS
+ RECEPTOR="A02             ",
+ LON=  13.7333002    ,
+ LAT=  47.8167000    ,
+ /
+&RECEPTORS
+ RECEPTOR="A03             ",
+ LON=  11.3500004    ,
+ LAT=  47.2667007    ,
+ /
+&RECEPTORS
+ RECEPTOR="A04             ",
+ LON=  14.1833000    ,
+ LAT=  48.2332993    ,
+ /
+&RECEPTORS
+ RECEPTOR="A05             ",
+ LON=  13.0500002    ,
+ LAT=  47.7832985    ,
+ /
+&RECEPTORS
+ RECEPTOR="A06             ",
+ LON=  12.9499998    ,
+ LAT=  47.0499992    ,
+ /
+&RECEPTORS
+ RECEPTOR="A07             ",
+ LON=  14.9167004    ,
+ LAT=  46.9333000    ,
+ /
+&RECEPTORS
+ RECEPTOR="A08             ",
+ LON=  16.3500004    ,
+ LAT=  48.2332993    ,
+ /
+&RECEPTORS
+ RECEPTOR="B01             ",
+ LON=  4.59999990    ,
+ LAT=  50.0999985    ,
+ /
+&RECEPTORS
+ RECEPTOR="B02             ",
+ LON=  6.18330002    ,
+ LAT=  50.4667015    ,
+ /
+&RECEPTORS
+ RECEPTOR="B03             ",
+ LON=  2.65000010    ,
+ LAT=  51.0833015    ,
+ /
+&RECEPTORS
+ RECEPTOR="B04             ",
+ LON=  5.08330011    ,
+ LAT=  51.2167015    ,
+ /
+&RECEPTORS
+ RECEPTOR="B05             ",
+ LON=  4.34999990    ,
+ LAT=  50.7999992    ,
+ /
+&RECEPTORS
+ RECEPTOR="BG01            ",
+ LON=  23.3833008    ,
+ LAT=  42.6500015    ,
+ /
+&RECEPTORS
+ RECEPTOR="BG02            ",
+ LON=  22.8833008    ,
+ LAT=  43.8167000    ,
+ /
+&RECEPTORS
+ RECEPTOR="CH01            ",
+ LON=  9.68330002    ,
+ LAT=  46.7832985    ,
+ /
+&RECEPTORS
+ RECEPTOR="CH02            ",
+ LON=  6.94999981    ,
+ LAT=  46.8167000    ,
+ /
+&RECEPTORS
+ RECEPTOR="CH03            ",
+ LON=  8.53330040    ,
+ LAT=  47.4832993    ,
+ /
+&RECEPTORS
+ RECEPTOR="CH04            ",
+ LON=  7.98330021    ,
+ LAT=  46.5499992    ,
+ /
+&RECEPTORS
+ RECEPTOR="CR01            ",
+ LON=  17.5499992    ,
+ LAT=  49.7667007    ,
+ /
+&RECEPTORS
+ RECEPTOR="CR02            ",
+ LON=  15.0166998    ,
+ LAT=  50.7667007    ,
+ /
+&RECEPTORS
+ RECEPTOR="CR03            ",
+ LON=  14.4499998    ,
+ LAT=  50.0000000    ,
+ /
+&RECEPTORS
+ RECEPTOR="CR04            ",
+ LON=  14.3332996    ,
+ LAT=  49.2000008    ,
+ /
+&RECEPTORS
+ RECEPTOR="D01             ",
+ LON=  14.0000000    ,
+ LAT=  53.0332985    ,
+ /
+&RECEPTORS
+ RECEPTOR="D02             ",
+ LON=  13.4333000    ,
+ LAT=  54.6833000    ,
+ /
+&RECEPTORS
+ RECEPTOR="D03             ",
+ LON=  11.3000002    ,
+ LAT=  51.3833008    ,
+ /
+&RECEPTORS
+ RECEPTOR="D04             ",
+ LON=  10.9333000    ,
+ LAT=  48.4333000    ,
+ /
+&RECEPTORS
+ RECEPTOR="D05             ",
+ LON=  13.3999996    ,
+ LAT=  52.4667015    ,
+ /
+&RECEPTORS
+ RECEPTOR="D06             ",
+ LON=  8.80000019    ,
+ LAT=  53.0499992    ,
+ /
+&RECEPTORS
+ RECEPTOR="D07             ",
+ LON=  10.6167002    ,
+ LAT=  51.7999992    ,
+ /
+&RECEPTORS
+ RECEPTOR="D08             ",
+ LON=  8.69999981    ,
+ LAT=  53.8666992    ,
+ /
+&RECEPTORS
+ RECEPTOR="D09             ",
+ LON=  13.7833004    ,
+ LAT=  51.1333008    ,
+ /
+&RECEPTORS
+ RECEPTOR="D10             ",
+ LON=  6.96670008    ,
+ LAT=  51.4000015    ,
+ /
+&RECEPTORS
+ RECEPTOR="D11             ",
+ LON=  8.00000000    ,
+ LAT=  47.8833008    ,
+ /
+&RECEPTORS
+ RECEPTOR="D12             ",
+ LON=  12.9499998    ,
+ LAT=  50.4333000    ,
+ /
+&RECEPTORS
+ RECEPTOR="D13             ",
+ LON=  8.60000038    ,
+ LAT=  50.0499992    ,
+ /
+&RECEPTORS
+ RECEPTOR="D14             ",
+ LON=  14.9499998    ,
+ LAT=  51.0167007    ,
+ /
+&RECEPTORS
+ RECEPTOR="D15             ",
+ LON=  13.3999996    ,
+ LAT=  54.0999985    ,
+ /
+&RECEPTORS
+ RECEPTOR="D16             ",
+ LON=  10.0000000    ,
+ LAT=  53.6333008    ,
+ /
+&RECEPTORS
+ RECEPTOR="D17             ",
+ LON=  9.69999981    ,
+ LAT=  52.4667015    ,
+ /
+&RECEPTORS
+ RECEPTOR="D18             ",
+ LON=  7.90000010    ,
+ LAT=  54.1833000    ,
+ /
+&RECEPTORS
+ RECEPTOR="D19             ",
+ LON=  11.8832998    ,
+ LAT=  50.3167000    ,
+ /
+&RECEPTORS
+ RECEPTOR="D20             ",
+ LON=  11.0166998    ,
+ LAT=  47.7999992    ,
+ /
+&RECEPTORS
+ RECEPTOR="D21             ",
+ LON=  8.48330021    ,
+ LAT=  51.1833000    ,
+ /
+&RECEPTORS
+ RECEPTOR="D22             ",
+ LON=  9.44999981    ,
+ LAT=  51.2999992    ,
+ /
+&RECEPTORS
+ RECEPTOR="D23             ",
+ LON=  12.2333002    ,
+ LAT=  51.4166985    ,
+ /
+&RECEPTORS
+ RECEPTOR="D24             ",
+ LON=  14.1167002    ,
+ LAT=  52.2167015    ,
+ /
+&RECEPTORS
+ RECEPTOR="D25             ",
+ LON=  7.30000019    ,
+ LAT=  52.5167007    ,
+ /
+&RECEPTORS
+ RECEPTOR="D26             ",
+ LON=  8.41670036    ,
+ LAT=  55.0167007    ,
+ /
+&RECEPTORS
+ RECEPTOR="D27             ",
+ LON=  11.1332998    ,
+ LAT=  52.9667015    ,
+ /
+&RECEPTORS
+ RECEPTOR="D28             ",
+ LON=  11.5832996    ,
+ LAT=  52.1166992    ,
+ /
+&RECEPTORS
+ RECEPTOR="D29             ",
+ LON=  8.55000019    ,
+ LAT=  49.5167007    ,
+ /
+&RECEPTORS
+ RECEPTOR="D30             ",
+ LON=  7.69999981    ,
+ LAT=  52.1333008    ,
+ /
+&RECEPTORS
+ RECEPTOR="D31             ",
+ LON=  13.1999998    ,
+ LAT=  53.5499992    ,
+ /
+&RECEPTORS
+ RECEPTOR="D32             ",
+ LON=  12.8167000    ,
+ LAT=  52.9000015    ,
+ /
+&RECEPTORS
+ RECEPTOR="D33             ",
+ LON=  7.15000010    ,
+ LAT=  53.7167015    ,
+ /
+&RECEPTORS
+ RECEPTOR="D34             ",
+ LON=  6.94999981    ,
+ LAT=  50.3666992    ,
+ /
+&RECEPTORS
+ RECEPTOR="D35             ",
+ LON=  11.0832996    ,
+ LAT=  49.5000000    ,
+ /
+&RECEPTORS
+ RECEPTOR="D36             ",
+ LON=  9.51669979    ,
+ LAT=  49.2167015    ,
+ /
+&RECEPTORS
+ RECEPTOR="D37             ",
+ LON=  13.4666996    ,
+ LAT=  48.5833015    ,
+ /
+&RECEPTORS
+ RECEPTOR="D38             ",
+ LON=  12.1000004    ,
+ LAT=  49.0499992    ,
+ /
+&RECEPTORS
+ RECEPTOR="D39             ",
+ LON=  12.0832996    ,
+ LAT=  54.1833000    ,
+ /
+&RECEPTORS
+ RECEPTOR="D40             ",
+ LON=  7.11670017    ,
+ LAT=  49.2167015    ,
+ /
+&RECEPTORS
+ RECEPTOR="D41             ",
+ LON=  9.55000019    ,
+ LAT=  54.5332985    ,
+ /
+&RECEPTORS
+ RECEPTOR="D42             ",
+ LON=  11.3832998    ,
+ LAT=  53.6500015    ,
+ /
+&RECEPTORS
+ RECEPTOR="D43             ",
+ LON=  9.21669960    ,
+ LAT=  48.6833000    ,
+ /
+&RECEPTORS
+ RECEPTOR="D44             ",
+ LON=  6.66669989    ,
+ LAT=  49.7500000    ,
+ /
+&RECEPTORS
+ RECEPTOR="D45             ",
+ LON=  9.94999981    ,
+ LAT=  50.5000000    ,
+ /
+&RECEPTORS
+ RECEPTOR="D46             ",
+ LON=  12.0166998    ,
+ LAT=  47.7000008    ,
+ /
+&RECEPTORS
+ RECEPTOR="D47             ",
+ LON=  9.96669960    ,
+ LAT=  49.7667007    ,
+ /
+&RECEPTORS
+ RECEPTOR="DK01            ",
+ LON=  9.86670017    ,
+ LAT=  57.0999985    ,
+ /
+&RECEPTORS
+ RECEPTOR="DK02            ",
+ LON=  10.9666996    ,
+ LAT=  54.8333015    ,
+ /
+&RECEPTORS
+ RECEPTOR="DK03            ",
+ LON=  10.9666996    ,
+ LAT=  56.4500008    ,
+ /
+&RECEPTORS
+ RECEPTOR="DK04            ",
+ LON=  14.7833004    ,
+ LAT=  55.2999992    ,
+ /
+&RECEPTORS
+ RECEPTOR="DK05            ",
+ LON=  8.13329983    ,
+ LAT=  56.0000000    ,
+ /
+&RECEPTORS
+ RECEPTOR="DK06            ",
+ LON=  12.5333004    ,
+ LAT=  55.7667007    ,
+ /
+&RECEPTORS
+ RECEPTOR="DK07            ",
+ LON=  9.11670017    ,
+ LAT=  56.2999992    ,
+ /
+&RECEPTORS
+ RECEPTOR="DK08            ",
+ LON=  12.5500002    ,
+ LAT=  54.9500008    ,
+ /
+&RECEPTORS
+ RECEPTOR="DK09            ",
+ LON=  10.6332998    ,
+ LAT=  57.7332993    ,
+ /
+&RECEPTORS
+ RECEPTOR="DK10            ",
+ LON=  9.26669979    ,
+ LAT=  55.2332993    ,
+ /
+&RECEPTORS
+ RECEPTOR="DK11            ",
+ LON=  8.21669960    ,
+ LAT=  56.7000008    ,
+ /
+&RECEPTORS
+ RECEPTOR="F01             ",
+ LON=  1.83329999    ,
+ LAT=  50.1333008    ,
+ /
+&RECEPTORS
+ RECEPTOR="F02             ",
+ LON= 0.100000001    ,
+ LAT=  48.4500008    ,
+ /
+&RECEPTORS
+ RECEPTOR="F03             ",
+ LON=  3.54999995    ,
+ LAT=  47.7999992    ,
+ /
+&RECEPTORS
+ RECEPTOR="F04             ",
+ LON=  7.51669979    ,
+ LAT=  47.5999985    ,
+ /
+&RECEPTORS
+ RECEPTOR="F05             ",
+ LON=  6.86670017    ,
+ LAT=  47.6333008    ,
+ /
+&RECEPTORS
+ RECEPTOR="F06             ",
+ LON=  5.98330021    ,
+ LAT=  47.2500000    ,
+ /
+&RECEPTORS
+ RECEPTOR="F07             ",
+ LON=  2.36669993    ,
+ LAT=  47.0667000    ,
+ /
+&RECEPTORS
+ RECEPTOR="F08             ",
+ LON= -3.58330011    ,
+ LAT=  48.4500008    ,
+ /
+&RECEPTORS
+ RECEPTOR="F09             ",
+ LON= 0.449999988    ,
+ LAT=  49.1833000    ,
+ /
+&RECEPTORS
+ RECEPTOR="F10             ",
+ LON=-0.383300006    ,
+ LAT=  49.6333008    ,
+ /
+&RECEPTORS
+ RECEPTOR="F11             ",
+ LON=  7.40000010    ,
+ LAT=  47.9166985    ,
+ /
+&RECEPTORS
+ RECEPTOR="F12             ",
+ LON=  5.08330011    ,
+ LAT=  47.2667007    ,
+ /
+&RECEPTORS
+ RECEPTOR="F13             ",
+ LON=  6.43330002    ,
+ LAT=  48.1666985    ,
+ /
+&RECEPTORS
+ RECEPTOR="F14             ",
+ LON=  3.09999990    ,
+ LAT=  50.5667000    ,
+ /
+&RECEPTORS
+ RECEPTOR="F15             ",
+ LON=  6.13329983    ,
+ LAT=  49.0833015    ,
+ /
+&RECEPTORS
+ RECEPTOR="F16             ",
+ LON=  6.21670008    ,
+ LAT=  48.6833000    ,
+ /
+&RECEPTORS
+ RECEPTOR="F17             ",
+ LON=-0.400000006    ,
+ LAT=  47.1666985    ,
+ /
+&RECEPTORS
+ RECEPTOR="F18             ",
+ LON=  2.53329992    ,
+ LAT=  49.0167007    ,
+ /
+&RECEPTORS
+ RECEPTOR="F19             ",
+ LON=  2.40000010    ,
+ LAT=  48.7332993    ,
+ /
+&RECEPTORS
+ RECEPTOR="F20             ",
+ LON=  4.03329992    ,
+ LAT=  49.2999992    ,
+ /
+&RECEPTORS
+ RECEPTOR="F21             ",
+ LON=-0.266700000    ,
+ LAT=  48.0667000    ,
+ /
+&RECEPTORS
+ RECEPTOR="F22             ",
+ LON=  1.18330002    ,
+ LAT=  49.3833008    ,
+ /
+&RECEPTORS
+ RECEPTOR="F23             ",
+ LON= -1.14999998    ,
+ LAT=  48.5332985    ,
+ /
+&RECEPTORS
+ RECEPTOR="F24             ",
+ LON=  7.63329983    ,
+ LAT=  48.5499992    ,
+ /
+&RECEPTORS
+ RECEPTOR="F25             ",
+ LON= 0.716700017    ,
+ LAT=  47.4500008    ,
+ /
+&RECEPTORS
+ RECEPTOR="F26             ",
+ LON= -1.25000000    ,
+ LAT=  47.5499992    ,
+ /
+&RECEPTORS
+ RECEPTOR="F27             ",
+ LON=  2.01670003    ,
+ LAT=  48.7667007    ,
+ /
+&RECEPTORS
+ RECEPTOR="H01             ",
+ LON=  19.1833000    ,
+ LAT=  47.4333000    ,
+ /
+&RECEPTORS
+ RECEPTOR="H02             ",
+ LON=  17.6833000    ,
+ LAT=  47.7000008    ,
+ /
+&RECEPTORS
+ RECEPTOR="H03             ",
+ LON=  16.8999996    ,
+ LAT=  46.4500008    ,
+ /
+&RECEPTORS
+ RECEPTOR="H04             ",
+ LON=  16.6333008    ,
+ LAT=  47.2667007    ,
+ /
+&RECEPTORS
+ RECEPTOR="N01             ",
+ LON=  5.21670008    ,
+ LAT=  60.2999992    ,
+ /
+&RECEPTORS
+ RECEPTOR="N02             ",
+ LON=  9.23330021    ,
+ LAT=  60.9832993    ,
+ /
+&RECEPTORS
+ RECEPTOR="N04             ",
+ LON=  8.08329964    ,
+ LAT=  58.2000008    ,
+ /
+&RECEPTORS
+ RECEPTOR="N05             ",
+ LON=  11.0832996    ,
+ LAT=  60.2000008    ,
+ /
+&RECEPTORS
+ RECEPTOR="N06             ",
+ LON=  10.7833004    ,
+ LAT=  59.3833008    ,
+ /
+&RECEPTORS
+ RECEPTOR="N07             ",
+ LON=  5.63329983    ,
+ LAT=  58.8833008    ,
+ /
+&RECEPTORS
+ RECEPTOR="NL01            ",
+ LON=  5.78329992    ,
+ LAT=  50.9166985    ,
+ /
+&RECEPTORS
+ RECEPTOR="NL02            ",
+ LON=  5.18330002    ,
+ LAT=  52.0999985    ,
+ /
+&RECEPTORS
+ RECEPTOR="NL03            ",
+ LON=  4.78329992    ,
+ LAT=  52.9166985    ,
+ /
+&RECEPTORS
+ RECEPTOR="NL04            ",
+ LON=  6.58330011    ,
+ LAT=  53.1333008    ,
+ /
+&RECEPTORS
+ RECEPTOR="NL05            ",
+ LON=  3.59999990    ,
+ LAT=  51.4500008    ,
+ /
+&RECEPTORS
+ RECEPTOR="NL06            ",
+ LON=  4.44999981    ,
+ LAT=  51.9500008    ,
+ /
+&RECEPTORS
+ RECEPTOR="NL07            ",
+ LON=  2.95000005    ,
+ LAT=  53.8167000    ,
+ /
+&RECEPTORS
+ RECEPTOR="NL08            ",
+ LON=  4.19999981    ,
+ LAT=  53.5499992    ,
+ /
+&RECEPTORS
+ RECEPTOR="NL09            ",
+ LON=  3.76670003    ,
+ LAT=  52.7667007    ,
+ /
+&RECEPTORS
+ RECEPTOR="PLO1            ",
+ LON=  18.8167000    ,
+ LAT=  54.5999985    ,
+ /
+&RECEPTORS
+ RECEPTOR="PLO2            ",
+ LON=  20.7000008    ,
+ LAT=  50.8167000    ,
+ /
+&RECEPTORS
+ RECEPTOR="PLO3            ",
+ LON=  16.6499996    ,
+ LAT=  50.4333000    ,
+ /
+&RECEPTORS
+ RECEPTOR="PLO4            ",
+ LON=  16.1499996    ,
+ LAT=  54.2000008    ,
+ /
+&RECEPTORS
+ RECEPTOR="PLO5            ",
+ LON=  18.6667004    ,
+ LAT=  52.2000008    ,
+ /
+&RECEPTORS
+ RECEPTOR="PLO6            ",
+ LON=  16.7500000    ,
+ LAT=  53.1333008    ,
+ /
+&RECEPTORS
+ RECEPTOR="PLO7            ",
+ LON=  22.9500008    ,
+ LAT=  54.1333008    ,
+ /
+&RECEPTORS
+ RECEPTOR="PLO8            ",
+ LON=  15.5333004    ,
+ LAT=  51.9333000    ,
+ /
+&RECEPTORS
+ RECEPTOR="R01             ",
+ LON=  21.3167000    ,
+ LAT=  46.1666985    ,
+ /
+&RECEPTORS
+ RECEPTOR="R02             ",
+ LON=  26.1333008    ,
+ LAT=  44.5000000    ,
+ /
+&RECEPTORS
+ RECEPTOR="S01             ",
+ LON=  15.5832996    ,
+ LAT=  59.5332985    ,
+ /
+&RECEPTORS
+ RECEPTOR="S02             ",
+ LON=  11.8832998    ,
+ LAT=  57.7832985    ,
+ /
+&RECEPTORS
+ RECEPTOR="S03             ",
+ LON=  19.2000008    ,
+ LAT=  58.4000015    ,
+ /
+&RECEPTORS
+ RECEPTOR="S04             ",
+ LON=  14.1332998    ,
+ LAT=  57.2999992    ,
+ /
+&RECEPTORS
+ RECEPTOR="S05             ",
+ LON=  18.1499996    ,
+ LAT=  56.9166985    ,
+ /
+&RECEPTORS
+ RECEPTOR="S06             ",
+ LON=  13.4666996    ,
+ LAT=  59.3666992    ,
+ /
+&RECEPTORS
+ RECEPTOR="S07             ",
+ LON=  12.4499998    ,
+ LAT=  56.2999992    ,
+ /
+&RECEPTORS
+ RECEPTOR="S08             ",
+ LON=  13.2333002    ,
+ LAT=  56.0833015    ,
+ /
+&RECEPTORS
+ RECEPTOR="S09             ",
+ LON=  15.2333002    ,
+ LAT=  58.0667000    ,
+ /
+&RECEPTORS
+ RECEPTOR="S10             ",
+ LON=  13.3667002    ,
+ LAT=  55.5499992    ,
+ /
+&RECEPTORS
+ RECEPTOR="S11             ",
+ LON=  13.7166996    ,
+ LAT=  60.6833000    ,
+ /
+&RECEPTORS
+ RECEPTOR="S12             ",
+ LON=  11.8999996    ,
+ LAT=  57.2999992    ,
+ /
+&RECEPTORS
+ RECEPTOR="S13             ",
+ LON=  16.1499996    ,
+ LAT=  58.5833015    ,
+ /
+&RECEPTORS
+ RECEPTOR="S14             ",
+ LON=  16.3999996    ,
+ LAT=  56.2000008    ,
+ /
+&RECEPTORS
+ RECEPTOR="S15             ",
+ LON=  15.2833004    ,
+ LAT=  56.2000008    ,
+ /
+&RECEPTORS
+ RECEPTOR="S16             ",
+ LON=  17.9500008    ,
+ LAT=  59.3499985    ,
+ /
+&RECEPTORS
+ RECEPTOR="S17             ",
+ LON=  16.6333008    ,
+ LAT=  59.5833015    ,
+ /
+&RECEPTORS
+ RECEPTOR="S18             ",
+ LON=  18.2000008    ,
+ LAT=  57.6666985    ,
+ /
+&RECEPTORS
+ RECEPTOR="SF01            ",
+ LON=  23.5000000    ,
+ LAT=  60.8167000    ,
+ /
+&RECEPTORS
+ RECEPTOR="SF02            ",
+ LON=  21.3833008    ,
+ LAT=  59.7832985    ,
+ /
+&RECEPTORS
+ RECEPTOR="SR01            ",
+ LON=  17.6667004    ,
+ LAT=  48.4832993    ,
+ /
+&RECEPTORS
+ RECEPTOR="SR02            ",
+ LON=  19.6667004    ,
+ LAT=  49.3666992    ,
+ /
+&RECEPTORS
+ RECEPTOR="SR03            ",
+ LON=  19.7667007    ,
+ LAT=  48.3333015    ,
+ /
+&RECEPTORS
+ RECEPTOR="SR04            ",
+ LON=  21.7332993    ,
+ LAT=  48.6666985    ,
+ /
+&RECEPTORS
+ RECEPTOR="UK01            ",
+ LON=  1.35000002    ,
+ LAT=  51.3499985    ,
+ /
+&RECEPTORS
+ RECEPTOR="UK02            ",
+ LON=  1.68330002    ,
+ LAT=  52.6833000    ,
+ /
+&RECEPTORS
+ RECEPTOR="UK03            ",
+ LON= 0.516700029    ,
+ LAT=  53.1666985    ,
+ /
+&RECEPTORS
+ RECEPTOR="UK04            ",
+ LON= 0.116700001    ,
+ LAT=  52.3499985    ,
+ /
+&RECEPTORS
+ RECEPTOR="UK05            ",
+ LON= 0.449999988    ,
+ LAT=  51.4832993    ,
+ /
+&RECEPTORS
+ RECEPTOR="UK06            ",
+ LON= 0.333299994    ,
+ LAT=  50.9000015    ,
+ /
+&RECEPTORS
+ RECEPTOR="UK07            ",
+ LON=-0.416700006    ,
+ LAT=  51.7500000    ,
+ /

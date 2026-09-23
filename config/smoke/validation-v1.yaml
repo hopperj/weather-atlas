@@ -1,0 +1,26 @@
+schema_version: 1
+threshold_version: smoke-validation-v1
+# Archived verbatim on 2026-07-22 before the first external-data validation.
+# Do not edit. The active protocol is config/smoke/validation.yaml.
+evaluations:
+  gfas_inventory:
+    reference_source: CAMS GFAS v1.4.2 fire-emission flux/injection-height product
+    units: matched dry-fire-emission mass
+    criteria:
+      normalized_mean_bias: {minimum: -0.75, maximum: 2.0}
+      pearson_correlation: {minimum: 0.3}
+      fraction_within_factor_two: {minimum: 0.25}
+  misr_plume_height:
+    reference_source: NASA ASDC MISR Canadian and Alaskan Wildfire Smoke plume heights
+    units: metres above ground level
+    criteria:
+      mean_bias: {minimum: -2000, maximum: 2000}
+      root_mean_square_error: {maximum: 3500}
+      pearson_correlation: {minimum: 0.3}
+  naps_pm25:
+    reference_source: Environment and Climate Change Canada NAPS hourly PM2.5 observations
+    units: micrograms per cubic metre
+    criteria:
+      normalized_mean_bias: {minimum: -0.75, maximum: 1.5}
+      pearson_correlation: {minimum: 0.3}
+      fraction_within_factor_two: {minimum: 0.35}
