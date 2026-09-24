@@ -75,18 +75,57 @@ fernet_key() {
 
 compose=(docker compose --project-directory "$script_dir" --file "$script_dir/compose.yaml")
 
+# Refuse an absent/wrong NAS mount before creating directories or secrets.
+weather_mount=$(env_value WEATHER_DATA_MOUNTPOINT)
+if [[ -n "$weather_mount" ]]; then
+  require_command findmnt
+  if ! findmnt --mountpoint "$weather_mount" >/dev/null; then
+    echo "Required weather-data mount is not mounted: $weather_mount" >&2
+    exit 1
+  fi
+  expected_source=$(env_value WEATHER_DATA_MOUNT_SOURCE)
+  actual_source=$(findmnt --noheadings --output SOURCE --mountpoint "$weather_mount")
+  if [[ -n "$expected_source" && "$actual_source" != "$expected_source" ]]; then
+    echo "Weather-data mount has an unexpected source: $actual_source" >&2
+    exit 1
+  fi
+fi
+
 weatherapp_data_root=$(env_value WEATHERAPP_DATA_DIR)
 weatherapp_data_root=${weatherapp_data_root:-./weatherapp_data}
 if [[ "$weatherapp_data_root" != /* ]]; then
   weatherapp_data_root="$script_dir/$weatherapp_data_root"
 fi
-mkdir -p "$weatherapp_data_root"
-weatherapp_data_root=$(cd "$weatherapp_data_root" && pwd -P)
-
+postgres_data_root=$(env_value POSTGRES_DATA_DIR)
+postgres_data_root=${postgres_data_root:-$weatherapp_data_root/postgres}
+if [[ "$postgres_data_root" != /* ]]; then
+  postgres_data_root="$script_dir/$postgres_data_root"
+fi
 postgres_storage_exists=false
-if [[ -d "$weatherapp_data_root/postgres" ]]; then
+if [[ -d "$postgres_data_root" ]]; then
   postgres_storage_exists=true
 fi
+# Check before creating the service root: temporary service state may be nested
+# under POSTGRES_DATA_DIR, which must not make a fresh install look established.
+manage_service_permissions=$(env_value WEATHER_MANAGE_SERVICE_PERMISSIONS)
+manage_service_permissions=${manage_service_permissions:-true}
+case "$manage_service_permissions" in
+  true) mkdir -p "$weatherapp_data_root" ;;
+  false)
+    if [[ -z "$(env_value WEATHER_MONITORING_DIR)" ]]; then
+      echo "Set WEATHER_MONITORING_DIR to local storage before using externally managed service directories." >&2
+      exit 1
+    fi
+    for directory in . redis airflow/logs sarracenia/cache caddy/data caddy/config tile-cache backups/postgres; do
+      if [[ ! -d "$weatherapp_data_root/$directory" ]]; then
+        echo "Externally managed service directory must already exist: $weatherapp_data_root/$directory" >&2
+        exit 1
+      fi
+    done
+    ;;
+  *) echo "WEATHER_MANAGE_SERVICE_PERMISSIONS must be true or false." >&2; exit 1 ;;
+esac
+weatherapp_data_root=$(cd "$weatherapp_data_root" && pwd -P)
 
 # Secret rotation must be coordinated with PostgreSQL and Airflow. Generate
 # strong values only for a fresh installation; preserve an existing deployment.
@@ -163,39 +202,58 @@ data_root=${WEATHER_DATA_DIR:-./weatherapp_data/weather}
 if [[ "$data_root" != /* ]]; then
   data_root="$script_dir/$data_root"
 fi
-mkdir -p "$weatherapp_data_root" "$data_root"
+manage_data_permissions=${WEATHER_MANAGE_DATA_PERMISSIONS:-true}
+case "$manage_data_permissions" in
+  true) mkdir -p "$data_root" ;;
+  false)
+    if [[ ! -d "$data_root" ]]; then
+      echo "Externally managed WEATHER_DATA_DIR must already exist: $data_root" >&2
+      exit 1
+    fi
+    ;;
+  *) echo "WEATHER_MANAGE_DATA_PERMISSIONS must be true or false." >&2; exit 1 ;;
+esac
+mkdir -p "$weatherapp_data_root"
 weatherapp_data_root=$(cd "$weatherapp_data_root" && pwd -P)
 data_root=$(cd "$data_root" && pwd -P)
-case "$data_root" in
-  "$weatherapp_data_root" | "$weatherapp_data_root"/*) ;;
-  *)
-    echo "WEATHER_DATA_DIR must be inside WEATHERAPP_DATA_DIR." >&2
-    echo "Resolved WEATHERAPP_DATA_DIR: $weatherapp_data_root" >&2
-    echo "Resolved WEATHER_DATA_DIR: $data_root" >&2
-    exit 1
-    ;;
-esac
+if [[ -n "$weather_mount" ]]; then
+  resolved_mount=$(cd "$weather_mount" && pwd -P)
+  case "$data_root" in
+    "$resolved_mount"|"$resolved_mount"/*) ;;
+    *) echo "WEATHER_DATA_DIR is outside the required mount." >&2; exit 1 ;;
+  esac
+fi
 
-mkdir -p \
-  "$weatherapp_data_root/postgres" \
-  "$weatherapp_data_root/redis" \
-  "$data_root/raw" \
-  "$data_root/staging" \
-  "$data_root/processed" \
-  "$data_root/derived" \
-  "$data_root/quarantine" \
-  "$data_root/cache" \
-  "$data_root/temporary" \
-  "$data_root/amqp/inbox" \
-  "$weatherapp_data_root/airflow/logs" \
-  "$weatherapp_data_root/sarracenia/cache" \
-  "$weatherapp_data_root/caddy/data" \
-  "$weatherapp_data_root/caddy/config" \
-  "$weatherapp_data_root/tile-cache" \
-  "$weatherapp_data_root/prometheus" \
-  "$weatherapp_data_root/grafana" \
-  "$weatherapp_data_root/backups/postgres" \
-  "$script_dir/airflow/plugins"
+for directory in raw staging processed derived quarantine cache temporary amqp/inbox; do
+  if [[ "$manage_data_permissions" == true ]]; then
+    mkdir -p "$data_root/$directory"
+  elif [[ ! -d "$data_root/$directory" ]]; then
+    echo "Required weather-data directory has not been transferred: $data_root/$directory" >&2
+    exit 1
+  fi
+done
+
+# PostgreSQL may live independently of other service state. Its entrypoint
+# manages cluster ownership; never descend into an existing private cluster.
+mkdir -p "$postgres_data_root"
+if [[ "$manage_service_permissions" == true ]]; then
+  for directory in redis airflow/logs sarracenia/cache caddy/data caddy/config \
+      tile-cache backups/postgres; do
+    service_root="$weatherapp_data_root/${directory%%/*}"
+    mkdir -p "$service_root"
+    # Private service state may belong to a container UID. Do not enter/chown it
+    # as the host user; storage-init creates its children.
+    if [[ -w "$service_root" && -x "$service_root" ]]; then
+      mkdir -p "$weatherapp_data_root/$directory"
+    fi
+  done
+fi
+monitoring_root=${WEATHER_MONITORING_DIR:-$weatherapp_data_root}
+if [[ "$monitoring_root" != /* ]]; then
+  monitoring_root="$script_dir/$monitoring_root"
+fi
+mkdir -p "$monitoring_root/prometheus" "$monitoring_root/grafana"
+mkdir -p "$script_dir/airflow/plugins"
 
 if ! "$script_dir/scripts/check_disk_capacity.sh"; then
   echo "WARNING: weather-data capacity is below the configured ingestion floor." >&2
@@ -218,8 +276,13 @@ if [[ "$skip_build" == "0" ]]; then
   "${compose[@]}" --profile observability build --pull
 
   echo
-  echo "Installation completed. Start the entire platform with:"
-  echo "  ./run.sh"
+  if [[ -n "${WEATHER_STARTUP_HOLD:-}" && "${WEATHER_STARTUP_HOLD}" != false ]]; then
+    echo "Images are ready. Startup remains on hold: $WEATHER_STARTUP_HOLD"
+    echo "Do not start containers until the migration cutover is complete."
+  else
+    echo "Installation completed. Start the entire platform with:"
+    echo "  ./run.sh"
+  fi
 else
   echo "Installation prerequisites and configuration are ready."
 fi

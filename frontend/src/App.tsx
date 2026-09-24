@@ -11,6 +11,7 @@ import {
 import {
   cityForecastInBounds,
   cityForecastTimes,
+  precipitationLikelihood,
   forecastMetric,
 } from './cityForecast'
 import {
@@ -181,6 +182,10 @@ function cityForecastLabel(
   feature: CityForecastCollection['features'][number],
 ) {
   const { properties } = feature
+  const likelihood = precipitationLikelihood(
+    properties.popPercent,
+    properties.condition,
+  )
   const element = document.createElement('article')
   element.className = 'city-forecast-label'
   element.setAttribute(
@@ -188,7 +193,7 @@ function cityForecastLabel(
     `${properties.locality}, ${properties.name}, ${properties.province}: ` +
       `temperature ${forecastMetric(properties.temperatureC, '°C')}, ` +
       `humidity ${forecastMetric(properties.relativeHumidityPercent, '%')}, ` +
-      `probability of precipitation ${forecastMetric(properties.popPercent, '%')}, ` +
+      `precipitation outlook ${likelihood ?? (properties.condition || 'not provided')}, ` +
       `precipitation amount ${properties.precipitationAmount ?? 'not issued'}`,
   )
 
@@ -203,7 +208,7 @@ function cityForecastLabel(
   const rows = [
     ['Temp:', forecastMetric(properties.temperatureC, '°C')],
     ['Hum:', forecastMetric(properties.relativeHumidityPercent, '%')],
-    ['POP:', forecastMetric(properties.popPercent, '%')],
+    ...(likelihood === null ? [] : [['Precip:', likelihood]]),
     ['Precip Amount:', properties.precipitationAmount ?? '—'],
   ] as const
   for (const [label, value] of rows) {
@@ -1726,8 +1731,8 @@ export function App() {
                     <dd>Relative humidity · %</dd>
                   </div>
                   <div>
-                    <dt>POP</dt>
-                    <dd>Probability of precipitation · %</dd>
+                    <dt>Precip chance</dt>
+                    <dd>Issued probability (%) or forecast wording</dd>
                   </div>
                   <div>
                     <dt>Precip Amount</dt>
@@ -1735,8 +1740,11 @@ export function App() {
                   </div>
                 </dl>
                 <p>
-                  A dash means ECCC did not issue a numeric precipitation amount
-                  for that period. It is not treated as zero unless POP is zero.
+                  When no percentage is issued, rain or snow wording is shown
+                  instead where available. A dash for the amount means ECCC did
+                  not issue a total for that period, not that no precipitation
+                  is expected. Open the local forecast for model-supplied
+                  amounts.
                 </p>
               </section>
 

@@ -16,6 +16,8 @@ RUN pip install --no-cache-dir "metpx-sr3[amqp]==3.2.0.post1" \
 
 COPY docker/sarracenia/weatherapp.conf /etc/sr3/subscribe/weatherapp.conf
 COPY --chown=50000:0 --chmod=600 docker/sarracenia/credentials.conf /etc/sr3/credentials.conf
+COPY --chmod=755 docker/sarracenia/entrypoint.sh /usr/local/bin/weather-subscriber-entrypoint
 
 USER 50000:0
+ENTRYPOINT ["/usr/local/bin/weather-subscriber-entrypoint"]
 CMD ["sh", "-c", "mkdir -p /var/lib/sarracenia/cache/sr3/subscribe/weatherapp && exec sr3 foreground subscribe/weatherapp"]

@@ -14,6 +14,15 @@ const periodSchema = z.object({
 export const regionSchema = z.object({
   id: z.string(),
   name: z.string(),
+  locality: z.string().optional(),
+  briefing: z
+    .object({
+      overview: z.string(),
+      precipitation: z.string(),
+      temperatures: z.string(),
+      validUntil: z.iso.datetime(),
+    })
+    .nullish(),
   latitude: z.number(),
   province: z.enum([
     'AB',
@@ -85,6 +94,44 @@ export const precipitationSchema = z.object({
 })
 export type PrecipitationForecast = z.infer<typeof precipitationSchema>
 
+const observationValuesSchema = z.object({
+  temperatureC: z.number().nullable(),
+  humidityPercent: z.number().nullable(),
+  windKmh: z.number().nullable(),
+  gustKmh: z.number().nullable(),
+  precipitationMm: z.number().nullable(),
+  pressureHpa: z.number().nullable(),
+})
+
+export const nearbyObservationsSchema = z.object({
+  schemaVersion: z.literal(1),
+  generatedAt: z.iso.datetime({ offset: true }),
+  items: z.array(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      source: z.string(),
+      attribution: z.string(),
+      latitude: z.number(),
+      longitude: z.number(),
+      distanceKm: z.number().nullable(),
+      stale: z.boolean(),
+      observation: z.object({
+        values: observationValuesSchema,
+        observedAt: z.iso.datetime(),
+      }),
+    }),
+  ),
+  nextOffset: z.number().nullable(),
+})
+export type NearbyObservations = z.infer<typeof nearbyObservationsSchema>
+
+export const nearestRegionSchema = z.object({
+  region: regionSchema,
+  distanceKm: z.number(),
+  matchKind: z.literal('nearest_representative_point'),
+})
+
 async function request<T>(
   url: string,
   schema: z.ZodType<T>,
@@ -117,6 +164,18 @@ export const forecastApi = {
     request(
       `/api/v1/forecast/precipitation?area_id=${encodeURIComponent(id)}`,
       precipitationSchema,
+      signal,
+    ),
+  nearby: (longitude: number, latitude: number, signal?: AbortSignal) =>
+    request(
+      `/api/v1/observations/nearby?longitude=${encodeURIComponent(longitude)}&latitude=${encodeURIComponent(latitude)}&radius=100`,
+      nearbyObservationsSchema,
+      signal,
+    ),
+  nearest: (longitude: number, latitude: number, signal?: AbortSignal) =>
+    request(
+      `/api/v1/forecast/nearest?longitude=${encodeURIComponent(longitude)}&latitude=${encodeURIComponent(latitude)}`,
+      nearestRegionSchema,
       signal,
     ),
 }

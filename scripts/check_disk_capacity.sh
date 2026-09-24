@@ -13,8 +13,8 @@ Read-only admission check for the weather data filesystem.
 Options:
   --data-root PATH            Filesystem path to inspect (default: WEATHER_DATA_DIR
                               or WEATHERAPP_DATA_DIR/weather)
-  --minimum-free-gib NUMBER   Free GiB that must remain (default: 20)
-  --minimum-free-percent N    Free percentage that must remain (default: 10)
+  --minimum-free-gib NUMBER   Free GiB that must remain (default: 200)
+  --minimum-free-percent N    Optional percentage floor (default: 0, disabled)
   --required-gib NUMBER       Additional capacity required by a planned job (default: 0)
   --help                      Show this help
 
@@ -43,8 +43,8 @@ if [[ -f "$repo_root/.env" ]]; then
 fi
 
 data_root=${WEATHER_DATA_DIR:-${WEATHERAPP_DATA_DIR:-./weatherapp_data}/weather}
-minimum_free_gib=${WEATHER_MIN_FREE_GIB:-20}
-minimum_free_percent=${WEATHER_MIN_FREE_PERCENT:-10}
+minimum_free_gib=${WEATHER_MIN_FREE_GIB:-200}
+minimum_free_percent=${WEATHER_MIN_FREE_PERCENT:-0}
 required_gib=0
 
 while [[ $# -gt 0 ]]; do
@@ -125,7 +125,11 @@ echo "Mount point:            $mountpoint"
 echo "Available now:          $(format_gib "$available_bytes") GiB"
 echo "Planned requirement:    $(format_gib "$required_bytes") GiB"
 echo "Free after planned job: $(format_gib "$remaining_bytes") GiB ($remaining_percent%)"
-echo "Required floor:         $minimum_free_gib GiB and $minimum_free_percent%"
+if awk -v value="$minimum_free_percent" 'BEGIN { exit !(value == 0) }'; then
+  echo "Required floor:         $minimum_free_gib GiB (percentage floor disabled)"
+else
+  echo "Required floor:         $minimum_free_gib GiB and $minimum_free_percent%"
+fi
 
 meets_percent=$(awk -v actual="$remaining_percent" -v minimum="$minimum_free_percent" \
   'BEGIN { print (actual >= minimum) ? "yes" : "no" }')

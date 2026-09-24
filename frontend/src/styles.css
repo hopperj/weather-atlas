@@ -1387,6 +1387,7 @@ input:disabled {
 }
 
 .city-forecast-label dd {
+  max-width: 76px;
   color: #ffffff;
   text-align: right;
 }

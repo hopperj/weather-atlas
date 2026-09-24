@@ -723,6 +723,12 @@ def verify_experiment_manifest(root: Path, start: date, end: date) -> Path:
     return output
 
 
+def configured_data_root() -> Path | None:
+    """Respect container/host storage settings without guessing a machine's mount."""
+    value = os.environ.get("WEATHER_DATA_ROOT") or os.environ.get("WEATHER_DATA_DIR")
+    return Path(value) if value else None
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--start", type=date.fromisoformat, required=True)
@@ -738,13 +744,14 @@ def main() -> int:
     parser.add_argument(
         "--data-root",
         type=Path,
-        default=Path(
-            os.environ.get("WEATHER_DATA_ROOT", "/Volumes/BigMrStorage/weatherapp_data/weather")
-        ),
+        default=configured_data_root(),
+        help="Weather directory; defaults to WEATHER_DATA_ROOT or WEATHER_DATA_DIR",
     )
     args = parser.parse_args()
     if args.end < args.start or args.spinup_days < 0 or not 1 <= args.workers <= 8:
         parser.error("invalid date, spin-up, or worker bounds")
+    if args.data_root is None:
+        parser.error("provide --data-root or set WEATHER_DATA_ROOT/WEATHER_DATA_DIR")
     root = args.data_root.expanduser().resolve()
     if shutil.disk_usage(root).free < 75 * 1024**3:
         raise OSError("at least 75 GiB of free space is required before backfill")

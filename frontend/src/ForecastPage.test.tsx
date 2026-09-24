@@ -15,6 +15,7 @@ import {
   type HourlyForecast,
   type PrecipitationForecast,
   hourlySchema,
+  nearbyObservationsSchema,
   precipitationSchema,
   regionsSchema,
 } from './forecastApi'
@@ -24,6 +25,8 @@ const mocks = vi.hoisted(() => ({
   regions: vi.fn(),
   hourly: vi.fn(),
   precipitation: vi.fn(),
+  nearby: vi.fn(),
+  nearest: vi.fn(),
 }))
 vi.mock('./forecastApi', async (importOriginal) => ({
   ...(await importOriginal<typeof import('./forecastApi')>()),
@@ -159,6 +162,34 @@ beforeEach(() => {
     regions: [region, other, toronto, vancouver, iqaluit],
   })
   mocks.hourly.mockResolvedValue(hourly)
+  mocks.nearby.mockResolvedValue({
+    schemaVersion: 1,
+    generatedAt: '2026-09-06T12:05:00Z',
+    nextOffset: null,
+    items: [
+      {
+        id: 'CYHZ',
+        name: 'Halifax/Stanfield Intl',
+        source: 'NAV CANADA',
+        attribution: 'Observational data provided by NAV CANADA.',
+        latitude: 44.88,
+        longitude: -63.51,
+        distanceKm: 26.7,
+        stale: false,
+        observation: {
+          observedAt: '2026-09-06T12:00:00Z',
+          values: {
+            temperatureC: 18.6,
+            humidityPercent: 63,
+            windKmh: 14,
+            gustKmh: 22,
+            precipitationMm: 0,
+            pressureHpa: 1018.4,
+          },
+        },
+      },
+    ],
+  })
   mocks.precipitation.mockImplementation(async (id: string) =>
     precipitationFor(
       [region, other, toronto, vancouver, iqaluit].find(
@@ -181,8 +212,31 @@ describe('forecast page', () => {
     expect(brand.querySelector('img')?.getAttribute('src')).toBe(
       '/icons/crimson-sky-v1-96.png',
     )
-    await screen.findByText('Your local forecast')
+    await screen.findByRole('heading', { name: 'Halifax Metro', level: 1 })
     client.clear()
+  })
+
+  it('leads with observed conditions and a scannable 24-hour strip', async () => {
+    mount()
+    const title = await screen.findByRole('heading', {
+      name: 'Halifax Metro',
+      level: 1,
+    })
+    const hero = title.closest('section')!
+    expect(await within(hero).findByText('19°')).toBeTruthy()
+    expect(
+      within(hero).getByText(/Observed at Halifax\/Stanfield Intl/),
+    ).toBeTruthy()
+    const strip = await screen.findByRole('region', {
+      name: 'Scrollable 24-hour forecast',
+    })
+    expect(within(strip).getAllByRole('article')).toHaveLength(24)
+    expect(screen.getByText('1018.4 hPa')).toBeTruthy()
+    expect(mocks.nearby).toHaveBeenCalledWith(
+      region.longitude,
+      region.latitude,
+      expect.anything(),
+    )
   })
 
   it('fills only missing bulletin amounts with a starred model estimate and explanation', async () => {
@@ -198,6 +252,50 @@ describe('forecast page', () => {
     expect(
       screen.getByText(/Model estimate \(ECCC GDPS\), used only/),
     ).toBeTruthy()
+  })
+
+  it('shows rain wording and server amounts when every period omits POP', async () => {
+    const rainy = {
+      ...region,
+      periods: [
+        {
+          ...region.periods[0],
+          popPercent: null,
+          precipitationAmount: null,
+          condition: 'Periods of rain',
+        },
+      ],
+    }
+    mocks.regions.mockResolvedValue({ regions: [rainy] })
+    mocks.precipitation.mockResolvedValue(precipitationFor(rainy, 10.16))
+    mount()
+    expect(await screen.findByText('10.2 mm*')).toBeTruthy()
+    expect(screen.getByText('Rain expected')).toBeTruthy()
+    expect(screen.queryByText('100%')).toBeNull()
+    expect(mocks.precipitation).toHaveBeenCalledWith(
+      region.id,
+      expect.anything(),
+    )
+  })
+
+  it('keeps rain expected when no model amount is available, without inventing a total', async () => {
+    const rainy = {
+      ...region,
+      periods: [
+        {
+          ...region.periods[0],
+          popPercent: null,
+          precipitationAmount: null,
+          condition: 'Showers',
+        },
+      ],
+    }
+    mocks.regions.mockResolvedValue({ regions: [rainy] })
+    mocks.precipitation.mockResolvedValue(precipitationFor(rainy, null))
+    mount()
+    expect(await screen.findByText('Rain expected')).toBeTruthy()
+    expect(screen.queryByText('0 mm')).toBeNull()
+    expect(screen.queryByText('100%')).toBeNull()
   })
 
   it.each([
@@ -276,17 +374,17 @@ describe('forecast page', () => {
         /Model precipitation estimates could not be refreshed/,
       ),
     ).toBeTruthy()
-    expect(screen.getByText('Sunny')).toBeTruthy()
+    expect(screen.getAllByText('Sunny')).not.toHaveLength(0)
     expect(screen.getByText('0 mm')).toBeTruthy()
   })
 
   it('shows both outlooks, zero amounts, and every hour including gaps', async () => {
     mount()
-    expect(await screen.findByText('Sunny')).toBeTruthy()
-    expect(screen.getByText('Clear')).toBeTruthy()
+    expect(await screen.findAllByText('Sunny')).not.toHaveLength(0)
+    expect(screen.getByText('Night: Clear')).toBeTruthy()
     expect(screen.getByRole('heading', { name: '7-day forecast' })).toBeTruthy()
     expect(
-      screen.getByRole('heading', { name: '72-hour forecast' }),
+      await screen.findByRole('heading', { name: '72-hour forecast' }),
     ).toBeTruthy()
     expect(screen.getByText('0 mm')).toBeTruthy()
     const table = await screen.findByRole('table')
@@ -318,7 +416,7 @@ describe('forecast page', () => {
     mocks.hourly.mockRejectedValue(new Error('Catalogue database is not ready'))
     mount()
     expect(await screen.findByRole('alert')).toBeTruthy()
-    expect(screen.getByText('Sunny')).toBeTruthy()
+    expect(screen.getAllByText('Sunny')).not.toHaveLength(0)
     expect(screen.queryByRole('table')).toBeNull()
   })
 
@@ -337,7 +435,7 @@ describe('forecast page', () => {
 
   it('keeps only NS regions at the first level with Other for the rest of Canada', async () => {
     mount()
-    await screen.findByText('Sunny')
+    await screen.findAllByText('Sunny')
     const primary = screen.getByLabelText('Forecast region')
     expect(
       within(primary)
@@ -387,7 +485,7 @@ describe('forecast page', () => {
     fireEvent.change(screen.getByLabelText('Region'), {
       target: { value: toronto.id },
     })
-    expect(await screen.findByText('Rain in Toronto')).toBeTruthy()
+    expect(await screen.findAllByText('Rain in Toronto')).not.toHaveLength(0)
     await screen.findByRole('table')
     expect(mocks.hourly).toHaveBeenLastCalledWith(toronto.id, expect.anything())
     expect(window.location.search).toBe(`?region=${toronto.id}`)
@@ -475,6 +573,17 @@ describe('forecast page', () => {
 })
 
 describe('forecast time and data contracts', () => {
+  it('accepts offset timestamps returned by the observation service', () => {
+    expect(
+      nearbyObservationsSchema.parse({
+        schemaVersion: 1,
+        generatedAt: '2026-09-24T14:29:23.238324+00:00',
+        items: [],
+        nextOffset: null,
+      }).generatedAt,
+    ).toBe('2026-09-24T14:29:23.238324+00:00')
+  })
+
   it('rejects negative model precipitation values', () => {
     expect(
       precipitationSchema.parse(precipitationFor(region, 0)).periods[1]

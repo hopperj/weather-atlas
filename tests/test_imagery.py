@@ -1,3 +1,4 @@
+import stat
 from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from uuid import uuid4
@@ -10,9 +11,40 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from rasterio.io import MemoryFile
 from weather_api import imagery
-from weather_ingest.imagery import available_times, bounded_get, create_cog, validate_config
+from weather_ingest.imagery import (
+    atomic_bytes,
+    available_times,
+    bounded_get,
+    create_cog,
+    validate_config,
+)
 
 NOW = datetime(2026, 9, 7, 12, tzinfo=UTC)
+
+
+def test_atomic_payload_publication_preserves_bytes_and_shared_group_access(tmp_path):
+    path = tmp_path / "raw" / "frame.png"
+    atomic_bytes(path, b"weather-payload")
+    assert path.read_bytes() == b"weather-payload"
+    assert stat.S_IMODE(path.stat().st_mode) == 0o664
+    atomic_bytes(path, b"replacement-payload")
+    assert path.read_bytes() == b"replacement-payload"
+    assert stat.S_IMODE(path.stat().st_mode) == 0o664
+    assert list(path.parent.iterdir()) == [path]
+
+
+def test_permission_failure_does_not_replace_existing_payload(tmp_path, monkeypatch):
+    path = tmp_path / "existing.png"
+    path.write_bytes(b"original")
+
+    def denied(*args):
+        raise PermissionError("denied")
+
+    monkeypatch.setattr("weather_ingest.imagery.os.fchmod", denied)
+    with pytest.raises(PermissionError):
+        atomic_bytes(path, b"replacement")
+    assert path.read_bytes() == b"original"
+    assert list(tmp_path.iterdir()) == [path]
 
 
 def capabilities(text, name="RADAR_1KM_RRAI"):

@@ -44,11 +44,12 @@ results preserved in the [research log](docs/smoke-validation-log.md).
   See [implementation and operations](docs/forecast-insights-implementation.md)
   for coverage, migrations, schedules, tests, and the remaining device widget checks.
 
-- A dedicated `/forecast` page with Canada-wide regional seven-day outlooks and
-  a 72-hour GDPS table for temperature, humidity, precipitation, wind and gusts.
-  Nova Scotia regions are directly selectable; other locations use province/
-  territory and region selectors.
-  Open **Daily & hourly forecast** in the map header. Sources, gap handling and
+- A dedicated, responsive `/forecast` page with nearby observed conditions,
+  a swipeable 24-hour forecast, compact seven-day outlook, weather-detail cards,
+  and an expandable 72-hour GDPS data table. Nova Scotia regions are directly
+  selectable; other locations use province/territory and region selectors, and
+  **Use my location** selects the nearest forecast region.
+  Open **Forecast** in the site header. Sources, fallbacks, gap handling and
   rollout are documented in [the forecast page guide](docs/forecast-page-2026-09-06.md).
 - One-server Docker Compose deployment with Caddy, PostgreSQL/PostGIS, Redis,
   Airflow 3 `LocalExecutor`, FastAPI services, React, MapLibre, and an Nginx tile
@@ -129,6 +130,12 @@ runs natively on both AMD64 Linux and ARM64 hosts.
 
 ## Quick start
 
+For an existing deployment moving to a NAS-backed Linux host, follow the
+[sparky migration notes](docs/sparky-migration.md) before running the quick start.
+Service state and bulk weather files can live on separate filesystems; preserve
+the existing private configuration and restore a database backup, not live
+PostgreSQL files.
+
 The zero-argument installer generates secrets for a new deployment, prepares
 storage, pulls dependencies, and builds every application image. The runner
 starts all required containers plus Prometheus and Grafana, applies and verifies
@@ -182,32 +189,47 @@ canonical HTTPS hostname. See [HTTPS deployment and verification](docs/https.md)
 
 ## Persistent data
 
-All mutable container data is bind-mounted below
-`WEATHERAPP_DATA_DIR` (default `./weatherapp_data`). Stopping, recreating, or
-upgrading a container therefore does not discard its data. The installer creates
-the complete tree, and Compose runs a short `storage-init` service before
-PostgreSQL or Redis to enforce the ownership required by the pinned images.
+Local service state is bind-mounted below `WEATHERAPP_DATA_DIR` (default
+`./weatherapp_data`). PostgreSQL can be placed independently with
+`POSTGRES_DATA_DIR`; when blank/unset it retains `WEATHERAPP_DATA_DIR/postgres`.
+Bulk weather files are mounted separately from
+`WEATHER_DATA_DIR`, which may be on a NAS. Stopping, recreating, or upgrading a
+container therefore does not discard its data. The installer and `storage-init`
+prepare service directories. `WEATHER_MANAGE_DATA_PERMISSIONS=false` leaves
+weather-file permissions alone; `WEATHER_MANAGE_SERVICE_PERMISSIONS=false`
+requires pre-provisioned service directories and leaves their permissions alone.
+Set `WEATHER_MONITORING_DIR` to local storage when ordinary service files use NFS.
 
 | Host subdirectory | Persistent contents |
 |---|---|
-| `postgres/` | PostgreSQL/PostGIS cluster |
+| `POSTGRES_DATA_DIR` (default `postgres/` under the service root) | PostgreSQL/PostGIS cluster |
 | `redis/` | Redis append-only data |
-| `weather/` | Raw, staging, processed, derived, quarantine, cache, and temporary weather files |
+| `WEATHER_DATA_DIR` (separate setting) | Raw, staging, processed, derived, quarantine, cache, and temporary weather files |
 | `airflow/logs/` | Airflow task logs |
 | `caddy/data/`, `caddy/config/` | Caddy certificates, state, and configuration data |
 | `tile-cache/` | Nginx raster tile cache |
-| `prometheus/` | Prometheus time-series data |
-| `grafana/` | Grafana database and runtime state |
+| `WEATHER_MONITORING_DIR/prometheus/` (defaults to the service root) | Prometheus time-series data |
+| `WEATHER_MONITORING_DIR/grafana/` (defaults to the service root) | Grafana database and runtime state |
 | `backups/postgres/` | Default host destination for PostgreSQL backups |
 
-`WEATHER_DATA_DIR` defaults to `./weatherapp_data/weather` and must remain
-inside `WEATHERAPP_DATA_DIR`. Both relative paths are resolved from the project
-root. Place `WEATHERAPP_DATA_DIR` on the intended data filesystem before the
-first start; changing it later selects a different, initially empty deployment.
+The generic local-install default for `WEATHER_DATA_DIR` is
+`./weatherapp_data/weather`; it does **not** have to be inside
+`WEATHERAPP_DATA_DIR`. Relative storage paths are resolved from the project root.
+Changing a setting selects a different storage location; it does not move
+existing files.
 
-Older releases used Docker named volumes and `./data`. This configuration does
-not delete or automatically import those stores. Back up and explicitly migrate
-any existing data before switching an established deployment.
+On **sparky**, the NAS mount is `/home/hopperj/weather-atlas/data`, weather files
+are in its `weather/` child, and PostgreSQL uses the local SSD directory
+`/home/hopperj/weather-atlas/postgres_data`. No `weatherapp_data` folder is needed
+there. Ordinary service files now use `data/services`; monitoring databases
+use `postgres_data/monitoring`. The former local service files are retained
+under `postgres_data/pending-service-migration` as rollback copies. See
+[.env.sparky.example](.env.sparky.example) for the current non-secret overrides
+and [migration notes](docs/sparky-migration.md) for the startup hold.
+
+Older releases used Docker named volumes. Existing stores are never deleted or
+automatically imported; explicitly migrate them before changing an established
+deployment. The current sparky deployment uses `data/` for its NAS mount.
 
 ## Endpoints
 

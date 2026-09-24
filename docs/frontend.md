@@ -62,14 +62,16 @@ the timeline.
 
 ## Official seven-day forecast view
 
-The map header also links to the dedicated **Daily & hourly forecast** page at
-`/forecast`. Nova Scotia regions are directly selectable in the first dropdown;
+The site header also links to the dedicated **Forecast** page at `/forecast`.
+It leads with nearby observed conditions, then a swipeable 24-hour forecast,
+compact seven-day rows, current weather details, and an expandable 72-hour model
+table. Nova Scotia regions are directly selectable in the first dropdown;
 **Other province or territory…** reveals a province/territory selector followed
-by that province/territory's regions. Both the seven-day outlook and all 72
-hourly forecast slots update for the selected location. All locations use
-explicitly labelled Atlantic times (not each location's local time) and explicit
-missing-data indicators. The page is scrollable independently of the map's
-fixed-height layout. See [the forecast page guide](forecast-page-2026-09-06.md).
+by that province/territory's regions. **Use my location** resolves the nearest
+forecast region after browser permission. All locations use explicitly labelled
+Atlantic times (not each location's local time) and explicit missing-data
+indicators. The responsive page scrolls independently of the map's fixed-height
+layout. See [the forecast page guide](forecast-page-2026-09-06.md).
 
 The **7-day forecast** view is separate from scientific raster overlays. It
 removes all colour contours and wind arrows, initially frames Nova Scotia, and

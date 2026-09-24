@@ -26,6 +26,7 @@
 # Anchor these at the root so small tests/data and tests/fixtures stay trackable.
 /data
 /weatherapp_data
+/postgres_data
 /weather-atlas-data
 /airflow/logs/
 /airflow/airflow.cfg

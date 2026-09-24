@@ -79,6 +79,45 @@ def test_disk_capacity_admits_and_blocks_without_writing(tmp_path: Path) -> None
     assert list(data_root.iterdir()) == []
 
 
+def test_capacity_default_is_200_gib_without_percentage_floor(tmp_path: Path) -> None:
+    # Isolate from the developer's private .env overrides.
+    scripts = tmp_path / "scripts"
+    scripts.mkdir()
+    shutil.copy2(SCRIPTS / "check_disk_capacity.sh", scripts)
+    fake_bin = tmp_path / "bin"
+    fake_bin.mkdir()
+    fake_df = fake_bin / "df"
+    fake_df.write_text(
+        "#!/usr/bin/env bash\n"
+        "echo 'Filesystem 1024-blocks Used Available Capacity Mounted on'\n"
+        "echo '/dev/test 10737418240 10475274240 262144000 98% /weather'\n"
+    )
+    fake_df.chmod(0o755)
+    environment = _environment_with_bin(fake_bin)
+    environment.pop("WEATHER_MIN_FREE_GIB", None)
+    environment.pop("WEATHER_MIN_FREE_PERCENT", None)
+    command = ["bash", str(scripts / "check_disk_capacity.sh"), "--data-root", str(tmp_path)]
+    admitted = subprocess.run(command, env=environment, capture_output=True, text=True)
+    blocked = subprocess.run(
+        command + ["--required-gib", "51"], env=environment, capture_output=True, text=True
+    )
+    assert admitted.returncode == 0, admitted.stderr
+    assert "200 GiB (percentage floor disabled)" in admitted.stdout
+    assert blocked.returncode == 1
+
+
+def test_sparky_boot_waits_for_exact_nas_without_restarting_docker() -> None:
+    unit = (PROJECT_ROOT / "docs/systemd/sparky-docker-nfs.conf").read_text()
+    installer = (SCRIPTS / "install_sparky_boot.sh").read_text()
+    assert "RequiresMountsFor=/home/hopperj/weather-atlas/data" in unit
+    assert "--source databanks.iolan:/volume1/data/weather-atlas-data --types nfs,nfs4" in unit
+    assert "ExecStartPre=/usr/bin/test -d /home/hopperj/weather-atlas/data/weather" in unit
+    assert "systemctl daemon-reload" in installer
+    assert "systemctl enable docker.service" in installer
+    assert "systemctl restart" not in installer
+    assert "compose up" not in installer
+
+
 def _write_fake_backup_commands(fake_bin: Path) -> None:
     fake_docker = fake_bin / "docker"
     fake_docker.write_text(
@@ -310,7 +349,7 @@ def test_single_collection_trigger_requires_only_a_product() -> None:
     assert "airflow dags state" in source
 
 
-def test_compose_persists_every_mutable_service_under_weatherapp_data() -> None:
+def test_compose_persists_mutable_services_with_independent_postgres_storage() -> None:
     compose = (PROJECT_ROOT / "compose.yaml").read_text()
 
     expected_mounts = (
@@ -318,15 +357,21 @@ def test_compose_persists_every_mutable_service_under_weatherapp_data() -> None:
         "/caddy/data:/data",
         "/caddy/config:/config",
         "/tile-cache:/var/cache/nginx/weather",
-        "/postgres:/var/lib/postgresql",
         "/redis:/data",
         "/sarracenia:/var/lib/sarracenia",
-        "/prometheus:/prometheus",
-        "/grafana:/var/lib/grafana",
     )
     for mount in expected_mounts:
         assert f"${{WEATHERAPP_DATA_DIR:-./weatherapp_data}}{mount}" in compose
 
+    for mount in ("/prometheus:/prometheus", "/grafana:/var/lib/grafana"):
+        assert (
+            f"${{WEATHER_MONITORING_DIR:-${{WEATHERAPP_DATA_DIR:-./weatherapp_data}}}}{mount}"
+            in compose
+        )
+    assert (
+        "${POSTGRES_DATA_DIR:-${WEATHERAPP_DATA_DIR:-./weatherapp_data}/postgres}"
+        ":/var/lib/postgresql" in compose
+    )
     assert "${WEATHER_DATA_DIR:-./weatherapp_data/weather}:/srv/weather-platform/data" in compose
     assert "storage-init:" in compose
     assert "condition: service_completed_successfully" in compose

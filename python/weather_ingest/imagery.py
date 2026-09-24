@@ -160,6 +160,9 @@ def atomic_bytes(path: Path, data: bytes) -> None:
         try:
             output.write(data)
             output.flush()
+            # NamedTemporaryFile starts at 0600 regardless of the service umask.
+            # Publish weather payloads readable/writable by the shared data group.
+            os.fchmod(output.fileno(), 0o664)
             os.fsync(output.fileno())
         except BaseException:
             temporary.unlink(missing_ok=True)
@@ -278,7 +281,6 @@ def ingest_imagery(config_path: Path, data_root: Path, database_url: str) -> dic
                             Path("processed/eccc/imagery") / code / f"legend-{legend_sha}.png"
                         )
                         atomic_bytes(data_root / legend_path, legend)
-                        os.chmod(data_root / legend_path, 0o644)
                         archive_bytes += len(legend)
                     png = bounded_get(client, params, 32 * 1024**2)
                     source_sha = hashlib.sha256(png).hexdigest()

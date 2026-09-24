@@ -3,6 +3,7 @@ import {
   cityForecastInBounds,
   cityForecastTimes,
   forecastMetric,
+  precipitationLikelihood,
 } from './cityForecast'
 import type { MapBounds } from './mapBounds'
 
@@ -51,5 +52,40 @@ describe('city forecast presentation', () => {
   it('formats issued values while preserving missing data', () => {
     expect(forecastMetric(24, '°C')).toBe('24°C')
     expect(forecastMetric(null, '%')).toBe('—')
+  })
+
+  it.each([
+    ['Periods of rain', 'Rain expected'],
+    ['Showers', 'Rain expected'],
+    ['A few showers.', 'Rain expected'],
+    [' Periods of drizzle or rain. ', 'Rain expected'],
+    ['Chance of showers', 'Rain possible'],
+    ['Risk of thunderstorms', 'Thunderstorms possible'],
+    ['Snow', 'Snow expected'],
+    ['Periods of snow', 'Snow expected'],
+    ['Rain mixed with snow', 'Rain or snow expected'],
+    ['Chance of rain showers or wet flurries', 'Rain or snow possible'],
+    ['Freezing rain', 'Freezing rain expected'],
+    ['Ice pellets', 'Ice pellets expected'],
+    ['Sunny', null],
+    ['Cloudy', null],
+    ['', null],
+    ['No rain', null],
+    ['Blowing snow', null],
+    ['Rain ending then clearing', null],
+  ])(
+    'restates unpublished probability conservatively: %s',
+    (condition, expected) => {
+      expect(precipitationLikelihood(null, condition!)).toBe(expected)
+    },
+  )
+
+  it('preserves numeric probabilities, including zero, without inferring 100%', () => {
+    for (const pop of [0, 30, 80, 100]) {
+      expect(precipitationLikelihood(pop, 'Rain')).toBe(`${pop}%`)
+    }
+    for (const pop of [-1, 101, NaN, Infinity]) {
+      expect(precipitationLikelihood(pop, 'Rain')).toBe('Rain expected')
+    }
   })
 })

@@ -1,9 +1,33 @@
 # Daily and hourly forecast page
 
-Implemented 2026-09-06. Open `/forecast` using **Daily & hourly forecast** in
-the map header. The page has a Canada-wide, Nova Scotia-first region selector, a seven-day outlook,
-and a scrollable 72-hour table. Both forecasts are visible on the same page;
-the existing map and its forecast mode remain available.
+Implemented 2026-09-06 and redesigned 2026-09-24. Open `/forecast` using
+**Forecast** in the site header. The responsive page presents current conditions,
+a swipeable 24-hour forecast, a compact seven-day outlook, current weather
+details, and an expandable 72-hour model table. The existing map and its
+forecast mode remain available.
+
+## Forecast experience
+
+The information order follows a general-purpose forecast workflow:
+
+1. The selected locality, nearest fresh station temperature, current regional
+   condition, and today's high/low appear first.
+2. The next 24 model hours are presented as horizontally scrollable cards with
+   temperature, precipitation amount, humidity, and the applicable regional
+   condition icon. A coverage warning appears only when one of these visible
+   24 hours is partial or missing.
+3. The official seven-day bulletin is condensed into day rows containing day
+   and night conditions, POP or conservative wet-weather wording, high/low, and
+   official or starred model precipitation amounts.
+4. Humidity, wind/gust, pressure, and recent precipitation use the nearest fresh
+   collected station when available. A missing observation service does not
+   disable the page; model values fill only supported fields and are labelled.
+5. The exact 72-hour values, status, and model-run metadata remain available in
+   the expandable **72-hour forecast** section for technical inspection.
+
+The interface uses condition-specific, code-native weather symbols and adapts
+to phone and desktop widths. It does not claim unavailable UV, visibility,
+sunrise/sunset, alerts, or feels-like values.
 
 ## Selecting a location
 
@@ -21,6 +45,10 @@ the existing map and its forecast mode remain available.
 - Completed selections persist as `/forecast?region={area_id}`. Opening a link
   for another province restores the full selector hierarchy. Incomplete choices
   persist as `?scope=other` or `?scope=other&province=ON`.
+- **Use my location** requests browser location only when selected, resolves it
+  through `/api/v1/forecast/nearest`, and stores the matched forecast region in
+  the same URL format. Denied or unavailable location access leaves manual
+  selection usable.
 
 This expands the dedicated forecast page, not the separate NS-only forecast
 labels on the map. Region choices are derived from the existing national ECCC
@@ -37,6 +65,14 @@ displayed as a dash; zero remains zero. Since 2026-09-07, missing precipitation
 amounts can be supplemented by starred model estimates as described below.
 The API does not discard late forecast
 periods just because a different region has a shorter horizon.
+
+Since 2026-09-23, an omitted numeric POP is no longer displayed as an unexplained
+dash: recognized wet bulletin descriptions show "Rain expected", "Rain possible"
+or equivalent snow/mixed-precipitation wording. Explicit percentages, including
+0%, are preserved. Dry or unrecognized descriptions with no percentage omit that
+row; the original condition remains visible. No percentage is inferred from
+wording or rainfall amounts. This presentation applies to the local forecast and
+map labels. Model totals on the local forecast remain independent of POP.
 
 The hourly section samples the already configured GDPS processed rasters at the
 selected region's representative coordinate (the mean of its city sites). This
@@ -67,6 +103,13 @@ repeating values or moving the window into the past. Precipitation is the
 one-hour accumulation **ending** at the displayed time, not starting then.
 GDPS does not supply hourly POP in this configured feed; official daily POP
 remains in the seven-day cards and is not copied into hourly slots.
+
+Current conditions use `GET /api/v1/observations/nearby` at the forecast
+region's representative coordinate. The closest fresh station with a
+temperature is preferred. Its actual station name, observation time, distance,
+and attribution are displayed. The regional bulletin remains the source of the
+condition text and high/low; observed and forecast values are not presented as
+though they came from one source.
 
 All valid-time displays use `America/Halifax` (Atlantic time, including daylight
 saving) with a 24-hour clock, **including regions outside Nova Scotia**. The
@@ -239,10 +282,9 @@ QC 119, SK 56, YT 13. These are collected ECCC forecast regions, not every
 municipality. All expired bulletins are marked stale, with no expired periods
 returned as current forecasts. Availability and region counts follow the feed.
 
-Live rollout was not possible in the editing session: Docker's socket was
-absent, and attempting a local Vite server failed with `listen EPERM` under the
-session's network restrictions. No live data or browser acceptance is claimed.
-After Docker Desktop is available, run from the project directory:
+The initial editing session could not reach Docker; the later rollout records
+below supersede that limitation. To rebuild the page, run from the project
+directory:
 
 ```bash
 docker compose build weather-api frontend
@@ -278,3 +320,21 @@ was still dated 2026-07-30 and correctly marked stale. Both city-forecast and
 GDPS DAGs were unpaused; a new GDPS run was running. The city-forecast DAG still
 had a pre-restart running record from July 30. No runs were manually cleared,
 backfilled, or marked successful during this startup verification.
+
+### Forecast experience redesign rollout — 2026-09-24
+
+The redesigned frontend image was built and deployed to the running Compose
+stack; the frontend container reported healthy. The public HTTPS page loaded
+641 selectable Canadian regions, a fresh Halifax bulletin, all seven daily rows,
+24 visible hourly cards, and the expandable 72-hour table. At verification the
+hourly response had 71 available and complete hours; the visible first 24 were
+complete, so the page correctly kept the coverage warning out of the primary
+view.
+
+Live browser acceptance confirmed the nearest fresh station reading from
+Bedford Basin, station name/time/attribution, humidity, wind/gust, pressure,
+hourly model values, and model precipitation fallbacks. The page was visually
+checked at its normal desktop width and at a 390 by 844 phone viewport. No
+browser console errors or warnings were present. The frontend production build,
+lint, and all 124 tests across 17 files passed. This change required no backend
+schema migration, new package, credential, or ingestion change.

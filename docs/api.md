@@ -67,6 +67,8 @@ active forecast bulletin is not returned.
 ```text
 GET /api/v1/forecast/regions
 GET /api/v1/forecast/hourly?area_id={16-character-hex-region-id}
+GET /api/v1/forecast/nearest?latitude={latitude}&longitude={longitude}
+GET /api/v1/observations/nearby?latitude={latitude}&longitude={longitude}&radius=100
 ```
 
 The regions endpoint returns all collected Canadian locations, including
@@ -81,6 +83,10 @@ humidity, one-hour precipitation, wind and gusts are numeric or null. Every row
 includes its model run and completeness status; wind is converted to km/h.
 Missing hours remain in the result. See the
 [forecast page guide](forecast-page-2026-09-06.md) for source and interval semantics.
+The nearest-region endpoint supports the page's opt-in browser-location action.
+The nearby-observations endpoint supplies current station temperature, humidity,
+wind/gust, pressure, precipitation, observation time, distance, freshness, and
+attribution; the page degrades to supported hourly model fields if it is unavailable.
 
 ## Resolve a layer
 

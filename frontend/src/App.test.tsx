@@ -650,7 +650,9 @@ describe('timeline range selector', () => {
         expect.anything(),
       )
       expect(screen.getByText('OFFICIAL 7-DAY FORECAST')).toBeTruthy()
-      expect(screen.getByText('Probability of precipitation · %')).toBeTruthy()
+      expect(
+        screen.getByText('Issued probability (%) or forecast wording'),
+      ).toBeTruthy()
       expect(screen.getByText('Issued amount · mm or cm')).toBeTruthy()
     })
     expect(screen.queryByLabelText('Variable')).toBeNull()

@@ -9,6 +9,16 @@ fi
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 cd "$script_dir"
 
+# Installation/image builds are safe during transfer, but collection is not.
+if [[ -f "$script_dir/.env" ]]; then
+  startup_hold=$(awk -F= '$1 == "WEATHER_STARTUP_HOLD" { sub(/^[^=]*=/, ""); value = $0 } END { print value }' "$script_dir/.env")
+  if [[ -n "$startup_hold" && "$startup_hold" != false ]]; then
+    echo "Startup is on hold: $startup_hold" >&2
+    echo "Complete the data/database cutover before clearing WEATHER_STARTUP_HOLD in .env." >&2
+    exit 1
+  fi
+fi
+
 # Always run the lightweight installation pass so run.sh is sufficient on its
 # own. Image assembly happens once below through Compose's --build option.
 echo "Validating installation prerequisites and configuration..."

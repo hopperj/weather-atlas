@@ -71,9 +71,13 @@ changes, preserving all collection jobs and application services.
 
 ## Persistent storage layout
 
-Compose bind-mounts every mutable service store below
-`WEATHERAPP_DATA_DIR`, which defaults to `./weatherapp_data` relative to the
-repository root:
+Compose bind-mounts local service state below `WEATHERAPP_DATA_DIR` and weather
+payloads from the independent `WEATHER_DATA_DIR`. `POSTGRES_DATA_DIR` overrides
+the database directory independently; blank/unset retains
+`WEATHERAPP_DATA_DIR/postgres`, including for existing deployments. The installer
+detects existing database storage at that selected path and preserves its secrets.
+The generic single-filesystem
+defaults use this layout relative to the repository root:
 
 ```text
 weatherapp_data/
@@ -118,13 +122,65 @@ filesystem. `install.sh` remains the authoritative host-side capacity check;
 the per-download guard is a smaller last-resort reserve for the container
 runtime view.
 
-`install.sh` rejects a `WEATHER_DATA_DIR` outside `WEATHERAPP_DATA_DIR`.
-Changing the root later points Compose at a separate deployment and does not
-move the old files.
+`WEATHER_DATA_DIR` and `POSTGRES_DATA_DIR` may be outside `WEATHERAPP_DATA_DIR`.
+On sparky, PostgreSQL and monitoring databases stay on the SSD. Weather files
+and ordinary service files use separate subdirectories of the `data` NAS mount:
 
-Releases that predate this layout used Docker named volumes and a repository
-`data/` directory. Those stores are intentionally neither deleted nor
-automatically copied. For an established installation, stop writers, create and
+```dotenv
+POSTGRES_DATA_DIR=/home/hopperj/weather-atlas/postgres_data
+WEATHERAPP_DATA_DIR=/home/hopperj/weather-atlas/data/services
+WEATHER_DATA_DIR=/home/hopperj/weather-atlas/data/weather
+WEATHER_BACKUP_DIR=/home/hopperj/weather-atlas/data/services/backups/postgres
+WEATHER_MONITORING_DIR=/home/hopperj/weather-atlas/postgres_data/monitoring
+WEATHER_MANAGE_SERVICE_PERMISSIONS=false
+REDIS_RUN_USER=999:1000
+WEATHER_DATA_MOUNTPOINT=/home/hopperj/weather-atlas/data
+WEATHER_DATA_MOUNT_SOURCE=databanks.iolan:/volume1/data/weather-atlas-data
+WEATHER_MANAGE_DATA_PERMISSIONS=false
+WEATHER_DATA_GID=100
+```
+
+These settings are also recorded in [.env.sparky.example](../.env.sparky.example).
+Merge them into the existing private configuration; do not replace database
+credentials with an example file. The mount guard rejects an absent or wrong NAS
+mount, and the initializer leaves NAS permissions unchanged. The containers need
+the shared group to access existing nested folders, not just the mount root.
+See [the migration notes](sparky-migration.md) before clearing the startup hold.
+
+Shared weather directories must also have **setgid inheritance** and group
+read/write/traverse access. On sparky, directories under `data/weather` inherit
+GID 100 (`users`); normal new directories are 2775 and weather files are 0664.
+Existing file owners and other permission bits are preserved. The mount root
+also inherits GID 100, but this policy is not applied recursively to private
+service state (TLS keys, Redis state, database backups, etc.).
+
+Airflow's entrypoint already sets `umask 0002`. The subscriber now does the same
+and uses `permCopy False`, `permDefault 0664`, and `permDirDefault 0775`; otherwise
+upstream modes can silently undo shared write access. Imagery's atomic writer
+sets 0664 before publication because temporary files initially have mode 0600.
+The API and tile API continue to mount weather data **read-only**. Future copies
+must retain group-write access and directory group inheritance, not restore
+foreign groups/restrictive modes. Re-run cross-user create/read/append/rename/
+delete probes after a final sync, including in newly created nested directories.
+
+The service-file move to `data/services` preserves the original local copies for
+rollback. Files were copied as each service's real UID, without changing NAS
+ownership policy: Airflow/backups 1000, Caddy 0, Redis 999, subscriber 50000, and
+tile cache 101, with shared GID 100. Redis starts directly as its image UID so its
+entrypoint does not try to chown NAS state. `WEATHER_MANAGE_SERVICE_PERMISSIONS=false`
+makes the installer/initializer validate existing service directories instead of
+creating or changing them. An explicit local `WEATHER_MONITORING_DIR` is required
+in that mode; its permissions are initialized separately. Monitoring mounts must
+remain local: [Prometheus does not support NFS](https://prometheus.io/docs/prometheus/latest/storage/),
+and this deployment also keeps Grafana's SQLite database off the NAS.
+
+Changing a root points Compose at a separate storage location; it does not move
+files. Never point `POSTGRES_DATA_DIR` at `data/postgres`: those NAS files came
+from a live filesystem copy, not the verified local database restore.
+
+Releases that predate this layout used Docker named volumes. Existing stores
+are intentionally neither deleted nor automatically copied. For an established
+installation, stop writers, create and
 verify database backups, copy each filesystem store to its matching subdirectory,
 and verify ownership and restore readiness before starting the new layout.
 
@@ -153,23 +209,49 @@ the row pending so the same bounded workflow can reconcile it on a later run.
 
 ## Storage capacity admission
 
-Place `WEATHERAPP_DATA_DIR` on the intended data filesystem. The capacity check
-measures the filesystem containing `WEATHER_DATA_DIR` (the
-`weatherapp_data/weather` subtree by default) before enabling a product,
+### Sparky boot ordering
+
+After enabling the intended collectors on sparky, run
+`sudo bash /home/hopperj/weather-atlas/scripts/install_sparky_boot.sh` there.
+This installs `docs/systemd/sparky-docker-nfs.conf` as a Docker service drop-in.
+Docker must wait for `/home/hopperj/weather-atlas/data` and verify that it is the
+expected NAS NFS export before restarting containers. This dependency applies
+to the Docker daemon on sparky, including any other containers on that host.
+The installer reloads systemd and enables Docker at boot; it does not restart
+Docker or reboot the machine. Existing GPU-related service overrides are retained.
+
+Docker's `unless-stopped` policy restarts collectors that were running before
+shutdown. Intentionally stopped containers stay stopped; images alone do not
+start services. Boot does not rebuild images or apply database migrations.
+Keep the old host's collectors stopped and DAGs paused after the handover.
+
+When moving a subscriber, set `ECCC_SUBSCRIBER_HOSTNAME` on the destination to
+the previous container's `Config.Hostname` (inspect it before removing that
+container). Its broker queue name includes this hostname. Keeping the identity
+lets the destination resume the existing queue instead of creating a new one.
+Never run both subscribers with that identity during the handover. Leave this
+setting empty for a new installation to retain Docker's default hostname.
+
+### Capacity check
+
+Place `WEATHER_DATA_DIR` on the intended weather-data filesystem. The capacity
+check measures that filesystem (`data/weather` on sparky, or
+`weatherapp_data/weather` in the generic local example) before enabling a product,
 backfill, or unusually large model run:
 
 ```bash
 ./scripts/check_disk_capacity.sh
 ```
 
-The defaults require at least 20 GiB and 10 percent free after the proposed job.
+The defaults require at least 200 GiB free after the proposed job, with no
+percentage floor. An optional percentage floor can still be enabled explicitly.
 Pass a measured download plus transformation estimate with `--required-gib`:
 
 ```bash
 ./scripts/check_disk_capacity.sh \
   --required-gib 45 \
-  --minimum-free-gib 30 \
-  --minimum-free-percent 12
+  --minimum-free-gib 200 \
+  --minimum-free-percent 0
 ```
 
 Exit status `0` means admit, `1` means capacity blocked, and `2` means the path or
@@ -178,8 +260,8 @@ stop before downloading. Defaults may be set locally without changing the
 script:
 
 ```dotenv
-WEATHER_MIN_FREE_GIB=30
-WEATHER_MIN_FREE_PERCENT=12
+WEATHER_MIN_FREE_GIB=200
+WEATHER_MIN_FREE_PERCENT=0
 ```
 
 Capacity planning must include simultaneous raw input, staging output, final COG,

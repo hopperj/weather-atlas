@@ -31,6 +31,8 @@ x-airflow-common: &airflow-common
     - ./config:/opt/weather/config:ro
     - ${WEATHER_DATA_DIR:-./weatherapp_data/weather}:/srv/weather-platform/data
   user: "${AIRFLOW_UID:-50000}:0"
+  group_add:
+    - "${WEATHER_DATA_GID:-0}"
   depends_on:
     postgres:
       condition: service_healthy
@@ -42,75 +44,26 @@ services:
     user: "0:0"
     environment:
       AIRFLOW_UID: ${AIRFLOW_UID:-50000}
+      WEATHER_DATA_GID: ${WEATHER_DATA_GID:-0}
+      WEATHER_MANAGE_DATA_PERMISSIONS: ${WEATHER_MANAGE_DATA_PERMISSIONS:-true}
+      WEATHER_MANAGE_SERVICE_PERMISSIONS: ${WEATHER_MANAGE_SERVICE_PERMISSIONS:-true}
+      WEATHER_MONITORING_DIR: ${WEATHER_MONITORING_DIR:-}
+    group_add:
+      - "${WEATHER_DATA_GID:-0}"
     volumes:
       - ${WEATHERAPP_DATA_DIR:-./weatherapp_data}:/storage
+      - ${WEATHER_MONITORING_DIR:-${WEATHERAPP_DATA_DIR:-./weatherapp_data}}:/monitoring
+      - ${WEATHER_DATA_DIR:-./weatherapp_data/weather}:/weather-data
+      - ./docker/storage/init-storage.sh:/init-storage.sh:ro
     command:
       - /bin/sh
       - -ec
-      - |
-        mkdir -p \
-          /storage/postgres \
-          /storage/redis \
-          /storage/weather/raw \
-          /storage/weather/staging \
-          /storage/weather/processed \
-          /storage/weather/derived \
-          /storage/weather/quarantine \
-          /storage/weather/cache \
-          /storage/weather/temporary \
-          /storage/weather/amqp/inbox \
-          /storage/airflow/logs \
-          /storage/sarracenia/cache \
-          /storage/caddy/data \
-          /storage/caddy/config \
-          /storage/tile-cache \
-          /storage/prometheus \
-          /storage/grafana \
-          /storage/backups/postgres
-        chown "$${AIRFLOW_UID}:0" \
-          /storage/weather \
-          /storage/weather/raw \
-          /storage/weather/staging \
-          /storage/weather/processed \
-          /storage/weather/derived \
-          /storage/weather/quarantine \
-          /storage/weather/cache \
-          /storage/weather/temporary \
-          /storage/weather/amqp \
-          /storage/weather/amqp/inbox \
-          /storage/airflow \
-          /storage/airflow/logs \
-          /storage/sarracenia \
-          /storage/sarracenia/cache
-        chown 101:101 /storage/tile-cache
-        chown 65534:65534 /storage/prometheus
-        chown 472:0 /storage/grafana
-        chmod 0770 \
-          /storage/weather \
-          /storage/weather/raw \
-          /storage/weather/staging \
-          /storage/weather/processed \
-          /storage/weather/derived \
-          /storage/weather/quarantine \
-          /storage/weather/cache \
-          /storage/weather/temporary \
-          /storage/weather/amqp \
-          /storage/weather/amqp/inbox \
-          /storage/airflow \
-          /storage/airflow/logs \
-          /storage/sarracenia \
-          /storage/sarracenia/cache \
-          /storage/caddy \
-          /storage/caddy/data \
-          /storage/caddy/config \
-          /storage/tile-cache \
-          /storage/prometheus \
-          /storage/grafana \
-          /storage/backups \
-          /storage/backups/postgres
+      - exec /bin/sh /init-storage.sh
 
   reverse-proxy:
     image: caddy:2.10.2-alpine
+    group_add:
+      - "${WEATHER_DATA_GID:-0}"
     restart: unless-stopped
     ports:
       - "${APP_BIND_ADDRESS:-0.0.0.0}:${APP_PORT:-8080}:80"
@@ -145,6 +98,8 @@ services:
       retries: 5
 
   weather-api:
+    group_add:
+      - "${WEATHER_DATA_GID:-0}"
     build:
       context: .
       dockerfile: docker/api/Dockerfile
@@ -186,6 +141,8 @@ services:
         condition: service_healthy
 
   tile-api:
+    group_add:
+      - "${WEATHER_DATA_GID:-0}"
     build:
       context: .
       dockerfile: docker/tiles/Dockerfile
@@ -251,7 +208,7 @@ services:
       WEATHER_READONLY_PASSWORD: ${WEATHER_READONLY_PASSWORD}
       WEATHER_BACKUP_PASSWORD: ${WEATHER_BACKUP_PASSWORD}
     volumes:
-      - ${WEATHERAPP_DATA_DIR:-./weatherapp_data}/postgres:/var/lib/postgresql
+      - ${POSTGRES_DATA_DIR:-${WEATHERAPP_DATA_DIR:-./weatherapp_data}/postgres}:/var/lib/postgresql
       - ./docker/postgres/init-databases.sh:/docker-entrypoint-initdb.d/10-init-databases.sh:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U weather_admin -d postgres"]
@@ -264,6 +221,10 @@ services:
 
   redis:
     image: ${REDIS_IMAGE:-redis:7.4-alpine}
+    # Run as the image's Redis UID on managed NAS storage, avoiding root chown.
+    user: ${REDIS_RUN_USER:-0:0}
+    group_add:
+      - "${WEATHER_DATA_GID:-0}"
     restart: unless-stopped
     command: ["redis-server", "--appendonly", "yes"]
     volumes:
@@ -278,6 +239,11 @@ services:
         condition: service_completed_successfully
 
   eccc-subscriber:
+    # Preserve the broker queue identity when moving an existing collector.
+    # Empty retains Docker's default hostname for other installations.
+    hostname: ${ECCC_SUBSCRIBER_HOSTNAME:-}
+    group_add:
+      - "${WEATHER_DATA_GID:-0}"
     build:
       context: .
       dockerfile: docker/sarracenia/Dockerfile
@@ -311,7 +277,7 @@ services:
       - "127.0.0.1:${PROMETHEUS_PORT:-9090}:9090"
     volumes:
       - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - ${WEATHERAPP_DATA_DIR:-./weatherapp_data}/prometheus:/prometheus
+      - ${WEATHER_MONITORING_DIR:-${WEATHERAPP_DATA_DIR:-./weatherapp_data}}/prometheus:/prometheus
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:9090/-/ready"]
       interval: 15s
@@ -337,7 +303,7 @@ services:
     ports:
       - "127.0.0.1:${GRAFANA_PORT:-3000}:3000"
     volumes:
-      - ${WEATHERAPP_DATA_DIR:-./weatherapp_data}/grafana:/var/lib/grafana
+      - ${WEATHER_MONITORING_DIR:-${WEATHERAPP_DATA_DIR:-./weatherapp_data}}/grafana:/var/lib/grafana
       - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
       - ./observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
     healthcheck:
