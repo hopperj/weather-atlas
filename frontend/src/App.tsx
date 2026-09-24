@@ -1500,12 +1500,32 @@ export function App() {
         >
           <AppIcon />
         </button>
-        <div>
+        <div className="brand-copy">
           <p className="eyebrow">ECCC MODEL EXPLORER</p>
           <h1>Weather Model Atlas</h1>
         </div>
-        <a className="forecast-page-link" href="/forecast">
-          Daily &amp; hourly forecast
+        <a
+          className="forecast-page-link"
+          href="/forecast"
+          aria-label="Open hourly and seven-day forecast"
+        >
+          <span className="forecast-page-link-icon" aria-hidden="true">
+            <svg viewBox="0 0 32 32">
+              <circle cx="12" cy="11" r="5" />
+              <path d="M10 23.5h13.2a4.8 4.8 0 0 0 .5-9.6 7 7 0 0 0-13-1.4A5.5 5.5 0 0 0 10 23.5Z" />
+            </svg>
+          </span>
+          <span className="forecast-page-link-copy">
+            <strong>Forecast</strong>
+            <small>Hourly &amp; 7-day</small>
+          </span>
+          <svg
+            className="forecast-page-link-arrow"
+            viewBox="0 0 16 16"
+            aria-hidden="true"
+          >
+            <path d="m6 3.5 4.5 4.5L6 12.5" />
+          </svg>
         </a>
         <div className={`run-status ${latestError ? 'error' : ''}`}>
           <span className="status-dot" />
