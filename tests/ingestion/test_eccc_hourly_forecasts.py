@@ -117,6 +117,17 @@ def test_normalization_retains_official_pop_condition_and_hourly_fields() -> Non
     assert result["hours"][8]["pop_percent"] == 30
 
 
+def test_normalization_treats_provider_calm_wind_as_zero() -> None:
+    payload = provider_payload()
+    payload[0]["hourlyFcst"]["hourly"][0]["windSpeed"]["metric"] = "Calm"
+    payload[0]["hourlyFcst"]["hourly"][0]["windGust"]["metric"] = "calm"
+
+    result = normalize_hourly_response(payload, REGION, collected_at=NOW)
+
+    assert result["hours"][0]["wind_speed_kmh"] == 0
+    assert result["hours"][0]["wind_gust_kmh"] == 0
+
+
 @pytest.mark.parametrize(
     ("change", "message"),
     [

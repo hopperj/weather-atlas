@@ -150,6 +150,15 @@ def _metric(container: object, *, minimum: float, maximum: float) -> float | Non
     return _optional_number(container.get("metric"), minimum=minimum, maximum=maximum)
 
 
+def _wind_metric(container: object) -> float | None:
+    if not isinstance(container, dict):
+        return None
+    value = container.get("metric")
+    if isinstance(value, str) and value.strip().casefold() == "calm":
+        return 0.0
+    return _optional_number(value, minimum=0, maximum=500)
+
+
 def _required_text(value: object, name: str, *, maximum: int = 200) -> str:
     if not isinstance(value, str) or not value.strip() or len(value.strip()) > maximum:
         raise ValueError(f"official hourly forecast has invalid {name}")
@@ -288,9 +297,9 @@ def normalize_hourly_response(
                 "temperature_c": _metric(source.get("temperature"), minimum=-100, maximum=70),
                 "feels_like_c": _metric(source.get("feelsLike"), minimum=-150, maximum=100),
                 "icon_code": icon_code,
-                "wind_speed_kmh": _metric(source.get("windSpeed"), minimum=0, maximum=500),
+                "wind_speed_kmh": _wind_metric(source.get("windSpeed")),
                 "wind_direction": wind_direction,
-                "wind_gust_kmh": _metric(source.get("windGust"), minimum=0, maximum=500),
+                "wind_gust_kmh": _wind_metric(source.get("windGust")),
                 "uv_index": (
                     _optional_number(uv.get("index"), minimum=0, maximum=30)
                     if isinstance(uv, dict)
