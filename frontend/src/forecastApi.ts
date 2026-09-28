@@ -77,6 +77,34 @@ export const hourlySchema = z.object({
 export type ForecastRegion = z.infer<typeof regionSchema>
 export type HourlyForecast = z.infer<typeof hourlySchema>
 
+export const officialHourlySchema = z.object({
+  regionId: z.string(),
+  source: z.literal('ECCC official hourly forecast'),
+  generatedAt: z.iso.datetime(),
+  issuedAt: z.iso.datetime(),
+  providerLocation: z.string(),
+  timeZone: z.string(),
+  sourceUrl: z.url(),
+  stale: z.boolean(),
+  hours: z
+    .array(
+      z.object({
+        time: z.iso.datetime(),
+        condition: z.string(),
+        popPercent: z.number().min(0).max(100).nullable(),
+        temperatureC: z.number().nullable(),
+        feelsLikeC: z.number().nullable(),
+        iconCode: z.string(),
+        windKmh: z.number().nonnegative().nullable(),
+        windDirection: z.string().nullable(),
+        gustKmh: z.number().nonnegative().nullable(),
+        uvIndex: z.number().nonnegative().nullable(),
+      }),
+    )
+    .length(24),
+})
+export type OfficialHourlyForecast = z.infer<typeof officialHourlySchema>
+
 export const precipitationSchema = z.object({
   regionId: z.string(),
   issuedAt: z.iso.datetime(),
@@ -158,6 +186,12 @@ export const forecastApi = {
     request(
       `/api/v1/forecast/hourly?area_id=${encodeURIComponent(id)}`,
       hourlySchema,
+      signal,
+    ),
+  officialHourly: (id: string, signal?: AbortSignal) =>
+    request(
+      `/api/v1/forecast/official-hourly?area_id=${encodeURIComponent(id)}`,
+      officialHourlySchema,
       signal,
     ),
   precipitation: (id: string, signal?: AbortSignal) =>

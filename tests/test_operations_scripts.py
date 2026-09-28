@@ -330,6 +330,7 @@ def test_run_all_collection_dags_is_bounded_and_waits_for_results() -> None:
     assert "--conf" not in source
     assert "INGESTION_WAIT_TIMEOUT_SECONDS" in source
     assert "eccc_city_forecasts_ingest" in source
+    assert "eccc_hourly_forecasts_ingest" in source
     assert "eccc_imagery_ingest" in source
     assert "nrcan_cwfis_cffdrs_ingest" in source
     assert source.index("airflow dags trigger fire_event_reconcile") > source.index(

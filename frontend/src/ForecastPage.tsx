@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   forecastApi,
@@ -216,13 +216,14 @@ function DailyForecast({
         const night = periods.find(
           (period) => period.temperatureClass === 'low',
         )
-        const likelihoods = periods
-          .map((period) =>
-            precipitationLikelihood(period.popPercent, period.condition),
-          )
-          .filter((value): value is string => Boolean(value))
-        const pop = likelihoods.find((value) => value.endsWith('%'))
-        const wording = likelihoods.find((value) => !value.endsWith('%'))
+        const precipitationPeriods = periods.map((period) => ({
+          label: period.temperatureClass === 'low' ? 'Night' : 'Day',
+          likelihood: precipitationLikelihood(
+            period.popPercent,
+            period.condition,
+          ),
+          period,
+        }))
         return (
           <article className="daily-row" key={date}>
             <div className="daily-date">
@@ -242,21 +243,6 @@ function DailyForecast({
             <div className="daily-summary">
               <strong>{daytime.condition || 'Condition unavailable'}</strong>
               {night && <span>Night: {night.condition}</span>}
-              <small>
-                {wording ?? (pop ? `${pop} precipitation` : 'No POP issued')}
-              </small>
-            </div>
-            <div className="daily-amounts">
-              {periods.map((period) => (
-                <span key={period.start}>
-                  {period.temperatureClass === 'low' ? 'Night' : 'Day'}:{' '}
-                  <PrecipitationAmount
-                    period={period}
-                    region={region}
-                    precipitation={precipitation}
-                  />
-                </span>
-              ))}
             </div>
             <div className="daily-temperatures" aria-label="High and low">
               <strong>
@@ -273,6 +259,31 @@ function DailyForecast({
                   '°',
                 )}
               </span>
+            </div>
+            <div
+              className="daily-pop"
+              aria-label="Probability of precipitation"
+            >
+              {precipitationPeriods.map(({ label, likelihood, period }) => (
+                <span key={period.start}>
+                  <small>{label}</small>
+                  <strong>{likelihood ?? 'Not issued'}</strong>
+                </span>
+              ))}
+            </div>
+            <div className="daily-amounts" aria-label="Precipitation totals">
+              {precipitationPeriods.map(({ label, period }) => (
+                <span key={period.start}>
+                  <small>{label}</small>
+                  <strong>
+                    <PrecipitationAmount
+                      period={period}
+                      region={region}
+                      precipitation={precipitation}
+                    />
+                  </strong>
+                </span>
+              ))}
             </div>
           </article>
         )
@@ -301,6 +312,7 @@ function DetailCard({
 
 export function ForecastPage() {
   const queryClient = useQueryClient()
+  const hourlyStripRef = useRef<HTMLDivElement>(null)
   const [location, setLocation] = useState<LocationSelection>(() => {
     const query = new URLSearchParams(window.location.search)
     return {
@@ -361,6 +373,14 @@ export function ForecastPage() {
     staleTime: 300_000,
     refetchInterval: 300_000,
   })
+  const officialHourly = useQuery({
+    queryKey: ['forecast-official-hourly', selected?.id],
+    queryFn: ({ signal }) => forecastApi.officialHourly(selected!.id, signal),
+    enabled: Boolean(selected),
+    staleTime: 300_000,
+    refetchInterval: 300_000,
+    retry: false,
+  })
   const precipitation = useQuery({
     queryKey: [
       'forecast-precipitation',
@@ -407,6 +427,9 @@ export function ForecastPage() {
     setNow(new Date())
     void queryClient.invalidateQueries({ queryKey: ['forecast-regions'] })
     void queryClient.invalidateQueries({ queryKey: ['forecast-hourly'] })
+    void queryClient.invalidateQueries({
+      queryKey: ['forecast-official-hourly'],
+    })
     void queryClient.invalidateQueries({
       queryKey: ['forecast-precipitation'],
     })
@@ -461,11 +484,34 @@ export function ForecastPage() {
     [observations.data],
   )
   const firstHour = hourly.data?.hours.find((hour) => hour.status !== 'missing')
+  const officialHours =
+    officialHourly.data &&
+    officialHourly.data.regionId === selected?.id &&
+    !officialHourly.data.stale
+      ? officialHourly.data.hours
+      : []
+  const officialHoursByTime = new Map(
+    officialHours.map((hour) => [hour.time, hour]),
+  )
+  const currentOfficialHour = officialHours[0]
   const currentPeriod = selected
     ? (periodAt(selected, now.toISOString()) ?? selected.periods[0])
     : undefined
+  const currentPrecipitationLikelihood = currentPeriod
+    ? currentOfficialHour?.popPercent !== null &&
+      currentOfficialHour?.popPercent !== undefined
+      ? forecastMetric(currentOfficialHour.popPercent, '%')
+      : precipitationLikelihood(
+          currentPeriod.popPercent,
+          currentPeriod.condition,
+        )
+    : null
   const currentTemperature =
-    station?.observation.values.temperatureC ?? firstHour?.temperatureC ?? null
+    station?.observation.values.temperatureC ??
+    currentOfficialHour?.temperatureC ??
+    firstHour?.temperatureC ??
+    null
+  const currentFeelsLike = currentOfficialHour?.feelsLikeC ?? null
   const daily = selected ? forecastDays(selected) : []
   const firstDay = daily[0]?.[1] ?? []
   const high =
@@ -474,16 +520,41 @@ export function ForecastPage() {
   const low =
     firstDay.find((period) => period.temperatureClass === 'low')
       ?.temperatureC ?? null
-  const currentCondition = currentPeriod?.condition || 'Forecast unavailable'
+  const currentCondition =
+    currentOfficialHour?.condition ||
+    currentPeriod?.condition ||
+    'Forecast unavailable'
   const theme = weatherKind(currentCondition)
   const currentValues = station?.observation.values
   const detailHumidity =
     currentValues?.humidityPercent ?? firstHour?.relativeHumidityPercent ?? null
-  const detailWind = currentValues?.windKmh ?? firstHour?.windKmh ?? null
-  const detailGust = currentValues?.gustKmh ?? firstHour?.gustKmh ?? null
+  const detailWind =
+    currentValues?.windKmh ??
+    currentOfficialHour?.windKmh ??
+    firstHour?.windKmh ??
+    null
+  const detailGust =
+    currentValues?.gustKmh ??
+    currentOfficialHour?.gustKmh ??
+    firstHour?.gustKmh ??
+    null
+  const detailWindDirection = currentOfficialHour?.windDirection ?? null
   const detailPressure = currentValues?.pressureHpa ?? null
   const detailPrecipitation =
     currentValues?.precipitationMm ?? firstHour?.precipitationMm ?? null
+  const displayedHours =
+    hourly.data?.hours.slice(0, 24) ??
+    officialHours.map((hour) => ({
+      time: hour.time,
+      runTime: null,
+      precipitationStart: hour.time,
+      status: 'missing' as const,
+      temperatureC: null,
+      relativeHumidityPercent: null,
+      precipitationMm: null,
+      windKmh: null,
+      gustKmh: null,
+    }))
 
   return (
     <main className={`forecast-page forecast-theme-${theme}`}>
@@ -655,50 +726,109 @@ export function ForecastPage() {
             <section className="forecast-hero" aria-labelledby="forecast-title">
               <div className="hero-atmosphere" aria-hidden="true" />
               <div className="hero-copy">
-                <p className="hero-kicker">
-                  {longDate(now.toISOString())} · Atlantic time
-                </p>
-                <h1 id="forecast-title">
-                  {selected.locality ?? selected.name}
-                </h1>
-                <div className="hero-weather">
-                  <WeatherGlyph
-                    condition={currentCondition}
-                    night={currentPeriod?.temperatureClass === 'low'}
-                    className="hero-weather-icon"
-                  />
-                  <strong className="hero-temperature">
-                    {forecastMetric(currentTemperature, '°')}
-                  </strong>
-                  <div className="hero-condition">
-                    <strong>{currentCondition}</strong>
-                    <span>
-                      High {forecastMetric(high, '°')} · Low{' '}
-                      {forecastMetric(low, '°')}
+                <div className="hero-heading">
+                  <div>
+                    <h1 id="forecast-title">
+                      {selected.locality ?? selected.name}
+                    </h1>
+                    <span className="hero-province">
+                      {selected.provinceName}
                     </span>
                   </div>
+                  <p className="hero-kicker">
+                    {longDate(now.toISOString())} · Atlantic time
+                  </p>
                 </div>
-                <p className="hero-source">
-                  {station
-                    ? `Observed at ${station.name} · ${clock(station.observation.observedAt)} AT`
-                    : hourly.isLoading
-                      ? 'Loading current conditions…'
-                      : 'Current temperature is the nearest available model hour'}
-                </p>
-              </div>
-              <div className="hero-briefing">
-                <p>Forecast at a glance</p>
-                <strong>
-                  {selected.briefing?.overview ??
-                    `${currentCondition}. See the hourly and seven-day outlook below.`}
-                </strong>
-                {selected.briefing && (
-                  <span>
-                    {selected.briefing.precipitation}{' '}
-                    {selected.briefing.temperatures}
-                  </span>
-                )}
-                <a href="/?buffer=12">View weather map →</a>
+                <div className="hero-dashboard">
+                  <div className="hero-weather">
+                    <WeatherGlyph
+                      condition={currentCondition}
+                      night={currentPeriod?.temperatureClass === 'low'}
+                      className="hero-weather-icon"
+                    />
+                    <div className="hero-temperature-group">
+                      <strong className="hero-temperature">
+                        {forecastMetric(currentTemperature, '°')}
+                      </strong>
+                      <div className="hero-condition">
+                        <strong>{currentCondition}</strong>
+                        {currentFeelsLike !== null && (
+                          <span>
+                            Feels like {forecastMetric(currentFeelsLike, '°')}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="hero-metrics">
+                    <div className="hero-metric">
+                      <span>High / Low</span>
+                      <strong>
+                        {forecastMetric(high, '°')} / {forecastMetric(low, '°')}
+                      </strong>
+                    </div>
+                    <div className="hero-metric">
+                      <span>Humidity</span>
+                      <strong>{forecastMetric(detailHumidity, '%')}</strong>
+                    </div>
+                    <div className="hero-metric">
+                      <span>Wind</span>
+                      <strong>
+                        {detailWindDirection ? `${detailWindDirection} ` : ''}
+                        {forecastMetric(detailWind, ' km/h')}
+                      </strong>
+                      {detailGust !== null && (
+                        <small>Gusts {detailGust.toFixed(0)} km/h</small>
+                      )}
+                    </div>
+                    <div
+                      className="hero-precipitation"
+                      aria-label="Current forecast precipitation"
+                    >
+                      <div className="hero-metric hero-metric-precipitation">
+                        <span title="Probability of precipitation">
+                          POP
+                          {currentOfficialHour
+                            ? ` · ${clock(currentOfficialHour.time)}`
+                            : ' · current period'}
+                        </span>
+                        <strong>
+                          {currentPrecipitationLikelihood ?? 'Not issued'}
+                        </strong>
+                      </div>
+                      <div className="hero-metric hero-metric-precipitation">
+                        <span>Period precipitation</span>
+                        <strong>
+                          {currentPeriod ? (
+                            <PrecipitationAmount
+                              period={currentPeriod}
+                              region={selected}
+                              precipitation={precipitation.data}
+                            />
+                          ) : (
+                            '—'
+                          )}
+                        </strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="hero-footer">
+                  <p className="hero-source">
+                    {station
+                      ? `Observed at ${station.name} · ${clock(station.observation.observedAt)} AT · temperature and station details`
+                      : currentOfficialHour
+                        ? `ECCC hourly forecast for ${clock(currentOfficialHour.time)} AT`
+                        : hourly.isLoading
+                          ? 'Loading current conditions…'
+                          : 'Current temperature is the nearest available model hour'}
+                  </p>
+                  <p className="hero-summary">
+                    {selected.briefing?.overview ??
+                      `${currentCondition}. See the hourly and seven-day outlook below.`}
+                  </p>
+                  <a href="/?buffer=12">View weather map →</a>
+                </div>
               </div>
             </section>
 
@@ -711,21 +841,52 @@ export function ForecastPage() {
             )}
 
             <section
-              className="forecast-section"
+              className="forecast-section forecast-section-card forecast-hourly-section"
               aria-labelledby="hourly-title"
               aria-busy={hourly.isFetching}
             >
               <header className="forecast-section-heading">
-                <div>
+                <div className="forecast-section-title">
                   <p className="eyebrow">HOUR BY HOUR</p>
-                  <h2 id="hourly-title">Next 24 hours</h2>
+                  <div className="forecast-section-title-line">
+                    <h2 id="hourly-title">Next 24 hours</h2>
+                    <p>ECCC official hourly · GDPS amounts</p>
+                  </div>
                 </div>
-                <p>ECCC GDPS · Updated automatically</p>
+                <div
+                  className="hourly-navigation"
+                  aria-label="Hourly forecast navigation"
+                >
+                  <button
+                    type="button"
+                    onClick={() =>
+                      hourlyStripRef.current?.scrollBy({
+                        left: -560,
+                        behavior: 'smooth',
+                      })
+                    }
+                    aria-label="Earlier forecast hours"
+                  >
+                    ‹
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      hourlyStripRef.current?.scrollBy({
+                        left: 560,
+                        behavior: 'smooth',
+                      })
+                    }
+                    aria-label="Later forecast hours"
+                  >
+                    ›
+                  </button>
+                </div>
               </header>
               {hourly.error && (
                 <p role="alert" className="forecast-warning">
-                  {hourly.error.message}. The seven-day outlook remains
-                  available below.
+                  {hourly.error.message}. Official hourly values remain
+                  available when collected.
                 </p>
               )}
               {hourly.isLoading && (
@@ -733,43 +894,67 @@ export function ForecastPage() {
                   Loading hourly forecasts…
                 </p>
               )}
-              {hourly.data && (
+              {(officialHourly.error || officialHourly.data?.stale) && (
+                <p className="forecast-warning" role="status">
+                  Official hourly conditions and POP are{' '}
+                  {officialHourly.data?.stale ? 'out of date' : 'unavailable'}.
+                  Model values remain visible.
+                </p>
+              )}
+              {displayedHours.length > 0 && (
                 <>
-                  {hourly.data.hours
-                    .slice(0, 24)
-                    .some((hour) => hour.status !== 'complete') && (
+                  {displayedHours.some(
+                    (hour) => hour.status !== 'complete',
+                  ) && (
                     <p className="forecast-warning" role="status">
-                      Some forecast hours or values have not been collected.
-                      Missing values are shown as dashes; every hour remains
-                      listed.
+                      Some GDPS model hours or values have not been collected.
+                      Official hourly values remain visible where available.
                     </p>
                   )}
                   <div
                     className="hourly-strip"
+                    ref={hourlyStripRef}
                     tabIndex={0}
                     role="region"
                     aria-label="Scrollable 24-hour forecast"
                   >
-                    {hourly.data.hours.slice(0, 24).map((hour, index) => {
+                    {displayedHours.map((hour, index) => {
                       const period = periodAt(selected, hour.time)
+                      const official = officialHoursByTime.get(hour.time)
                       const condition =
-                        period?.condition || 'Conditions unavailable'
+                        official?.condition ||
+                        period?.condition ||
+                        'Conditions unavailable'
                       return (
-                        <article className="hour-card" key={hour.time}>
-                          <time dateTime={hour.time}>
-                            {index === 0 ? 'Now' : clock(hour.time)}
-                          </time>
+                        <article
+                          className={`hour-card${index === 0 ? ' hour-card-current' : ''}`}
+                          key={hour.time}
+                        >
+                          <div className="hour-time">
+                            <time dateTime={hour.time}>{clock(hour.time)}</time>
+                            {index === 0 && <span>Now</span>}
+                          </div>
                           <WeatherGlyph
                             condition={condition}
                             night={period?.temperatureClass === 'low'}
                           />
+                          <span className="hour-condition">{condition}</span>
                           <strong>
-                            {forecastMetric(hour.temperatureC, '°')}
+                            {forecastMetric(
+                              official?.temperatureC ?? hour.temperatureC,
+                              '°',
+                            )}
                           </strong>
+                          <span className="hour-pop">
+                            {official?.popPercent === null ||
+                            official?.popPercent === undefined
+                              ? 'POP —'
+                              : `POP ${official.popPercent.toFixed(0)}%`}
+                          </span>
                           <span className="hour-precipitation">
                             {hour.precipitationMm === null
-                              ? '—'
-                              : `${hour.precipitationMm.toFixed(1)} mm`}
+                              ? 'GDPS amount —'
+                              : `GDPS ${hour.precipitationMm.toFixed(1)} mm`}
                           </span>
                           <small>
                             {hour.relativeHumidityPercent === null
@@ -780,12 +965,16 @@ export function ForecastPage() {
                       )
                     })}
                   </div>
+                  <p className="hourly-source-legend">
+                    POP and conditions: ECCC official hourly forecast · Amounts:
+                    GDPS point forecast
+                  </p>
                 </>
               )}
             </section>
 
             <section
-              className="forecast-section"
+              className="forecast-section forecast-section-card forecast-daily-section"
               aria-labelledby="seven-day-title"
             >
               <header className="forecast-section-heading">
@@ -795,6 +984,13 @@ export function ForecastPage() {
                 </div>
                 <p>Issued {dateTime(selected.issuedAt)} AT</p>
               </header>
+              <div className="daily-column-headings" aria-hidden="true">
+                <span>Day</span>
+                <span>Conditions</span>
+                <span>High / Low</span>
+                <span>POP</span>
+                <span>Precipitation (total)</span>
+              </div>
               <DailyForecast
                 region={selected}
                 precipitation={precipitation.data}
@@ -896,7 +1092,8 @@ export function ForecastPage() {
                     {TIME_ZONE}), using a 24-hour clock. Values are sampled at
                     the centre of the selected region. Precipitation is the
                     amount in the hour ending at the displayed time. GDPS does
-                    not provide hourly POP in this feed.
+                    not provide hourly POP in this feed; official POP and
+                    conditions come from ECCC's separate public hourly forecast.
                   </p>
                   <div
                     className="hourly-table-scroll"

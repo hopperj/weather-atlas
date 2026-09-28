@@ -94,9 +94,16 @@ def test_factory_import_creates_supported_grib_dags_with_expected_dependencies(
 ) -> None:
     airflow_module = ModuleType("airflow")
     sdk_module = _fake_sdk()
+    sdk_exceptions_module = ModuleType("airflow.sdk.exceptions")
+
+    class AirflowSkipException(Exception):
+        pass
+
+    sdk_exceptions_module.AirflowSkipException = AirflowSkipException
     airflow_module.sdk = sdk_module
     monkeypatch.setitem(sys.modules, "airflow", airflow_module)
     monkeypatch.setitem(sys.modules, "airflow.sdk", sdk_module)
+    monkeypatch.setitem(sys.modules, "airflow.sdk.exceptions", sdk_exceptions_module)
 
     source_path = Path(__file__).parents[1] / "dags" / "eccc_ingestion.py"
     spec = importlib.util.spec_from_file_location("test_eccc_ingestion_dags", source_path)
@@ -126,15 +133,11 @@ def test_factory_import_creates_supported_grib_dags_with_expected_dependencies(
         }
         assert generated.task_dict["download_source"].pool == "eccc_downloads"
         assert generated.task_dict["create_cog"].pool == "cog_transforms"
-        assert generated.task_dict["download_source"].upstream_task_ids == {
-            "requests_for_mapping"
-        }
+        assert generated.task_dict["download_source"].upstream_task_ids == {"requests_for_mapping"}
         assert generated.task_dict["requests_for_mapping"].upstream_task_ids == {
             "discover_and_register"
         }
-        assert generated.task_dict["validate_source"].upstream_task_ids == {
-            "download_source"
-        }
+        assert generated.task_dict["validate_source"].upstream_task_ids == {"download_source"}
         assert generated.task_dict["create_cog"].upstream_task_ids == {"validate_source"}
         assert generated.task_dict["finalize_run"].upstream_task_ids == {
             "create_cog",

@@ -42,6 +42,46 @@ The first live collection on 2026-07-28 discovered 844 sites, retained 840
 sites with active bulletins, and normalized them into 641 regional forecasts.
 The web API and contour-free map view use this snapshot.
 
+## ECCC official hourly forecasts
+
+The `eccc_hourly_forecasts_ingest` DAG collects the official 24-hour forecast
+used by ECCC's public hourly forecast page. It runs without parameters at minute
+15 of every hour (`15 * * * *`) and uses the normalized City Page regions as a
+bounded location inventory. The City Page collector must therefore run once
+before the hourly collector is first enabled.
+
+For every region, the collector requests the public ECCC JSON service that
+drives the hourly page. It requires exactly 24 unique, consecutive forecast
+hours and validates the provider location, province, coordinates, issue time,
+POP, condition, temperature, feels-like temperature, icon, wind, gust, and UV
+index. A missing or invalid region fails the atomic collection instead of
+publishing a silently incomplete national snapshot.
+
+The latest normalized snapshot and its manifest are stored under:
+
+```text
+processed/eccc/hourly_forecast/latest.json
+processed/eccc/hourly_forecast/manifest.json
+```
+
+Every changed national snapshot is also retained under
+`processed/eccc/hourly_forecast/history/YYYY/MM/DD/`. An unchanged run updates
+the manifest's collection time without duplicating the snapshot. The forecast
+API serves one region at
+`/api/v1/forecast/official-hourly?area_id={16-character-hex-id}`. This product
+is the source of official hourly POP and condition wording; GDPS remains the
+separate source of point-model hourly precipitation amounts and the 72-hour
+technical table.
+
+Operational bounds can be overridden with
+`ECCC_HOURLY_FORECAST_MAXIMUM_REGIONS`,
+`ECCC_HOURLY_FORECAST_MAXIMUM_DOWNLOAD_BYTES`,
+`ECCC_HOURLY_FORECAST_MINIMUM_FREE_BYTES`,
+`ECCC_HOURLY_FORECAST_TIMEOUT_SECONDS`, and
+`ECCC_HOURLY_FORECAST_PARALLEL_DOWNLOADS`. Defaults allow at most 1,200
+regions, a 2 MiB response per region, eight parallel requests, and require
+1 GiB of free space.
+
 ## NRCan CWFIS wildfire hotspots
 
 The `nrcan_cwfis_hotspots_ingest` DAG collects the Canadian Wildland Fire
@@ -161,10 +201,12 @@ ensemble analysis:
 ## Running collection
 
 The GDPS DAG runs every 15 minutes because its twice-daily forecast is published
-as a long sequence of individual files. The other ECCC DAGs run at minute 15 of
-every hour in UTC. Scheduled and manual runs have identical behavior and require
-no configuration, parameters, run timestamp, or object list. In the Airflow UI,
-select a DAG and choose **Trigger DAG**.
+as a long sequence of individual files. The City Page DAG also runs every 15
+minutes, the imagery DAG every six minutes, and the official hourly forecast and
+remaining ECCC data-product DAGs at minute 15 of every hour. Scheduled and manual
+runs have identical behavior and require no configuration, parameters, run
+timestamp, or object list. In the Airflow UI, select a DAG and choose **Trigger
+DAG**.
 
 To trigger one product from the host:
 
@@ -182,9 +224,10 @@ Both scripts return a nonzero status when a DAG fails or times out. The default
 wait limit is two hours and can be changed with
 `INGESTION_WAIT_TIMEOUT_SECONDS`.
 
-The all-collections runner includes City Page forecasts and CWFIS CFFDRS in
-addition to the seven model products, GFS and hotspots. After those 11
-collectors succeed, it triggers and waits for fire-event reconciliation.
+The all-collections runner includes City Page and official hourly forecasts,
+collected imagery, and CWFIS CFFDRS in addition to the seven model products,
+GFS and hotspots. After those 13 collectors succeed, it triggers and waits for
+fire-event reconciliation.
 
 Forecast collection covers every configured lead time in the provider cycle:
 HRDPS hours 0–48, RAQDPS 0–72, RDPS 0–84, and GDPS 0–84 hourly plus 87–240

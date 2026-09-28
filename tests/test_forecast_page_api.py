@@ -8,7 +8,13 @@ from types import SimpleNamespace
 import pytest
 from fastapi.testclient import TestClient
 from weather_api import main
-from weather_api.forecast import FIELDS, PROVINCES, hourly_outlook, regional_outlooks
+from weather_api.forecast import (
+    FIELDS,
+    PROVINCES,
+    hourly_outlook,
+    official_hourly_outlook,
+    regional_outlooks,
+)
 from weather_api.repository import CatalogueNotFoundError
 
 NOW = datetime(2026, 9, 6, 12, 20, tzinfo=UTC)
@@ -54,6 +60,46 @@ def outlook_file(tmp_path):
         ],
     }
     path.write_text(json.dumps(snapshot))
+    return path
+
+
+def write_official_hourly(data_root):
+    path = data_root / main.OFFICIAL_HOURLY_FORECAST_SNAPSHOT
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "provider": "eccc",
+                "product": "hourly_forecast",
+                "generated_at": "2026-09-06T12:20:00Z",
+                "regions": [
+                    {
+                        "area_id": REGION_ID,
+                        "issued_at": "2026-09-06T12:00:00Z",
+                        "provider_location": "Halifax",
+                        "timezone": "America/Halifax",
+                        "source_url": "https://weather.gc.ca/en/forecast/hourly/",
+                        "hours": [
+                            {
+                                "valid_time": utc.isoformat().replace("+00:00", "Z"),
+                                "condition": "Showers",
+                                "pop_percent": 80,
+                                "temperature_c": 19,
+                                "feels_like_c": None,
+                                "icon_code": "12",
+                                "wind_speed_kmh": 20,
+                                "wind_direction": "NE",
+                                "wind_gust_kmh": 40,
+                                "uv_index": 2,
+                            }
+                            for utc in (START + timedelta(hours=index) for index in range(24))
+                        ],
+                    }
+                ],
+            }
+        )
+    )
     return path
 
 
@@ -130,6 +176,22 @@ def test_missing_rasters_wrong_units_and_invalid_values_stay_missing():
     assert all(row["status"] == "missing" for row in result["hours"])
 
 
+def test_official_hourly_snapshot_exposes_pop_and_condition(tmp_path):
+    path = write_official_hourly(tmp_path)
+    result = official_hourly_outlook(path, REGION_ID, NOW)
+
+    assert result["source"] == "ECCC official hourly forecast"
+    assert result["providerLocation"] == "Halifax"
+    assert result["issuedAt"] == "2026-09-06T12:00:00Z"
+    assert not result["stale"]
+    assert len(result["hours"]) == 24
+    assert result["hours"][0]["popPercent"] == 80
+    assert result["hours"][0]["condition"] == "Showers"
+
+    with pytest.raises(LookupError):
+        official_hourly_outlook(path, "ffffffffffffffff", NOW)
+
+
 def test_outlook_retains_zero_and_marks_expired_bulletin(outlook_file):
     fresh = regional_outlooks(outlook_file, NOW)["regions"][0]
     assert fresh["name"] == "Halifax Metro"
@@ -198,6 +260,7 @@ def test_forecast_routes_missing_unknown_and_72_hours(
         raise CatalogueNotFoundError
 
     monkeypatch.setattr(main, "_resolve_and_sample", sample)
+    write_official_hourly(outlook_file.parents[3])
     main.app.dependency_overrides[main.get_repository] = lambda: ForecastCatalogue()
     try:
         client = TestClient(main.app)
@@ -209,7 +272,14 @@ def test_forecast_routes_missing_unknown_and_72_hours(
         hourly = client.get(f"/api/v1/forecast/hourly?area_id={REGION_ID}")
         assert hourly.status_code == 200
         assert len(hourly.json()["hours"]) == 72
+        official = client.get(f"/api/v1/forecast/official-hourly?area_id={REGION_ID}")
+        assert official.status_code == 200
+        assert official.json()["hours"][0]["popPercent"] == 80
         assert client.get("/api/v1/forecast/hourly?area_id=ffffffffffffffff").status_code == 404
+        assert (
+            client.get("/api/v1/forecast/official-hourly?area_id=ffffffffffffffff").status_code
+            == 404
+        )
         assert client.get("/api/v1/forecast/hourly?area_id=../invalid").status_code == 422
         outlook_file.unlink()
         assert client.get("/api/v1/forecast/regions").status_code == 404

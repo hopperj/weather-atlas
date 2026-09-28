@@ -39,12 +39,14 @@ FIELDS = {
 
 def nearest_region(regions: list[dict], longitude: float, latitude: float) -> dict | None:
     """Select a nearby representative point, without claiming a region-polygon match."""
+
     def distance(region):
         phi1, phi2 = math.radians(latitude), math.radians(region["latitude"])
         dphi = phi2 - phi1
         dlon = math.radians(region["longitude"] - longitude)
         a = math.sin(dphi / 2) ** 2 + math.cos(phi1) * math.cos(phi2) * math.sin(dlon / 2) ** 2
         return 6371 * 2 * math.asin(math.sqrt(min(1, max(0, a))))
+
     if not regions:
         return None
     closest = min(regions, key=distance)
@@ -139,6 +141,68 @@ def regional_outlooks(path: Path, now: datetime) -> dict[str, Any]:
                 region["name"],
             ),
         ),
+    }
+
+
+def official_hourly_outlook(path: Path, area_id: str, now: datetime) -> dict[str, Any]:
+    """Read one region from the collected ECCC official 24-hour snapshot."""
+
+    if not path.is_file() or path.is_symlink():
+        raise FileNotFoundError(path)
+    if not 0 < path.stat().st_size <= 128 * 1024**2:
+        raise ValueError("Invalid official hourly forecast snapshot size")
+    snapshot = json.loads(path.read_bytes())
+    if (
+        snapshot.get("schema_version") != 1
+        or snapshot.get("provider") != "eccc"
+        or snapshot.get("product") != "hourly_forecast"
+        or not isinstance(snapshot.get("regions"), list)
+    ):
+        raise ValueError("Invalid official hourly forecast snapshot contract")
+    source = next(
+        (region for region in snapshot["regions"] if region.get("area_id") == area_id),
+        None,
+    )
+    if source is None:
+        raise LookupError(area_id)
+    issued_at = timestamp(source["issued_at"])
+    hours = []
+    for hour in source["hours"]:
+        valid_time = timestamp(hour["valid_time"])
+        pop = hour.get("pop_percent")
+        if pop is not None and (
+            not isinstance(pop, (int, float)) or not math.isfinite(pop) or not 0 <= pop <= 100
+        ):
+            raise ValueError("Invalid official hourly POP")
+        condition = hour.get("condition")
+        if not isinstance(condition, str) or not condition:
+            raise ValueError("Invalid official hourly condition")
+        hours.append(
+            {
+                "time": utc_text(valid_time),
+                "condition": condition,
+                "popPercent": pop,
+                "temperatureC": hour.get("temperature_c"),
+                "feelsLikeC": hour.get("feels_like_c"),
+                "iconCode": hour.get("icon_code"),
+                "windKmh": hour.get("wind_speed_kmh"),
+                "windDirection": hour.get("wind_direction"),
+                "gustKmh": hour.get("wind_gust_kmh"),
+                "uvIndex": hour.get("uv_index"),
+            }
+        )
+    if len(hours) != 24 or hours != sorted(hours, key=lambda hour: hour["time"]):
+        raise ValueError("Invalid official hourly forecast hours")
+    return {
+        "regionId": area_id,
+        "source": "ECCC official hourly forecast",
+        "generatedAt": snapshot["generated_at"],
+        "issuedAt": utc_text(issued_at),
+        "providerLocation": source["provider_location"],
+        "timeZone": source["timezone"],
+        "sourceUrl": source["source_url"],
+        "stale": now.astimezone(UTC) - issued_at > timedelta(hours=24),
+        "hours": hours,
     }
 
 

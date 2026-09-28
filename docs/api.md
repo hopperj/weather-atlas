@@ -67,6 +67,7 @@ active forecast bulletin is not returned.
 ```text
 GET /api/v1/forecast/regions
 GET /api/v1/forecast/hourly?area_id={16-character-hex-region-id}
+GET /api/v1/forecast/official-hourly?area_id={16-character-hex-region-id}
 GET /api/v1/forecast/nearest?latitude={latitude}&longitude={longitude}
 GET /api/v1/observations/nearby?latitude={latitude}&longitude={longitude}&radius=100
 ```
@@ -83,6 +84,10 @@ humidity, one-hour precipitation, wind and gusts are numeric or null. Every row
 includes its model run and completeness status; wind is converted to km/h.
 Missing hours remain in the result. See the
 [forecast page guide](forecast-page-2026-09-06.md) for source and interval semantics.
+The official-hourly endpoint returns ECCC's 24 public hourly forecast records,
+including condition, POP, temperature, feels-like temperature, wind, gust, UV,
+provider issue time, and source location. It is collected by Airflow; API reads
+never contact ECCC or trigger ETL.
 The nearest-region endpoint supports the page's opt-in browser-location action.
 The nearby-observations endpoint supplies current station temperature, humidity,
 wind/gust, pressure, precipitation, observation time, distance, freshness, and

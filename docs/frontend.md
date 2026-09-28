@@ -63,9 +63,14 @@ the timeline.
 ## Official seven-day forecast view
 
 The site header also links to the dedicated **Forecast** page at `/forecast`.
-It leads with nearby observed conditions, then a swipeable 24-hour forecast,
-compact seven-day rows, current weather details, and an expandable 72-hour model
-table. Nova Scotia regions are directly selectable in the first dropdown;
+It leads with one responsive current-conditions dashboard that keeps observed
+temperature, official hourly condition/POP, and current-period precipitation
+visually distinct. The swipeable 24-hour forecast uses explicit condition text
+and prefers official ECCC condition, POP, and temperature while labelling GDPS
+point-model precipitation amounts separately. The seven-day table aligns
+condition, high/low, day/night POP, and day/night totals in stable columns;
+current weather details and an expandable 72-hour model table follow. Nova
+Scotia regions are directly selectable in the first dropdown;
 **Other province or territory…** reveals a province/territory selector followed
 by that province/territory's regions. **Use my location** resolves the nearest
 forecast region after browser permission. All locations use explicitly labelled

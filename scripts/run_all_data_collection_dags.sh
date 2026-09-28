@@ -114,7 +114,45 @@ if (( failure_count > 0 )); then
   exit 1
 fi
 
-echo "All ${#dag_ids[@]} data-collection DAG(s) completed successfully."
+# The official hourly collector derives its bounded location inventory from the
+# City Page snapshot, so run it only after the independent collectors finish.
+dependent_dag_id=eccc_hourly_forecasts_ingest
+echo "Triggering dependent data-collection DAG: $dependent_dag_id"
+docker compose exec -T airflow-scheduler \
+  airflow dags trigger "$dependent_dag_id" \
+    --run-id "$run_id" \
+    --output json \
+  >/dev/null
+started_at=$SECONDS
+while true; do
+  state=$(
+    docker compose exec -T airflow-scheduler \
+      airflow dags state "$dependent_dag_id" "$run_id" 2>/dev/null \
+      | tail -n 1 \
+      | cut -d ',' -f 1 \
+      | tr '[:upper:]' '[:lower:]' \
+      | tr -d '[:space:]"'
+  )
+  case "$state" in
+    success)
+      echo "SUCCESS  $dependent_dag_id"
+      break
+      ;;
+    failed)
+      echo "FAILED   $dependent_dag_id" >&2
+      docker compose exec -T airflow-scheduler \
+        airflow tasks states-for-dag-run "$dependent_dag_id" "$run_id" --output table >&2
+      exit 1
+      ;;
+  esac
+  if (( SECONDS - started_at >= wait_timeout )); then
+    echo "TIMEOUT  $dependent_dag_id after ${wait_timeout}s" >&2
+    exit 1
+  fi
+  sleep "$poll_interval"
+done
+
+echo "All $((${#dag_ids[@]} + 1)) data-collection DAG(s) completed successfully."
 
 # Events depend on the newly collected hotspots and fire-weather state. Never
 # reconcile before those inputs finish, or after an upstream collection fails.

@@ -5,6 +5,29 @@ This guide covers the initial single-server deployment. It supplements the
 off-site backup, monitoring, or restore procedures appropriate to the operator's
 environment.
 
+## Production and development
+
+Effective **2026-09-24**, **sparky is production** and **the local Mac
+(wolf359) is development**:
+
+- Production checkout: `/home/hopperj/weather-atlas` on sparky (`10.0.0.243`).
+  Weather payloads and ordinary service state use the NAS-backed `data` folder;
+  PostgreSQL and monitoring databases use local `postgres_data`.
+- Development checkout: `/Users/hopperj/work/hobby/weatherapp` on the Mac.
+  Code changes, builds and tests default to this environment. Production
+  deployments, migrations and service changes require an explicit production
+  operation, not merely a request to implement a feature.
+
+Keep development storage, databases, credentials and subscriber queue identities
+separate from production. The old Mac collectors remain stopped after migration;
+do not resume them with the queue identity now used by sparky. No services,
+credentials or routing were changed by this environment designation.
+
+Public routing was still directed at the old Mac at the migration verification;
+the production designation is not a DNS/router cutover. Confirm the current route
+before treating the public hostname as a production verification target. See the
+[migration record](sparky-migration.md) for the last verified state.
+
 All commands below run from the repository root. Application database migrations
 remain explicit operator actions. Starting or restarting Compose directly never
 applies them; the repository's `run.sh` wrapper deliberately invokes the same
@@ -47,8 +70,9 @@ The web gateway explicitly binds to `APP_BIND_ADDRESS=0.0.0.0` by default,
 publishing redirect-only HTTP on `APP_PORT` and application HTTPS on `HTTPS_PORT`.
 Set `CADDY_SITE_ADDRESS` to a single public DNS hostname, without a scheme, port
 or extra HTTP site. The current installation uses `weatheratlas.ioresearch.ca`,
-`APP_PORT=18080` and `HTTPS_PORT=8443`. Start Docker Desktop, then run `./run.sh`
-from this repository
+`APP_PORT=18080` and `HTTPS_PORT=8443`. Production uses Docker Engine on sparky;
+the Mac development environment uses Docker Desktop. For an explicitly intended
+startup/deployment, run `./run.sh` from the selected environment's repository
 to build and start the app, database, cache, tile services, Airflow, the ECCC
 subscriber, and monitoring services with health checks.
 

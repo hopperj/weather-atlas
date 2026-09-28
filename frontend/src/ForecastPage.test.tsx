@@ -13,6 +13,7 @@ import { ForecastPage } from './ForecastPage'
 import {
   type ForecastRegion,
   type HourlyForecast,
+  type OfficialHourlyForecast,
   type PrecipitationForecast,
   hourlySchema,
   nearbyObservationsSchema,
@@ -24,6 +25,7 @@ import { forecastDate, forecastDays } from './forecastTime'
 const mocks = vi.hoisted(() => ({
   regions: vi.fn(),
   hourly: vi.fn(),
+  officialHourly: vi.fn(),
   precipitation: vi.fn(),
   nearby: vi.fn(),
   nearest: vi.fn(),
@@ -122,6 +124,28 @@ const hourly: HourlyForecast = {
     gustKmh: index === 1 ? null : 54,
   })),
 }
+const officialHourly: OfficialHourlyForecast = {
+  regionId: region.id,
+  source: 'ECCC official hourly forecast',
+  generatedAt: '2026-09-06T12:05:00Z',
+  issuedAt: '2026-09-06T12:00:00Z',
+  providerLocation: 'Halifax',
+  timeZone: 'America/Halifax',
+  sourceUrl: 'https://weather.gc.ca/en/forecast/hourly/',
+  stale: false,
+  hours: Array.from({ length: 24 }, (_, index) => ({
+    time: new Date(Date.UTC(2026, 8, 6, 12 + index)).toISOString(),
+    condition: 'Sunny',
+    popPercent: null,
+    temperatureC: 19,
+    feelsLikeC: null,
+    iconCode: '01',
+    windKmh: 20,
+    windDirection: 'NE',
+    gustKmh: 40,
+    uvIndex: 2,
+  })),
+}
 
 function mount() {
   const client = new QueryClient({
@@ -162,6 +186,10 @@ beforeEach(() => {
     regions: [region, other, toronto, vancouver, iqaluit],
   })
   mocks.hourly.mockResolvedValue(hourly)
+  mocks.officialHourly.mockImplementation(async (id: string) => ({
+    ...officialHourly,
+    regionId: id,
+  }))
   mocks.nearby.mockResolvedValue({
     schemaVersion: 1,
     generatedAt: '2026-09-06T12:05:00Z',
@@ -224,6 +252,13 @@ describe('forecast page', () => {
     })
     const hero = title.closest('section')!
     expect(await within(hero).findByText('19°')).toBeTruthy()
+    const precipitation = within(hero).getByLabelText(
+      'Current forecast precipitation',
+    )
+    expect(within(precipitation).getByText(/^POP/)).toBeTruthy()
+    expect(within(precipitation).getByText('0%')).toBeTruthy()
+    expect(within(precipitation).getByText('Period precipitation')).toBeTruthy()
+    expect(within(precipitation).getByText('0 mm')).toBeTruthy()
     expect(
       within(hero).getByText(/Observed at Halifax\/Stanfield Intl/),
     ).toBeTruthy()
@@ -239,12 +274,38 @@ describe('forecast page', () => {
     )
   })
 
+  it('uses official hourly POP and conditions while labelling GDPS amounts', async () => {
+    mocks.officialHourly.mockResolvedValue({
+      ...officialHourly,
+      hours: officialHourly.hours.map((hour) => ({
+        ...hour,
+        condition: 'Showers',
+        popPercent: 80,
+        temperatureC: 15,
+        iconCode: '12',
+      })),
+    })
+    mount()
+
+    const precipitation = await screen.findByLabelText(
+      'Current forecast precipitation',
+    )
+    expect(await within(precipitation).findByText('80%')).toBeTruthy()
+    const strip = await screen.findByRole('region', {
+      name: 'Scrollable 24-hour forecast',
+    })
+    const first = within(strip).getAllByRole('article')[0]
+    expect(await within(first).findByText('POP 80%')).toBeTruthy()
+    expect(within(first).getByText('GDPS 0.0 mm')).toBeTruthy()
+    expect(within(first).getByRole('img', { name: 'Showers' })).toBeTruthy()
+  })
+
   it('fills only missing bulletin amounts with a starred model estimate and explanation', async () => {
     mocks.precipitation.mockResolvedValue(precipitationFor(region, 6.24))
     mount()
     const value = await screen.findByText('6.2 mm*')
     expect(screen.getAllByText('6.2 mm*')).toHaveLength(1)
-    expect(screen.getByText('0 mm')).toBeTruthy()
+    expect(screen.getAllByText('0 mm')).toHaveLength(2)
     expect(value.getAttribute('title')).toContain('2026-09-06T00:00:00Z')
     expect(value.getAttribute('aria-describedby')).toBe(
       'model-precipitation-note',
@@ -269,8 +330,11 @@ describe('forecast page', () => {
     mocks.regions.mockResolvedValue({ regions: [rainy] })
     mocks.precipitation.mockResolvedValue(precipitationFor(rainy, 10.16))
     mount()
-    expect(await screen.findByText('10.2 mm*')).toBeTruthy()
-    expect(screen.getByText('Rain expected')).toBeTruthy()
+    const precipitation = await screen.findByLabelText(
+      'Current forecast precipitation',
+    )
+    expect(await within(precipitation).findByText('10.2 mm*')).toBeTruthy()
+    expect(within(precipitation).getByText('Rain expected')).toBeTruthy()
     expect(screen.queryByText('100%')).toBeNull()
     expect(mocks.precipitation).toHaveBeenCalledWith(
       region.id,
@@ -293,7 +357,10 @@ describe('forecast page', () => {
     mocks.regions.mockResolvedValue({ regions: [rainy] })
     mocks.precipitation.mockResolvedValue(precipitationFor(rainy, null))
     mount()
-    expect(await screen.findByText('Rain expected')).toBeTruthy()
+    const precipitation = await screen.findByLabelText(
+      'Current forecast precipitation',
+    )
+    expect(within(precipitation).getByText('Rain expected')).toBeTruthy()
     expect(screen.queryByText('0 mm')).toBeNull()
     expect(screen.queryByText('100%')).toBeNull()
   })
@@ -319,7 +386,10 @@ describe('forecast page', () => {
     }
     mocks.regions.mockResolvedValue({ regions: [supplied] })
     mount()
-    expect(await screen.findByText('5 to 10 mm')).toBeTruthy()
+    const precipitation = await screen.findByLabelText(
+      'Current forecast precipitation',
+    )
+    expect(within(precipitation).getByText('5 to 10 mm')).toBeTruthy()
     expect(screen.getByText('2 cm')).toBeTruthy()
     expect(mocks.precipitation).not.toHaveBeenCalled()
   })
@@ -342,7 +412,7 @@ describe('forecast page', () => {
         ).toBeNull(),
       )
       expect(screen.queryByText('6.2 mm*')).toBeNull()
-      expect(screen.getByText('0 mm')).toBeTruthy()
+      expect(screen.getAllByText('0 mm')).not.toHaveLength(0)
     },
   )
 
@@ -359,7 +429,7 @@ describe('forecast page', () => {
     })
     await screen.findByText('Estimating missing precipitation amounts…')
     expect(screen.queryByText('6.2 mm*')).toBeNull()
-    expect(screen.getByText('0 mm')).toBeTruthy()
+    expect(screen.getAllByText('0 mm')).not.toHaveLength(0)
     expect(mocks.precipitation).toHaveBeenLastCalledWith(
       other.id,
       expect.anything(),
@@ -375,7 +445,7 @@ describe('forecast page', () => {
       ),
     ).toBeTruthy()
     expect(screen.getAllByText('Sunny')).not.toHaveLength(0)
-    expect(screen.getByText('0 mm')).toBeTruthy()
+    expect(screen.getAllByText('0 mm')).not.toHaveLength(0)
   })
 
   it('shows both outlooks, zero amounts, and every hour including gaps', async () => {
@@ -386,7 +456,7 @@ describe('forecast page', () => {
     expect(
       await screen.findByRole('heading', { name: '72-hour forecast' }),
     ).toBeTruthy()
-    expect(screen.getByText('0 mm')).toBeTruthy()
+    expect(screen.getAllByText('0 mm')).not.toHaveLength(0)
     const table = await screen.findByRole('table')
     expect(within(table).getAllByRole('row')).toHaveLength(73)
     expect(within(table).getByText('Not available')).toBeTruthy()

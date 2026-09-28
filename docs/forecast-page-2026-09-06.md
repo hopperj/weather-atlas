@@ -1,6 +1,6 @@
 # Daily and hourly forecast page
 
-Implemented 2026-09-06 and redesigned 2026-09-24. Open `/forecast` using
+Implemented 2026-09-06 and redesigned 2026-09-24 and 2026-09-28. Open `/forecast` using
 **Forecast** in the site header. The responsive page presents current conditions,
 a swipeable 24-hour forecast, a compact seven-day outlook, current weather
 details, and an expandable 72-hour model table. The existing map and its
@@ -10,24 +10,33 @@ forecast mode remain available.
 
 The information order follows a general-purpose forecast workflow:
 
-1. The selected locality, nearest fresh station temperature, current regional
-   condition, and today's high/low appear first.
-2. The next 24 model hours are presented as horizontally scrollable cards with
-   temperature, precipitation amount, humidity, and the applicable regional
-   condition icon. A coverage warning appears only when one of these visible
-   24 hours is partial or missing.
-3. The official seven-day bulletin is condensed into day rows containing day
-   and night conditions, POP or conservative wet-weather wording, high/low, and
-   official or starred model precipitation amounts.
+1. A single current-conditions dashboard leads with the selected locality,
+   nearest fresh station temperature, official hourly condition and optional
+   feels-like value, today's high/low, humidity, wind/gust, POP, and period
+   precipitation. POP and the amount stay in separate labelled cells because
+   probability and accumulation are different measurements. Missing official
+   amounts can use the same clearly starred model fallback as the seven-day
+   outlook.
+2. The next 24 hours are presented as horizontally scrollable cards. Official
+   ECCC hourly temperature, condition and POP are preferred; GDPS supplies the
+   separately labelled point-model precipitation amount and humidity. A
+   coverage warning appears when official hourly data or a visible model hour
+   is unavailable.
+3. The official seven-day bulletin uses aligned columns for date, icon and
+   conditions, high/low, POP, and precipitation total. Day and night POP and
+   totals keep their labels instead of collapsing into ambiguous duplicate
+   values.
 4. Humidity, wind/gust, pressure, and recent precipitation use the nearest fresh
    collected station when available. A missing observation service does not
    disable the page; model values fill only supported fields and are labelled.
 5. The exact 72-hour values, status, and model-run metadata remain available in
    the expandable **72-hour forecast** section for technical inspection.
 
-The interface uses condition-specific, code-native weather symbols and adapts
-to phone and desktop widths. It does not claim unavailable UV, visibility,
-sunrise/sunset, alerts, or feels-like values.
+The interface uses condition-specific, code-native weather symbols, light
+content cards, a storm-coloured current-conditions dashboard, and layouts that
+adapt to phone and desktop widths. It displays feels-like only when the official
+hourly feed issues it and does not invent unavailable visibility,
+sunrise/sunset, or alert data.
 
 ## Selecting a location
 
@@ -65,6 +74,13 @@ displayed as a dash; zero remains zero. Since 2026-09-07, missing precipitation
 amounts can be supplemented by starred model estimates as described below.
 The API does not discard late forecast
 periods just because a different region has a shorter horizon.
+
+The current-conditions hero repeats the applicable period's POP and
+precipitation amount so the immediate precipitation forecast is visible without
+scrolling to the seven-day outlook. POP preserves an issued percentage or uses
+the conservative wet-weather wording described below. The amount preserves the
+official bulletin value and otherwise uses a starred model estimate when a
+complete matching estimate is available.
 
 Since 2026-09-23, an omitted numeric POP is no longer displayed as an unexplained
 dash: recognized wet bulletin descriptions show "Rain expected", "Rain possible"
@@ -104,6 +120,11 @@ one-hour accumulation **ending** at the displayed time, not starting then.
 GDPS does not supply hourly POP in this configured feed; official daily POP
 remains in the seven-day cards and is not copied into hourly slots.
 
+The current POP uses the first applicable record from the official hourly
+forecast collected by `eccc_hourly_forecasts_ingest`. The hero labels that
+hour explicitly. The displayed period precipitation remains the official
+day/night bulletin total, not the sum of the independent GDPS hourly values.
+
 Current conditions use `GET /api/v1/observations/nearby` at the forecast
 region's representative coordinate. The closest fresh station with a
 temperature is preferred. Its actual station name, observation time, distance,
@@ -121,6 +142,7 @@ hours, including over clock changes. Region selection is saved in the URL as
 Provider references:
 
 - [ECCC City Page Weather](https://eccc-msc.github.io/open-data/msc-data/citypage-weather/readme_citypageweather-datamart_en/)
+- [ECCC public hourly forecast](https://weather.gc.ca/en/forecast/hourly/index.html)
 - [ECCC GDPS temporal resolution](https://eccc-msc.github.io/open-data/msc-data/nwp_gdps/readme_gdps-datamart_en/)
 
 ## API and operational behaviour
@@ -139,15 +161,20 @@ Provider references:
   catalogue queries, path validation and point sampling. Four concurrent
   sample operations per request, a 90-second timeout, the existing sample
   request rate limit, and a five-minute Redis cache bound the work.
+- `GET /api/v1/forecast/official-hourly?area_id={16-character-hex-id}`: the 24
+  official ECCC public forecast hours collected by Airflow, including hourly
+  condition, POP, temperature, wind, gust and UV index. API reads never contact
+  ECCC directly.
 - Regions and hourly results refresh every five minutes; the hourly query also
   changes when the current UTC hour changes. Refresh is available manually.
 - An hourly service failure does not hide an independently loaded daily
   outlook. Changing region clears the previous hourly view while the next one
   loads. Errors and missing coverage are visible.
 
-No new download source, schema migration, credential, or DAG is required.
-Existing City Page Weather and GDPS ingestion must be operating. The snapshot
-is `processed/eccc/citypage_weather/latest.json` under `WEATHER_DATA_ROOT`.
+No schema migration or credential is required. City Page Weather, official
+hourly forecast, and GDPS ingestion must be operating. Their snapshots are
+`processed/eccc/citypage_weather/latest.json` and
+`processed/eccc/hourly_forecast/latest.json` under `WEATHER_DATA_ROOT`.
 
 ## Model precipitation fallback — 2026-09-07
 
@@ -296,9 +323,9 @@ regions updates both, the main selector lists only NS regions plus Other, and
 Other → Province or territory → Region supports a location outside NS. Confirm
 its direct URL restores the selections. Check hourly rows span 72 consecutive times, source/run times
 are current, and any missing fields remain marked. Check that
-`eccc_city_forecasts_ingest` and GDPS ingestion are unpaused if fresh data does
-not appear. Existing ingestion schedules supply the data; this page does not
-trigger large downloads on demand.
+`eccc_city_forecasts_ingest`, `eccc_hourly_forecasts_ingest`, and GDPS ingestion
+are unpaused if fresh data does not appear. Existing ingestion schedules supply
+the data; this page does not trigger large downloads on demand.
 
 ### Subsequent live rollout — 2026-09-06 (Atlantic time)
 

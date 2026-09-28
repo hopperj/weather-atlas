@@ -55,6 +55,7 @@ from weather_tiles.rendering import resolve_asset_path
 from weather_api.forecast import (
     hourly_outlook,
     nearest_region,
+    official_hourly_outlook,
     precipitation_outlook,
     regional_outlooks,
 )
@@ -124,6 +125,12 @@ CITY_FORECAST_SNAPSHOT = Path(
     "processed",
     "eccc",
     "citypage_weather",
+    "latest.json",
+)
+OFFICIAL_HOURLY_FORECAST_SNAPSHOT = Path(
+    "processed",
+    "eccc",
+    "hourly_forecast",
     "latest.json",
 )
 WIND_U_FIELD = "wind_u_10m"
@@ -700,6 +707,32 @@ async def forecast_hourly(
         except RedisError:
             logger.warning("hourly_forecast_cache_write_failed")
     return JSONResponse(response)
+
+
+@app.get("/api/v1/forecast/official-hourly", tags=["forecast"])
+async def forecast_official_hourly(
+    area_id: Annotated[str, Query(pattern=r"^[a-f0-9]{16}$")],
+) -> JSONResponse:
+    try:
+        response = await run_in_threadpool(
+            official_hourly_outlook,
+            settings.data_root / OFFICIAL_HOURLY_FORECAST_SNAPSHOT,
+            area_id,
+            datetime.now(UTC),
+        )
+    except FileNotFoundError as exc:
+        raise HTTPException(
+            404,
+            "No official hourly forecasts have been collected yet",
+        ) from exc
+    except LookupError as exc:
+        raise HTTPException(404, "Unknown official hourly forecast region") from exc
+    except (ValueError, TypeError, KeyError, AttributeError) as exc:
+        raise HTTPException(503, "The official hourly forecast snapshot is invalid") from exc
+    return JSONResponse(
+        response,
+        headers={"Cache-Control": "public, max-age=300, must-revalidate"},
+    )
 
 
 @app.get("/api/v1/golf/outlook", tags=["forecast"])

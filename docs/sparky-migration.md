@@ -1,10 +1,103 @@
 # Sparky migration (2026-09-22)
 
-## 2026-09-24 collection handover in progress
+## 2026-09-24 environment designation and boot verification
+
+The user designated **sparky as production** and **the local Mac (wolf359) as
+development**. This is the default environment boundary for future work; it does
+not itself authorize changes to production or public traffic routing.
+
+After the user ran `install_sparky_boot.sh`, verification at **15:27 UTC**
+confirmed Docker is enabled and active, with its NAS drop-in loaded.
+`RequiresMountsFor`, `Requires` and `After` include the correct NAS mount; the
+exact source/type and `weather`/`services` directory checks are present as
+pre-start guards. The existing GPU-related Docker override is preserved.
+The NAS is mounted read/write from the expected source. All 14 long-running
+services are running, configured health checks pass, and all use
+`unless-stopped`. The API readiness check passed through HTTPS with certificate
+verification. Collection remains active, with 2,648 successful tasks and no failed
+or retrying tasks in the latest 15-minute check. The capacity floor is 200 GiB,
+with no percentage floor. **No reboot test was performed.**
+
+Public routing remains unchanged from the migration checks below. Local
+development must not resume the old collectors with production's queue identity.
+
+## 2026-09-24 collection moved to sparky
 
 The user authorized the final sync, moving collection to sparky, a 200 GiB
 capacity floor with no percentage requirement, and collection autostart.
 Public routing is deliberately unchanged.
+
+Current state after activation at approximately **15:13 UTC**:
+
+- Both databases are migrated and the final weather-file sync is complete.
+  All 743 transfer batches succeeded. All 143 final comparison partitions
+  succeeded; the only additional files were 14 station observations (102,993
+  bytes), copied and then verified with no remaining differences.
+- The real API UID verified 494,764 registered records and 50 sampled checksums
+  with zero issues. Source catalogue SHA256 still matched the frozen snapshot
+  after the concurrent source restart described below.
+- The final scoped permission pass checked 75,759 transferred paths/parents,
+  repaired 8,502 entries, and verified zero remaining corrections. Its private
+  `transfer-permissions-before.jsonl` retains original modes/groups/inodes.
+- Sparky's startup hold is cleared, its original simulation-submission flags
+  are restored, and exactly the original 22 DAGs are enabled. The previously
+  paused `flexpart_smoke_operational` DAG remains paused.
+- All 14 long-running services are running/healthy; the two initializers exited
+  successfully. All long-running containers use `unless-stopped`. PostgreSQL
+  and monitoring remain on local storage, with weather/service files under
+  the NAS `data` mount.
+- Fresh collection is confirmed: model discovery, forecast preparation,
+  station observations and imagery tasks succeeded, and the subscriber is
+  receiving new files. A new subscriber-owned GRIB is UID 50000/GID 100, mode
+  0664; the real API UID can read it through its read-only mount and Airflow's
+  UID 1000 can read/write it.
+- HTTPS tests with certificate verification passed for readiness, frontend,
+  eight products, Halifax daily forecast, 72 hourly slots (70 currently complete),
+  numeric model sampling and actual 256x256 model/radar/infrared/optical tiles.
+  In the 15:23 UTC check, Halifax's bulletin was issued at 14:00 UTC; radar at
+  15:18 UTC and both satellite layers at 15:00 UTC were non-stale. A transient
+  upstream city-forecast disconnect and one RDPS connection timeout recovered
+  through normal retries. More than 1,700 tasks had succeeded, with no failed
+  or retrying tasks remaining in that check. No filesystem/permission failure
+  was reported.
+- Refreshed the frontend image from the current checkout. Its JavaScript/CSS
+  bundle filenames now match the source deployment. All 22 installed API,
+  shared-settings and tile-module Python files match the source byte-for-byte.
+- Source collectors remain stopped and all 23 source DAGs remain paused.
+  The source API is healthy but will not receive new ETL data. Public routing
+  still points to that source; no DNS/router/firewall changes were made.
+- The capacity check on sparky requires 200 GiB free, with no percentage floor;
+  approximately 3.4 TiB was free at activation.
+- The boot safeguard was initially pending at activation; the user subsequently
+  installed it and the loaded dependencies were verified as recorded above.
+  No reboot was performed.
+
+The private target backup directory below contains pre-activation `.env`,
+database dumps/manifests, permission journals and verification reports.
+Local `api-check.log` contains the successful final HTTPS test result.
+
+Earlier handover checkpoints (superseded by the activation state above):
+
+- The user changed the switch port to 2.5 Gb/s; sparky's active `enP7s7`
+  interface now confirms 2500 Mb/s, full duplex. No host network settings were
+  changed by this migration. The main transfer subsequently finished: all 743
+  batches succeeded. Destination verification as the real API UID passed all
+  494,764 catalogue records and 50 sampled hashes with zero issues.
+- A concurrent deployment briefly restarted source collectors around 14:48 UTC.
+  They were stopped again at 14:53 UTC. All 23 source DAGs had remained paused,
+  no tasks ran, all 31 application table counts still match the snapshot, and
+  the full source catalogue export has an identical SHA256. A final comparison
+  includes station inbox files downloaded by the briefly restarted subscriber.
+- Sparky's API, tile services, frontend, Redis, HTTPS gateway and monitoring are
+  running for read-only validation. The collectors are still stopped. Initial
+  API checks found 70 complete hourly slots; recent imagery lists are empty
+  because the imported imagery is stale, pending resumption of collection.
+- The final serial folder comparison timed out and was stopped without writing
+  data. The replacement read-only `parallel_final_compare.py` uses 143 disjoint
+  partitions. Its completion and the final permission repair remain required
+  before clearing the target startup hold or resuming its 22 original DAGs.
+
+Earlier handover checkpoint:
 
 - Source collection is stopped and all source DAGs are paused. Both source
   simulation-submission flags are disabled; its API continues serving reads.
