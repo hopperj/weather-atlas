@@ -415,7 +415,7 @@
 
 .hero-dashboard {
   display: grid;
-  grid-template-columns: minmax(280px, 0.75fr) minmax(600px, 1.7fr);
+  grid-template-columns: minmax(360px, 1fr) minmax(500px, 1.55fr);
   align-items: stretch;
   gap: 26px;
   margin-top: 20px;
@@ -444,18 +444,23 @@
 
 .hero-temperature-group {
   display: flex;
+  flex: 1 1 auto;
   align-items: center;
   gap: 18px;
+  min-width: 0;
 }
 
 .hero-condition {
   display: grid;
   align-self: center;
   gap: 5px;
+  min-width: 0;
 }
 
 .hero-condition strong {
   font-size: 15px;
+  line-height: 1.25;
+  overflow-wrap: break-word;
 }
 
 .hero-condition span {
