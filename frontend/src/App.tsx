@@ -39,13 +39,16 @@ import { groupVariables } from './variableGroups'
 import {
   createWindArrowImage,
   weatherBasemapStyle,
+  windArrowImage,
   windInsertionPoint,
   windSize,
+  WIND_ARROW_SPRITES,
+  WIND_SPEED_GRADIENT,
+  WIND_UNKNOWN_IMAGE_ID,
   WIND_VECTOR_LAYER_ID,
 } from './mapPresentation'
 
 const WILDFIRE_HOTSPOTS_CODE = 'wildfire_hotspots'
-const WIND_ARROW_IMAGE_ID = 'wind-arrow-image'
 const WIND_VECTOR_SOURCE_ID = 'wind-vector-source'
 const WIND_U_FIELD = 'wind_u_10m'
 const WIND_V_FIELD = 'wind_v_10m'
@@ -1060,10 +1063,11 @@ export function App() {
       return
     }
 
-    if (!map.hasImage(WIND_ARROW_IMAGE_ID)) {
-      const arrow = createWindArrowImage()
+    for (const sprite of WIND_ARROW_SPRITES) {
+      if (map.hasImage(sprite.id)) continue
+      const arrow = createWindArrowImage(sprite.color)
       if (arrow) {
-        map.addImage(WIND_ARROW_IMAGE_ID, arrow, {
+        map.addImage(sprite.id, arrow, {
           pixelRatio: 2,
           sdf: false,
         })
@@ -1081,7 +1085,7 @@ export function App() {
     }
     if (
       !map.getLayer(WIND_VECTOR_LAYER_ID) &&
-      map.hasImage(WIND_ARROW_IMAGE_ID)
+      map.hasImage(WIND_UNKNOWN_IMAGE_ID)
     ) {
       map.addLayer(
         {
@@ -1089,8 +1093,8 @@ export function App() {
           type: 'symbol',
           source: WIND_VECTOR_SOURCE_ID,
           layout: {
-            'icon-image': WIND_ARROW_IMAGE_ID,
-            'icon-size': windSize,
+            'icon-image': windArrowImage(windQuery.data.unit),
+            'icon-size': windQuery.data.unit === 'm/s' ? windSize : 1,
             'icon-rotate': ['get', 'bearing'],
             'icon-rotation-alignment': 'map',
             'icon-pitch-alignment': 'map',
@@ -1105,6 +1109,16 @@ export function App() {
       )
     }
     if (map.getLayer(WIND_VECTOR_LAYER_ID)) {
+      map.setLayoutProperty(
+        WIND_VECTOR_LAYER_ID,
+        'icon-image',
+        windArrowImage(windQuery.data.unit),
+      )
+      map.setLayoutProperty(
+        WIND_VECTOR_LAYER_ID,
+        'icon-size',
+        windQuery.data.unit === 'm/s' ? windSize : 1,
+      )
       map.setLayoutProperty(WIND_VECTOR_LAYER_ID, 'visibility', 'visible')
       map.moveLayer(WIND_VECTOR_LAYER_ID, windInsertionPoint(map))
     }
@@ -2001,10 +2015,28 @@ export function App() {
                     </button>
                   </div>
                   <p>
-                    Larger arrows indicate stronger wind. Dark arrows with white
-                    outlines point where the air is moving and remain distinct
-                    from the weather colours.
+                    Arrow colour and size indicate wind speed. White-outlined
+                    arrows point where the air is moving.
                   </p>
+                  {windVisible && (
+                    <div
+                      className="wind-speed-legend"
+                      role="img"
+                      aria-label="Wind speed in metres per second: blue 0, green 10, orange 20, red 30, purple 40 or more."
+                    >
+                      <div
+                        className="wind-speed-ramp"
+                        style={{ background: WIND_SPEED_GRADIENT }}
+                      />
+                      <div className="wind-speed-labels" aria-hidden="true">
+                        <span>0</span>
+                        <span>10</span>
+                        <span>20</span>
+                        <span>30</span>
+                        <span>40+ m/s</span>
+                      </div>
+                    </div>
+                  )}
                   {windVisible && windQuery.isFetching && (
                     <small>Updating wind field…</small>
                   )}

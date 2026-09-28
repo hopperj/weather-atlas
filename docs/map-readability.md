@@ -1,5 +1,31 @@
 # Map readability — 2026-09-08
 
+## Wind-colour update — 2026-09-28 (development only)
+
+The web map and iPhone **Wind direction** view now colour each arrow using its
+server-provided speed, while retaining white outlines, speed-dependent size and
+the existing direction/rotation. A matching **m/s** legend is shown with the
+wind controls. The presentation scale runs from blue (0), through teal (5),
+green (10), yellow (15), orange (20), red (30), to purple (40 and above).
+This is a speed scale, not a warning/advisory classification.
+
+Colours are RGB-interpolated and cached at whole-m/s resolution, capped at
+40 m/s; iPhone callouts retain the exact reported speed. Missing/invalid or
+unsupported-unit speeds use a neutral dark arrow, never the calm-wind colour.
+The browser uses 42 bounded RGBA sprites (41 speeds plus unknown), not an
+uncoloured bitmap with an ineffective `icon-color` property. The iPhone cache
+keys images by both colour and size, so equal-sized arrows can differ in colour.
+This supersedes the dark-only symbol descriptions in the original report below.
+
+Development verification: all 129 web tests, lint and build pass; all eight
+focused iPhone map-appearance tests pass, including actual rendered colour/white
+outline pixels, speed limits, cache reuse and retained rotation/callouts.
+A simulator UI test also passes through Wind direction, its speed legend,
+switching overlays and opening a nearby forecast; its wind screenshot was
+visually checked against the fixture's 10 m/s speed.
+No server ETL, API, database, production deployment or routing changes are needed
+or performed for this presentation-only update.
+
 Both clients now start weather overlays at **62% opacity**, retaining their
 existing controls for users to change it. Weather palettes, units, values,
 timestamps, filtering and server collection/processing are unchanged.

@@ -469,12 +469,19 @@ describe('timeline range selector', () => {
     const toggle = await screen.findByRole('button', {
       name: 'Hide 10 metre wind arrows',
     })
+    expect(
+      screen.getByRole('img', { name: /Wind speed in metres per second/ }),
+    ).toBeTruthy()
+    expect(screen.getByText('40+ m/s')).toBeTruthy()
     fireEvent.click(toggle)
 
     expect(
       screen.getByRole('button', { name: 'Show 10 metre wind arrows' }),
     ).toBeTruthy()
     expect(screen.getByText('10 m wind arrows')).toBeTruthy()
+    expect(
+      screen.queryByRole('img', { name: /Wind speed in metres per second/ }),
+    ).toBeNull()
   })
 
   it('pins a completed FLEXPART run until the user returns to Now', async () => {

@@ -270,8 +270,78 @@ export const windSize: ExpressionSpecification = [
   1.22,
 ]
 
+// Presentation-only scale in m/s, shared with the iPhone wind-direction view.
+// One sprite per whole m/s keeps the image cache bounded during playback.
+export const WIND_SPEED_COLOURS = [
+  { speed: 0, color: '#2563eb' },
+  { speed: 5, color: '#0d9488' },
+  { speed: 10, color: '#65a30d' },
+  { speed: 15, color: '#eab308' },
+  { speed: 20, color: '#ea580c' },
+  { speed: 30, color: '#dc2626' },
+  { speed: 40, color: '#a21caf' },
+] as const
+export const WIND_UNKNOWN_COLOUR = '#243746'
+export const WIND_UNKNOWN_IMAGE_ID = 'wind-arrow-unknown'
+export const WIND_MAX_COLOUR_SPEED = 40
+export const WIND_SPEED_GRADIENT = `linear-gradient(to right, ${WIND_SPEED_COLOURS.map(
+  ({ speed, color }) => `${color} ${(speed / WIND_MAX_COLOUR_SPEED) * 100}%`,
+).join(', ')})`
+
+export function windColour(speed: number | null | undefined) {
+  if (speed == null || !Number.isFinite(speed) || speed < 0) {
+    return WIND_UNKNOWN_COLOUR
+  }
+  const bounded = Math.min(Math.floor(speed), WIND_MAX_COLOUR_SPEED)
+  for (let index = 1; index < WIND_SPEED_COLOURS.length; index += 1) {
+    const low = WIND_SPEED_COLOURS[index - 1]
+    const high = WIND_SPEED_COLOURS[index]
+    if (bounded > high.speed) continue
+    const fraction = (bounded - low.speed) / (high.speed - low.speed)
+    const channels = [1, 3, 5].map((offset) => {
+      const start = parseInt(low.color.slice(offset, offset + 2), 16)
+      const end = parseInt(high.color.slice(offset, offset + 2), 16)
+      return Math.round(start + fraction * (end - start))
+        .toString(16)
+        .padStart(2, '0')
+    })
+    return `#${channels.join('')}`
+  }
+  return WIND_SPEED_COLOURS[WIND_SPEED_COLOURS.length - 1].color
+}
+
+export const WIND_ARROW_SPRITES = [
+  { id: WIND_UNKNOWN_IMAGE_ID, color: WIND_UNKNOWN_COLOUR },
+  ...Array.from({ length: WIND_MAX_COLOUR_SPEED + 1 }, (_, speed) => ({
+    id: `wind-arrow-${speed}`,
+    color: windColour(speed),
+  })),
+]
+
+export function windArrowImage(unit: string): string | ExpressionSpecification {
+  if (unit !== 'm/s') return WIND_UNKNOWN_IMAGE_ID
+  return [
+    'let',
+    'speed',
+    ['number', ['get', 'speed'], -1],
+    [
+      'case',
+      ['>=', ['var', 'speed'], 0],
+      [
+        'concat',
+        'wind-arrow-',
+        [
+          'to-string',
+          ['floor', ['min', WIND_MAX_COLOUR_SPEED, ['var', 'speed']]],
+        ],
+      ],
+      WIND_UNKNOWN_IMAGE_ID,
+    ],
+  ]
+}
+
 /** A real RGBA outline, not a bitmap falsely declared to be a signed-distance-field sprite. */
-export function createWindArrowImage() {
+export function createWindArrowImage(color: string) {
   const canvas = document.createElement('canvas')
   canvas.width = 48
   canvas.height = 48
@@ -290,7 +360,7 @@ export function createWindArrowImage() {
   context.lineWidth = 4
   context.lineJoin = 'round'
   context.stroke()
-  context.fillStyle = '#243746'
+  context.fillStyle = color
   context.fill()
   return context.getImageData(0, 0, 48, 48)
 }
