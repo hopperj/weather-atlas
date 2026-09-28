@@ -76,7 +76,9 @@ by that province/territory's regions. **Use my location** resolves the nearest
 forecast region after browser permission. All locations use explicitly labelled
 Atlantic times (not each location's local time) and explicit missing-data
 indicators. The responsive page scrolls independently of the map's fixed-height
-layout. See [the forecast page guide](forecast-page-2026-09-06.md).
+layout. The page defaults to a dark appearance; its top-bar **Settings** menu
+offers Dark and Light choices and saves the selection in the browser. See
+[the forecast page guide](forecast-page-2026-09-06.md).
 
 The **7-day forecast** view is separate from scientific raster overlays. It
 removes all colour contours and wind arrows, initially frames Nova Scotia, and

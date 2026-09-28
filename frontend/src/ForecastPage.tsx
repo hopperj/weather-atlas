@@ -21,6 +21,20 @@ type LocationSelection = {
   scope: 'auto' | 'ns' | 'other'
 }
 
+type ForecastColorMode = 'dark' | 'light'
+
+const FORECAST_COLOR_MODE_KEY = 'weather-atlas.forecast-color-mode'
+
+function savedColorMode(): ForecastColorMode {
+  try {
+    return window.localStorage.getItem(FORECAST_COLOR_MODE_KEY) === 'light'
+      ? 'light'
+      : 'dark'
+  } catch {
+    return 'dark'
+  }
+}
+
 function clock(value: string, timeZone = TIME_ZONE) {
   return new Intl.DateTimeFormat('en-GB', {
     timeZone,
@@ -313,6 +327,7 @@ function DetailCard({
 export function ForecastPage() {
   const queryClient = useQueryClient()
   const hourlyStripRef = useRef<HTMLDivElement>(null)
+  const [colorMode, setColorMode] = useState<ForecastColorMode>(savedColorMode)
   const [location, setLocation] = useState<LocationSelection>(() => {
     const query = new URLSearchParams(window.location.search)
     return {
@@ -324,6 +339,13 @@ export function ForecastPage() {
   const [now, setNow] = useState(() => new Date())
   const [locating, setLocating] = useState(false)
   const [locationMessage, setLocationMessage] = useState('')
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(FORECAST_COLOR_MODE_KEY, colorMode)
+    } catch {
+      // The selected mode still applies for this visit when storage is blocked.
+    }
+  }, [colorMode])
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 60_000)
     return () => window.clearInterval(timer)
@@ -557,18 +579,39 @@ export function ForecastPage() {
     }))
 
   return (
-    <main className={`forecast-page forecast-theme-${theme}`}>
+    <main
+      className={`forecast-page forecast-color-${colorMode} forecast-theme-${theme}`}
+    >
       <header className="forecast-topbar">
         <a className="forecast-brand" href="/?buffer=12">
           <AppIcon />
           <span>Weather Model Atlas</span>
         </a>
-        <nav aria-label="Main navigation">
-          <a href="/?buffer=12">Weather map</a>
-          <a href="/forecast" aria-current="page">
-            Forecast
-          </a>
-        </nav>
+        <div className="forecast-topbar-actions">
+          <nav aria-label="Main navigation">
+            <a href="/?buffer=12">Weather map</a>
+            <a href="/forecast" aria-current="page">
+              Forecast
+            </a>
+          </nav>
+          <details className="forecast-settings">
+            <summary>Settings</summary>
+            <div className="forecast-settings-panel">
+              <label htmlFor="forecast-color-mode">Appearance</label>
+              <select
+                id="forecast-color-mode"
+                value={colorMode}
+                onChange={(event) =>
+                  setColorMode(event.target.value as ForecastColorMode)
+                }
+              >
+                <option value="dark">Dark</option>
+                <option value="light">Light</option>
+              </select>
+              <small>Saved on this device.</small>
+            </div>
+          </details>
+        </div>
       </header>
 
       <div className="forecast-content">

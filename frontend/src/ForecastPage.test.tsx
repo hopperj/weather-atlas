@@ -179,6 +179,7 @@ function precipitationFor(
 }
 
 beforeEach(() => {
+  window.localStorage.clear()
   window.history.replaceState(null, '', '/forecast')
   mocks.regions.mockResolvedValue({
     generatedAt: region.issuedAt,
@@ -233,6 +234,31 @@ afterEach(() => {
 })
 
 describe('forecast page', () => {
+  it('defaults to dark and saves the appearance selected in settings', async () => {
+    const client = mount()
+    const page = document.querySelector('.forecast-page')!
+    expect(page.classList.contains('forecast-color-dark')).toBe(true)
+
+    fireEvent.click(screen.getByText('Settings'))
+    fireEvent.change(screen.getByLabelText('Appearance'), {
+      target: { value: 'light' },
+    })
+    expect(page.classList.contains('forecast-color-light')).toBe(true)
+    expect(
+      window.localStorage.getItem('weather-atlas.forecast-color-mode'),
+    ).toBe('light')
+
+    client.clear()
+    cleanup()
+    mount()
+    expect(
+      document
+        .querySelector('.forecast-page')!
+        .classList.contains('forecast-color-light'),
+    ).toBe(true)
+    await screen.findByRole('heading', { name: 'Halifax Metro', level: 1 })
+  })
+
   it('uses the selected icon without changing the named link back to the map', async () => {
     const client = mount()
     const brand = screen.getByRole('link', { name: 'Weather Model Atlas' })
