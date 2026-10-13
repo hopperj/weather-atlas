@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import {
   forecastApi,
   type ForecastRegion,
@@ -11,7 +11,10 @@ import {
   FORECAST_TIME_ZONE as TIME_ZONE,
   forecastDate,
   forecastDays,
+  activeForecast,
+  forecastDayName,
 } from './forecastTime'
+import { forecastRefreshOptions, useForecastRefresh } from './forecastRefresh'
 import './forecast.css'
 
 type Period = ForecastRegion['periods'][number]
@@ -54,14 +57,6 @@ function longDate(value: string) {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
-  }).format(new Date(value))
-}
-
-function dayName(value: string, index: number) {
-  if (index === 0) return 'Today'
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: TIME_ZONE,
-    weekday: 'short',
   }).format(new Date(value))
 }
 
@@ -208,11 +203,13 @@ function PrecipitationAmount({
 function DailyForecast({
   region,
   precipitation,
+  now,
 }: {
   region: ForecastRegion
   precipitation?: PrecipitationForecast
+  now: Date
 }) {
-  const days = forecastDays(region)
+  const days = forecastDays(region, now)
   if (days.length === 0)
     return (
       <p className="forecast-empty">
@@ -223,7 +220,7 @@ function DailyForecast({
 
   return (
     <div className="daily-forecast-card">
-      {days.map(([date, periods], index) => {
+      {days.map(([date, periods]) => {
         const daytime =
           periods.find((period) => period.temperatureClass === 'high') ??
           periods[0]
@@ -241,7 +238,7 @@ function DailyForecast({
         return (
           <article className="daily-row" key={date}>
             <div className="daily-date">
-              <strong>{dayName(periods[0].start, index)}</strong>
+              <strong>{forecastDayName(periods[0].start, now)}</strong>
               <span>
                 {new Intl.DateTimeFormat('en-CA', {
                   timeZone: TIME_ZONE,
@@ -325,7 +322,7 @@ function DetailCard({
 }
 
 export function ForecastPage() {
-  const queryClient = useQueryClient()
+  const { now, refresh, online } = useForecastRefresh()
   const hourlyStripRef = useRef<HTMLDivElement>(null)
   const [colorMode, setColorMode] = useState<ForecastColorMode>(savedColorMode)
   const [location, setLocation] = useState<LocationSelection>(() => {
@@ -336,7 +333,6 @@ export function ForecastPage() {
       scope: query.get('scope') === 'other' ? 'other' : 'auto',
     }
   })
-  const [now, setNow] = useState(() => new Date())
   const [locating, setLocating] = useState(false)
   const [locationMessage, setLocationMessage] = useState('')
   useEffect(() => {
@@ -346,16 +342,10 @@ export function ForecastPage() {
       // The selected mode still applies for this visit when storage is blocked.
     }
   }, [colorMode])
-  useEffect(() => {
-    const timer = window.setInterval(() => setNow(new Date()), 60_000)
-    return () => window.clearInterval(timer)
-  }, [])
-
   const regions = useQuery({
     queryKey: ['forecast-regions'],
     queryFn: ({ signal }) => forecastApi.regions(signal),
-    staleTime: 300_000,
-    refetchInterval: 300_000,
+    ...forecastRefreshOptions,
   })
   const allRegions = regions.data?.regions ?? []
   const nsRegions = allRegions.filter((region) => region.province === 'NS')
@@ -380,27 +370,30 @@ export function ForecastPage() {
   const provinceRegions = allRegions.filter(
     (region) => region.province === province,
   )
-  const selected = browsingOther
+  const selectedSource = browsingOther
     ? savedRegion?.province === province && province !== 'NS'
       ? savedRegion
       : undefined
     : (nsRegions.find((region) => region.id === location.regionId) ??
       nsRegions.find((region) => region.name.includes('Halifax Metro')) ??
       nsRegions[0])
+  const selected = selectedSource
+    ? activeForecast(selectedSource, now)
+    : undefined
 
   const hourly = useQuery({
     queryKey: ['forecast-hourly', selected?.id, now.toISOString().slice(0, 13)],
     queryFn: ({ signal }) => forecastApi.hourly(selected!.id, signal),
     enabled: Boolean(selected),
-    staleTime: 300_000,
-    refetchInterval: 300_000,
+    placeholderData: (previous) =>
+      previous?.regionId === selected?.id ? previous : undefined,
+    ...forecastRefreshOptions,
   })
   const officialHourly = useQuery({
     queryKey: ['forecast-official-hourly', selected?.id],
     queryFn: ({ signal }) => forecastApi.officialHourly(selected!.id, signal),
     enabled: Boolean(selected),
-    staleTime: 300_000,
-    refetchInterval: 300_000,
+    ...forecastRefreshOptions,
     retry: false,
   })
   const precipitation = useQuery({
@@ -408,14 +401,13 @@ export function ForecastPage() {
       'forecast-precipitation',
       selected?.id,
       selected?.issuedAt,
-      selected?.periods,
+      selectedSource?.periods,
     ],
     queryFn: ({ signal }) => forecastApi.precipitation(selected!.id, signal),
     enabled: Boolean(
       selected?.periods.some((period) => period.precipitationAmount === null),
     ),
-    staleTime: 300_000,
-    refetchInterval: 300_000,
+    ...forecastRefreshOptions,
   })
   const observations = useQuery({
     queryKey: [
@@ -427,8 +419,7 @@ export function ForecastPage() {
     queryFn: ({ signal }) =>
       forecastApi.nearby(selected!.longitude, selected!.latitude, signal),
     enabled: Boolean(selected),
-    staleTime: 300_000,
-    refetchInterval: 300_000,
+    ...forecastRefreshOptions,
     retry: false,
   })
 
@@ -443,19 +434,6 @@ export function ForecastPage() {
       if (next.province) url.searchParams.set('province', next.province)
     }
     window.history.replaceState(null, '', url)
-  }
-
-  const refresh = () => {
-    setNow(new Date())
-    void queryClient.invalidateQueries({ queryKey: ['forecast-regions'] })
-    void queryClient.invalidateQueries({ queryKey: ['forecast-hourly'] })
-    void queryClient.invalidateQueries({
-      queryKey: ['forecast-official-hourly'],
-    })
-    void queryClient.invalidateQueries({
-      queryKey: ['forecast-precipitation'],
-    })
-    void queryClient.invalidateQueries({ queryKey: ['forecast-current'] })
   }
 
   const useCurrentLocation = () => {
@@ -498,44 +476,69 @@ export function ForecastPage() {
     )
   }
 
-  const station = useMemo(
-    () =>
-      observations.data?.items.find(
-        (item) => !item.stale && item.observation.values.temperatureC !== null,
-      ) ?? observations.data?.items[0],
-    [observations.data],
+  const station = useMemo(() => {
+    const current = observations.data?.items.filter(
+      (item) =>
+        !item.stale &&
+        (item.observation.expiresAt
+          ? new Date(item.observation.expiresAt).getTime() > now.getTime()
+          : now.getTime() - new Date(item.observation.observedAt).getTime() <=
+            2 * 3600_000),
+    )
+    return (
+      current?.find((item) => item.observation.values.temperatureC !== null) ??
+      current?.[0]
+    )
+  }, [observations.data, now])
+  const hourStart = Math.floor(now.getTime() / 3600_000) * 3600_000
+  const modelHours =
+    hourly.data && hourly.data.regionId === selected?.id
+      ? hourly.data.hours.filter(
+          (hour) => new Date(hour.time).getTime() >= hourStart,
+        )
+      : []
+  const firstHour = modelHours.find((hour) => hour.status !== 'missing')
+  const officialExpired = Boolean(
+    officialHourly.data &&
+    (officialHourly.data.stale ||
+      now.getTime() - new Date(officialHourly.data.issuedAt).getTime() >
+        24 * 3600_000 ||
+      officialHourly.data.hours.every(
+        (hour) => new Date(hour.time).getTime() < hourStart,
+      )),
   )
-  const firstHour = hourly.data?.hours.find((hour) => hour.status !== 'missing')
   const officialHours =
     officialHourly.data &&
     officialHourly.data.regionId === selected?.id &&
-    !officialHourly.data.stale
-      ? officialHourly.data.hours
+    !officialExpired
+      ? officialHourly.data.hours.filter(
+          (hour) => new Date(hour.time).getTime() >= hourStart,
+        )
       : []
   const officialHoursByTime = new Map(
-    officialHours.map((hour) => [hour.time, hour]),
+    officialHours.map((hour) => [new Date(hour.time).getTime(), hour]),
   )
   const currentOfficialHour = officialHours[0]
-  const currentPeriod = selected
-    ? (periodAt(selected, now.toISOString()) ?? selected.periods[0])
-    : undefined
-  const currentPrecipitationLikelihood = currentPeriod
-    ? currentOfficialHour?.popPercent !== null &&
-      currentOfficialHour?.popPercent !== undefined
+  const currentPeriod = periodAt(selected, now.toISOString())
+  const currentPrecipitationLikelihood =
+    currentOfficialHour?.popPercent !== null &&
+    currentOfficialHour?.popPercent !== undefined
       ? forecastMetric(currentOfficialHour.popPercent, '%')
-      : precipitationLikelihood(
-          currentPeriod.popPercent,
-          currentPeriod.condition,
-        )
-    : null
+      : currentPeriod
+        ? precipitationLikelihood(
+            currentPeriod.popPercent,
+            currentPeriod.condition,
+          )
+        : null
   const currentTemperature =
     station?.observation.values.temperatureC ??
     currentOfficialHour?.temperatureC ??
     firstHour?.temperatureC ??
     null
   const currentFeelsLike = currentOfficialHour?.feelsLikeC ?? null
-  const daily = selected ? forecastDays(selected) : []
-  const firstDay = daily[0]?.[1] ?? []
+  const daily = selected ? forecastDays(selected, now) : []
+  const firstDay =
+    daily.find(([date]) => date === forecastDate(now.toISOString()))?.[1] ?? []
   const high =
     firstDay.find((period) => period.temperatureClass === 'high')
       ?.temperatureC ?? null
@@ -564,19 +567,47 @@ export function ForecastPage() {
   const detailPressure = currentValues?.pressureHpa ?? null
   const detailPrecipitation =
     currentValues?.precipitationMm ?? firstHour?.precipitationMm ?? null
+  const modelHoursByTime = new Map(
+    modelHours.map((hour) => [new Date(hour.time).getTime(), hour]),
+  )
   const displayedHours =
-    hourly.data?.hours.slice(0, 24) ??
-    officialHours.map((hour) => ({
-      time: hour.time,
-      runTime: null,
-      precipitationStart: hour.time,
-      status: 'missing' as const,
-      temperatureC: null,
-      relativeHumidityPercent: null,
-      precipitationMm: null,
-      windKmh: null,
-      gustKmh: null,
-    }))
+    hourly.data || officialHourly.data
+      ? Array.from({ length: 24 }, (_, index) => {
+          const time = new Date(hourStart + index * 3600_000).toISOString()
+          return (
+            modelHoursByTime.get(new Date(time).getTime()) ?? {
+              time,
+              runTime: null,
+              precipitationStart: new Date(
+                hourStart + (index - 1) * 3600_000,
+              ).toISOString(),
+              status: 'missing' as const,
+              temperatureC: null,
+              relativeHumidityPercent: null,
+              precipitationMm: null,
+              windKmh: null,
+              gustKmh: null,
+            }
+          )
+        })
+      : []
+  const refreshSections = [
+    { name: 'daily forecast', query: regions },
+    { name: 'model hours', query: hourly },
+    { name: 'official hourly forecast', query: officialHourly },
+    ...(precipitation.isEnabled
+      ? [{ name: 'precipitation totals', query: precipitation }]
+      : []),
+    { name: 'observations', query: observations },
+  ]
+  const unavailableUpdates = refreshSections
+    .filter(({ query }) => query.isError)
+    .map(({ name }) => name)
+  const checkedTimes = refreshSections
+    .filter(({ query }) => query.dataUpdatedAt > 0)
+    .map(({ query }) => query.dataUpdatedAt)
+  const lastChecked = checkedTimes.length ? Math.min(...checkedTimes) : null
+  const refreshing = refreshSections.some(({ query }) => query.isFetching)
 
   return (
     <main
@@ -736,6 +767,7 @@ export function ForecastPage() {
               disabled={
                 regions.isFetching ||
                 hourly.isFetching ||
+                officialHourly.isFetching ||
                 precipitation.isFetching ||
                 observations.isFetching
               }
@@ -756,6 +788,17 @@ export function ForecastPage() {
             </p>
           )}
         </section>
+
+        <p className="forecast-refresh-status" role="status" aria-live="polite">
+          {lastChecked
+            ? `Last updated ${dateTime(new Date(lastChecked).toISOString())} AT`
+            : 'Waiting for forecast updates'}
+          {refreshing && ' · Updating…'}
+          {!online && ' · Offline; saved data shown where still valid'}
+          {online &&
+            unavailableUpdates.length > 0 &&
+            ` · Updates unavailable: ${unavailableUpdates.join(', ')}. Previously loaded data is shown where still valid.`}
+        </p>
 
         {regions.error && (
           <p role="alert" className="forecast-warning">
@@ -878,8 +921,9 @@ export function ForecastPage() {
             {selected.stale && (
               <p className="forecast-warning" role="status">
                 Forecast update overdue. Last issue:{' '}
-                {dateTime(selected.issuedAt)} Atlantic time. Collection needs to
-                resume before this outlook can be considered current.
+                {dateTime(selected.issuedAt)} Atlantic time. Previously loaded
+                periods are shown only while they remain valid. Try Refresh
+                forecasts.
               </p>
             )}
 
@@ -937,11 +981,11 @@ export function ForecastPage() {
                   Loading hourly forecasts…
                 </p>
               )}
-              {(officialHourly.error || officialHourly.data?.stale) && (
+              {(officialHourly.error || officialExpired) && (
                 <p className="forecast-warning" role="status">
                   Official hourly conditions and POP are{' '}
-                  {officialHourly.data?.stale ? 'out of date' : 'unavailable'}.
-                  Model values remain visible.
+                  {officialExpired ? 'out of date' : 'unavailable'}. Model
+                  values remain visible.
                 </p>
               )}
               {displayedHours.length > 0 && (
@@ -963,7 +1007,9 @@ export function ForecastPage() {
                   >
                     {displayedHours.map((hour, index) => {
                       const period = periodAt(selected, hour.time)
-                      const official = officialHoursByTime.get(hour.time)
+                      const official = officialHoursByTime.get(
+                        new Date(hour.time).getTime(),
+                      )
                       const condition =
                         official?.condition ||
                         period?.condition ||
@@ -988,17 +1034,19 @@ export function ForecastPage() {
                               '°',
                             )}
                           </strong>
-                          <span className="hour-pop">
-                            {official?.popPercent === null ||
-                            official?.popPercent === undefined
-                              ? 'POP —'
-                              : `POP ${official.popPercent.toFixed(0)}%`}
-                          </span>
-                          <span className="hour-precipitation">
-                            {hour.precipitationMm === null
-                              ? 'GDPS amount —'
-                              : `GDPS ${hour.precipitationMm.toFixed(1)} mm`}
-                          </span>
+                          <div className="hour-precipitation-values">
+                            <span className="hour-pop">
+                              {official?.popPercent === null ||
+                              official?.popPercent === undefined
+                                ? 'POP —'
+                                : `POP ${official.popPercent.toFixed(0)}%`}
+                            </span>
+                            <span className="hour-precipitation">
+                              {hour.precipitationMm === null
+                                ? 'GDPS amount —'
+                                : `GDPS ${hour.precipitationMm.toFixed(1)} mm`}
+                            </span>
+                          </div>
                           <small>
                             {hour.relativeHumidityPercent === null
                               ? 'Humidity —'
@@ -1011,6 +1059,10 @@ export function ForecastPage() {
                   <p className="hourly-source-legend">
                     POP and conditions: ECCC official hourly forecast · Amounts:
                     GDPS point forecast
+                    {officialHourly.data &&
+                      ` · Official issue ${dateTime(officialHourly.data.issuedAt)} AT`}
+                    {firstHour?.runTime &&
+                      ` · Model run ${dateTime(firstHour.runTime)} AT`}
                   </p>
                 </>
               )}
@@ -1037,6 +1089,7 @@ export function ForecastPage() {
               <DailyForecast
                 region={selected}
                 precipitation={precipitation.data}
+                now={now}
               />
               <p className="forecast-note" id="model-precipitation-note">
                 * Model estimate (ECCC GDPS), used only when the ECCC bulletin
@@ -1120,7 +1173,7 @@ export function ForecastPage() {
               )}
             </section>
 
-            {hourly.data && (
+            {hourly.data && modelHours.length > 0 && (
               <details className="forecast-data-details">
                 <summary>
                   <span>
@@ -1147,7 +1200,7 @@ export function ForecastPage() {
                     <table className="hourly-forecast-table">
                       <caption>
                         {selected.name}, {selected.provinceName} ·{' '}
-                        {dateTime(hourly.data.start)} to{' '}
+                        {dateTime(modelHours[0].time)} to{' '}
                         {dateTime(hourly.data.end)} Atlantic
                       </caption>
                       <thead>
@@ -1163,7 +1216,7 @@ export function ForecastPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {hourly.data.hours.map((hour, index, hours) => (
+                        {modelHours.map((hour, index, hours) => (
                           <tr
                             key={hour.time}
                             className={
@@ -1210,9 +1263,17 @@ export function ForecastPage() {
                     </table>
                   </div>
                   <p className="forecast-note">
-                    {hourly.data.availableHours} / 72 hours available ·{' '}
-                    {hourly.data.completeHours} complete. Each row uses one GDPS
-                    run; forecast gaps are not interpolated.
+                    {
+                      modelHours.filter((hour) => hour.status !== 'missing')
+                        .length
+                    }{' '}
+                    / {modelHours.length} hours available ·{' '}
+                    {
+                      modelHours.filter((hour) => hour.status === 'complete')
+                        .length
+                    }{' '}
+                    complete. Each row uses one GDPS run; forecast gaps are not
+                    interpolated.
                   </p>
                 </div>
               </details>

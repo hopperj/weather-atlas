@@ -1,13 +1,18 @@
 // @vitest-environment jsdom
 import {
   cleanup,
+  act,
   fireEvent,
   render,
   screen,
   waitFor,
   within,
 } from '@testing-library/react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import {
+  QueryClient,
+  QueryClientProvider,
+  onlineManager,
+} from '@tanstack/react-query'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ForecastPage } from './ForecastPage'
 import {
@@ -179,6 +184,8 @@ function precipitationFor(
 }
 
 beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] })
+  vi.setSystemTime(new Date('2026-09-06T12:00:00Z'))
   window.localStorage.clear()
   window.history.replaceState(null, '', '/forecast')
   mocks.regions.mockResolvedValue({
@@ -186,7 +193,10 @@ beforeEach(() => {
     timeZone: 'America/Halifax',
     regions: [region, other, toronto, vancouver, iqaluit],
   })
-  mocks.hourly.mockResolvedValue(hourly)
+  mocks.hourly.mockImplementation(async (id: string) => ({
+    ...hourly,
+    regionId: id,
+  }))
   mocks.officialHourly.mockImplementation(async (id: string) => ({
     ...officialHourly,
     regionId: id,
@@ -231,6 +241,9 @@ beforeEach(() => {
 afterEach(() => {
   cleanup()
   vi.resetAllMocks()
+  vi.restoreAllMocks()
+  onlineManager.setOnline(true)
+  vi.useRealTimers()
 })
 
 describe('forecast page', () => {
@@ -526,7 +539,133 @@ describe('forecast page', () => {
     expect(
       await screen.findByText(/last collected bulletin has expired/),
     ).toBeTruthy()
-    expect(screen.queryByText('Sunny')).toBeNull()
+    expect(
+      within(
+        screen.getByRole('region', { name: '7-day forecast' }),
+      ).queryByText('Sunny'),
+    ).toBeNull()
+  })
+
+  it('expires a retained bulletin on return even when its saved stale flag is false', async () => {
+    mount()
+    await screen.findByRole('table')
+    const daily = screen.getByRole('region', { name: '7-day forecast' })
+    expect(within(daily).getByText('Today')).toBeTruthy()
+    mocks.regions.mockRejectedValue(new Error('Connection lost'))
+    mocks.hourly.mockRejectedValue(new Error('Connection lost'))
+    mocks.officialHourly.mockRejectedValue(new Error('Connection lost'))
+    vi.setSystemTime(new Date('2026-09-10T12:00:00Z'))
+    fireEvent(document, new Event('visibilitychange'))
+    await waitFor(() => expect(mocks.regions).toHaveBeenCalledTimes(2))
+    expect(within(daily).queryByText('Today')).toBeNull()
+    expect(within(daily).queryByText('0 mm')).toBeNull()
+    expect(within(daily).getByText(/bulletin has expired/)).toBeTruthy()
+    expect(screen.queryByRole('table')).toBeNull()
+    await screen.findByText(/Updates unavailable: daily forecast/)
+    expect(screen.getByText(/Forecast update overdue/)).toBeTruthy()
+  })
+
+  it('expires the last daily period while the page stays open, without waiting for a request', async () => {
+    vi.useFakeTimers({ toFake: ['Date', 'setInterval', 'clearInterval'] })
+    vi.setSystemTime(new Date('2026-09-07T08:59:00Z'))
+    mount()
+    const daily = await screen.findByRole('region', { name: '7-day forecast' })
+    await within(daily).findByText('Clear')
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(60_000)
+    })
+    expect(within(daily).queryByText('Clear')).toBeNull()
+    expect(within(daily).getByText(/bulletin has expired/)).toBeTruthy()
+    expect(mocks.regions).toHaveBeenCalledTimes(1)
+  })
+
+  it('refreshes every section on reconnect without cancelling or blanking in-flight data', async () => {
+    mount()
+    await screen.findByRole('table')
+    mocks.regions.mockImplementation(() => new Promise(() => {}))
+    vi.setSystemTime(new Date('2026-09-06T12:10:00Z'))
+    fireEvent(window, new Event('online'))
+    fireEvent(window, new Event('focus'))
+    fireEvent(document, new Event('visibilitychange'))
+    await waitFor(() => expect(mocks.regions).toHaveBeenCalledTimes(2))
+    expect(mocks.hourly).toHaveBeenCalledTimes(2)
+    expect(mocks.officialHourly).toHaveBeenCalledTimes(2)
+    expect(mocks.nearby).toHaveBeenCalledTimes(2)
+    expect(mocks.precipitation).toHaveBeenCalledTimes(2)
+    expect(screen.getByRole('table')).toBeTruthy()
+    expect(screen.getByText(/Last updated.*Updating/)).toBeTruthy()
+  })
+
+  it('labels offline data and recovers the existing location when connectivity returns', async () => {
+    mount()
+    await screen.findByRole('table')
+    const network = vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false)
+    fireEvent(window, new Event('offline'))
+    expect(
+      screen.getByText(/Offline; saved data shown where still valid/),
+    ).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh forecasts' }))
+    expect(screen.getByRole('table')).toBeTruthy()
+    expect(mocks.regions).toHaveBeenCalledTimes(1)
+    network.mockReturnValue(true)
+    fireEvent(window, new Event('online'))
+    await waitFor(() => expect(mocks.regions).toHaveBeenCalledTimes(2))
+    await waitFor(() =>
+      expect(screen.queryByText(/Offline; saved data/)).toBeNull(),
+    )
+    expect(
+      (screen.getByLabelText('Forecast region') as HTMLSelectElement).value,
+    ).toBe(region.id)
+    expect(mocks.nearest).not.toHaveBeenCalled()
+  })
+
+  it('drops elapsed model and official hours when the clock advances', async () => {
+    mount()
+    await screen.findByRole('table')
+    vi.setSystemTime(new Date('2026-09-06T15:10:00Z'))
+    fireEvent(window, new Event('pageshow'))
+    const cards = screen.getByRole('region', {
+      name: 'Scrollable 24-hour forecast',
+    })
+    expect(cards.querySelector('time')?.getAttribute('datetime')).toBe(
+      '2026-09-06T15:00:00.000Z',
+    )
+    expect(
+      [...cards.querySelectorAll('time')].every(
+        (time) => new Date(time.dateTime) >= new Date('2026-09-06T15:00:00Z'),
+      ),
+    ).toBe(true)
+    expect(await screen.findByText(/69 \/ 69 hours available/)).toBeTruthy()
+  })
+
+  it('matches hourly sources even when timestamps use different equivalent ISO formats', async () => {
+    mocks.hourly.mockResolvedValue({
+      ...hourly,
+      hours: hourly.hours.map((hour) => ({
+        ...hour,
+        time: hour.time.replace('.000Z', 'Z'),
+      })),
+    })
+    mocks.officialHourly.mockResolvedValue({
+      ...officialHourly,
+      hours: officialHourly.hours.map((hour) => ({
+        ...hour,
+        time: hour.time.replace('.000Z', 'Z'),
+        popPercent: 60,
+      })),
+    })
+    mount()
+    const cards = await screen.findByRole('region', {
+      name: 'Scrollable 24-hour forecast',
+    })
+    await waitFor(() =>
+      expect(
+        within(cards.querySelector('article')!).getByText('POP 60%'),
+      ).toBeTruthy(),
+    )
+    expect(
+      within(cards.querySelector('article')!).getByText('GDPS 0.0 mm'),
+    ).toBeTruthy()
   })
 
   it('keeps only NS regions at the first level with Other for the rest of Canada', async () => {

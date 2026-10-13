@@ -1616,29 +1616,45 @@ export function App() {
 
           {!cityForecastMode && (
             <div className="selection-grid">
-              <label className="full-width">
-                Variable
-                <select
-                  value={selection.variable}
-                  onChange={(event) => {
-                    resetTimelineRange()
-                    selection.setVariable(event.target.value)
-                  }}
-                  disabled={variablesQuery.isLoading}
-                >
-                  {variablesQuery.isLoading && (
-                    <option value="">Loading variables…</option>
-                  )}
-                  {groupedSelectableVariables.map((group) => (
-                    <optgroup key={group.code} label={group.label}>
-                      {group.items.map((variable) => (
-                        <option key={variable.code} value={variable.code}>
-                          {variableLabel(variable)}
-                        </option>
-                      ))}
-                    </optgroup>
-                  ))}
-                </select>
+              <label className="full-width map-data-picker">
+                <span className="map-data-picker-heading">
+                  <strong>Choose map data</strong>
+                  <small>
+                    {variablesQuery.isLoading
+                      ? 'Loading choices…'
+                      : `${selectableVariables.length} choices available`}
+                  </small>
+                </span>
+                <span className="map-data-select">
+                  <select
+                    aria-label="Variable"
+                    value={selection.variable}
+                    onChange={(event) => {
+                      resetTimelineRange()
+                      selection.setVariable(event.target.value)
+                    }}
+                    disabled={variablesQuery.isLoading}
+                  >
+                    {variablesQuery.isLoading && (
+                      <option value="">Loading variables…</option>
+                    )}
+                    {groupedSelectableVariables.map((group) => (
+                      <optgroup key={group.code} label={group.label}>
+                        {group.items.map((variable) => (
+                          <option key={variable.code} value={variable.code}>
+                            {variableLabel(variable)}
+                          </option>
+                        ))}
+                      </optgroup>
+                    ))}
+                  </select>
+                  <span className="map-data-select-action" aria-hidden="true">
+                    Change
+                  </span>
+                </span>
+                <small className="map-data-picker-help">
+                  Temperature, precipitation, wind, air quality and more
+                </small>
               </label>
 
               {!wildfireSelected && (

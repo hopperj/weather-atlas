@@ -47,7 +47,7 @@ def data(wind=10, rain=0, pop=10):
     return rows, amounts, context
 
 
-def test_complete_score_monotonic_round_cap_and_no_probability_claim():
+def test_complete_outlook_monotonic_and_no_probability_claim():
     good = assess_day(WINDOW, *data(), GolfLimits(), NOW, NOW)
     windy = assess_day(WINDOW, *data(wind=40), GolfLimits(), NOW, NOW)
     assert good["state"] == "within" and good["score"] > 50
@@ -81,7 +81,7 @@ def test_unpublished_pop_keeps_normal_rainfall_assessment_without_disclaimer():
     )
     # The same 0.5 mm must fail a stricter amount limit, not disappear with PoP.
     wet = assess_day(WINDOW, *data(pop=None, rain=0.125), GolfLimits(maxRainMm=0.25), NOW, NOW)
-    assert wet["state"] == "outside" and wet["score"] < 50
+    assert wet["state"] == "outside" and wet["rating"] == "good"
     assert "Precipitation amount falls outside" in wet["briefingDetail"]
     assert wet["probabilityNote"] is None
     assert wet["score"] < result["score"]
@@ -116,9 +116,82 @@ def test_known_limit_failures_remain_visible_with_partial_probability():
         {"start": utc_text(TEE), "end": utc_text(NOW + 24 * HOUR), "popPercent": 90},
     ]
     result = assess_day(WINDOW, rows, rain, context, GolfLimits(), NOW, NOW)
-    assert result["scoreCoverage"] == "complete" and result["score"] < 50
+    assert result["scoreCoverage"] == "complete" and result["rating"] == "mixed"
     assert result["state"] == "outside"
     assert result["segments"][1]["popPercent"] == 90
+
+
+def test_dry_comfortable_day_is_excellent_and_zero_rain_has_full_fit():
+    result = assess_day(WINDOW, *data(pop=None), GolfLimits(), NOW, NOW)
+    assert result["rating"] == "excellent"
+    assert result["primaryIssue"] is None
+    assert result["score"] > 95
+    assert all(
+        next(c["fit"] for c in p["checks"] if c["field"] == "rain") == 100
+        for p in result["segments"]
+    )
+
+
+def test_light_rain_is_good_instead_of_excellent():
+    result = assess_day(WINDOW, *data(rain=0.125, pop=None), GolfLimits(), NOW, NOW)
+    assert result["rating"] == "good"
+    assert result["state"] == "within"
+
+
+def test_small_wind_breach_has_no_numeric_cliff_or_unhappy_face():
+    before = assess_day(WINDOW, *data(wind=25, pop=None), GolfLimits(), NOW, NOW)
+    after = assess_day(WINDOW, *data(wind=25.1, pop=None), GolfLimits(), NOW, NOW)
+    assert before["rating"] == after["rating"] == "good"
+    assert before["state"] == "within" and after["state"] == "outside"
+    assert abs(before["score"] - after["score"]) <= 1
+    assert after["score"] > 80
+
+
+def test_brief_wind_peak_has_less_influence_than_sustained_wind():
+    rows, rain, context = data(pop=None)
+    rows[14]["windKmh"] = 40
+    brief = assess_day(WINDOW, rows, rain, context, GolfLimits(), NOW, NOW)
+    sustained = assess_day(WINDOW, *data(wind=40, pop=None), GolfLimits(), NOW, NOW)
+    assert brief["rating"] == "good"
+    assert sustained["rating"] == "poor"
+    assert brief["score"] > sustained["score"] + 30
+    assert brief["segments"][1]["maxWindKmh"] == sustained["segments"][1]["maxWindKmh"] == 40
+
+
+@pytest.mark.parametrize(
+    "wind,rating", [(10, "excellent"), (25, "good"), (35, "mixed"), (40, "poor"), (50, "very_poor")]
+)
+def test_wind_outlook_progression(wind, rating):
+    result = assess_day(WINDOW, *data(wind=wind, pop=None), GolfLimits(), NOW, NOW)
+    assert result["rating"] == rating
+    assert result["primaryIssue"] == ("wind" if rating in {"mixed", "poor", "very_poor"} else None)
+
+
+@pytest.mark.parametrize("temperature,issue", [(4, "cold"), (34, "heat")])
+def test_temperature_cause_distinguishes_cold_from_heat(temperature, issue):
+    rows, rain, context = data(pop=None)
+    for row in rows:
+        row["temperatureC"] = temperature
+    result = assess_day(WINDOW, rows, rain, context, GolfLimits(), NOW, NOW)
+    assert result["rating"] == "mixed"
+    assert result["primaryIssue"] == issue
+
+
+def test_rain_and_missing_data_do_not_become_wind_faces():
+    wet = assess_day(WINDOW, *data(rain=0.5, pop=None), GolfLimits(), NOW, NOW)
+    assert wet["primaryIssue"] == "rain"
+    missing = assess_day(WINDOW, [], [], None, GolfLimits(), NOW, NOW)
+    assert missing["rating"] is None and missing["primaryIssue"] is None
+
+
+def test_stale_started_and_invalid_rounds_have_no_face():
+    for window, run, now in [
+        (WINDOW, NOW - 25 * HOUR, NOW),
+        (WINDOW, NOW, TEE),
+        ({**WINDOW, "valid": False}, NOW, NOW),
+    ]:
+        result = assess_day(window, *data(), GolfLimits(), run, now)
+        assert result["rating"] is None and result["primaryIssue"] is None
 
 
 def test_native_rain_bounds_no_prorating_no_double_counting():

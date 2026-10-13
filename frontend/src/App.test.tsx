@@ -367,6 +367,31 @@ describe('timeline range selector', () => {
     queryClient.clear()
   })
 
+  it('presents the weather-variable selector as an obvious map-data control', async () => {
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false, gcTime: 0 } },
+    })
+    render(
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>,
+    )
+
+    const variableSelect = await screen.findByLabelText('Variable')
+    expect(screen.getByText('Choose map data')).toBeTruthy()
+    expect(screen.getByText('Change')).toBeTruthy()
+    expect(
+      screen.getByText(
+        'Temperature, precipitation, wind, air quality and more',
+      ),
+    ).toBeTruthy()
+    await waitFor(() => {
+      expect(screen.getByText('2 choices available')).toBeTruthy()
+      expect((variableSelect as HTMLSelectElement).disabled).toBe(false)
+    })
+    queryClient.clear()
+  })
+
   it('resets a custom range to the latest available 24-hour window', async () => {
     const queryClient = new QueryClient({
       defaultOptions: { queries: { retry: false } },

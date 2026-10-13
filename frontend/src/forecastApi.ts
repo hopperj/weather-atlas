@@ -147,6 +147,7 @@ export const nearbyObservationsSchema = z.object({
       observation: z.object({
         values: observationValuesSchema,
         observedAt: z.iso.datetime(),
+        expiresAt: z.iso.datetime().optional(),
       }),
     }),
   ),
@@ -165,7 +166,8 @@ async function request<T>(
   schema: z.ZodType<T>,
   signal?: AbortSignal,
 ) {
-  const response = await fetch(url, { signal })
+  // Revalidate with the server even when the browser's HTTP cache is still fresh.
+  const response = await fetch(url, { signal, cache: 'no-cache' })
   if (!response.ok) {
     let message = `Forecast service unavailable (${response.status})`
     try {

@@ -6,6 +6,34 @@ a swipeable 24-hour forecast, a compact seven-day outlook, current weather
 details, and an expandable 72-hour model table. The existing map and its
 forecast mode remain available.
 
+## Forecast freshness (2026-10-09)
+
+The page keeps its five-minute polling interval and immediately rechecks all
+forecast sections when a visible tab gains focus, is restored through browser
+navigation, or reconnects to the network. Resume events share a refresh path so
+an event burst does not cancel a request already in progress. Manual Refresh uses
+the same path. HTTP requests revalidate cached responses with the server.
+
+Display validity is checked every minute and immediately on resume, independently
+of request success. Expired daily periods and briefing text are removed; elapsed
+model and official hourly entries are filtered against the current hour. “Today”
+is based on the Atlantic calendar date, never the first row's position. Missing
+hours remain explicit gaps, and the table's counts reflect the remaining window.
+Daily model totals still require the exact selected region, bulletin issue and
+period bounds. Hourly feeds match by timestamp rather than ISO-string spelling.
+
+A persistent status line shows the oldest successful check among the displayed
+sections, names unsuccessful updates, and identifies offline saved data. Each
+section also retains its specific error notice. A failed update preserves useful
+data while its validity interval remains open; an expired bulletin cannot remain
+labelled as today's forecast. Official hourly issue and GDPS model-run times are
+shown beside the source legend. POP and model amounts occupy separate lines.
+
+Regression tests cover returning after several days, local midnight, minute-by-
+minute expiry without a network response, reconnect/focus event bursts, elapsed
+hour removal and HTTP cache revalidation. This is a client change; ETL schedules
+and the production deployment are unchanged.
+
 ## Forecast experience
 
 The information order follows a general-purpose forecast workflow:

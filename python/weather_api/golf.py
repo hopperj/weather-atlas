@@ -21,7 +21,120 @@ from weather_api.forecast import (
 from weather_api.repository import CatalogueNotFoundError
 
 HOUR = timedelta(hours=1)
-RULE_VERSION = "golf-fit-v3"
+RULE_VERSION = "golf-fit-v4"
+CORE_WEIGHTS = {"temperature": 0.25, "wind": 0.35, "rain": 0.4}
+WINDOW_WEIGHTS = (0.15, 0.7, 0.15)
+
+
+def maximum_fit(value: float, limit: float, scale: float, *, squared: bool = False) -> float:
+    """Comfort declines continuously; meeting a preference is not a failing grade."""
+    if value <= 0:
+        return 100.0
+    if limit > 0 and value <= limit:
+        return 100 - 35 * (value / limit) ** (2 if squared else 1)
+    baseline = 65 if limit > 0 else 100
+    return max(0.0, baseline * (1 - (value - limit) / scale))
+
+
+def temperature_fit(value: float, limits: GolfLimits) -> float:
+    margin = min(value - limits.minTemperatureC, limits.maxTemperatureC - value)
+    return min(100.0, 65 + 7 * margin) if margin >= 0 else max(0.0, 65 + 13 * margin)
+
+
+def scalar_fit(rows, key, start, end, fit) -> float | None:
+    """Time-weighted comfort over covered native intervals, without filling gaps."""
+    points = sorted((timestamp(r["time"]), r.get(key)) for r in rows)
+    integral, covered = 0.0, start
+    for (left, a), (right, b) in zip(points, points[1:], strict=False):
+        if right <= left or right <= start or left >= end:
+            continue
+        if (
+            a is None
+            or b is None
+            or not math.isfinite(a)
+            or not math.isfinite(b)
+            or right - left > 3 * HOUR
+        ):
+            continue
+        lo, hi = max(start, left), min(end, right)
+        if lo > covered:
+            return None
+        seconds = (hi - lo).total_seconds()
+        steps = max(2, math.ceil(seconds / 600) * 2)
+        samples = []
+        for i in range(steps + 1):
+            at = lo + timedelta(seconds=seconds * i / steps)
+            value = a + (b - a) * (at - left) / (right - left)
+            samples.append(fit(value))
+        integral += seconds / steps * (sum(samples) - 0.5 * (samples[0] + samples[-1]))
+        covered = max(covered, hi)
+    return integral / (end - start).total_seconds() if covered >= end else None
+
+
+def segment_comfort(part):
+    fits = {c["field"]: c["fit"] for c in part["checks"]}
+    if any(fits[field] is None for field in CORE_WEIGHTS):
+        return None
+    if any(fits[field] <= 0 for field in CORE_WEIGHTS):
+        core = 0.0
+    else:
+        core = math.exp(
+            sum(weight * math.log(fits[field] / 100) for field, weight in CORE_WEIGHTS.items())
+        )
+    # Regional probability is optional context; it cannot single-handedly erase
+    # a complete, favourable point forecast, unlike a severe core condition.
+    if fits["pop"] is not None:
+        core *= max(0.05, fits["pop"] / 100) ** 0.15
+    return 100 * core
+
+
+def outlook_rating(index: float, parts, outside) -> str:
+    comfortably_within = not outside and all(
+        c["fit"] is None or c["fit"] >= (95 if c["field"] == "rain" else 85)
+        for part in parts
+        for c in part["checks"]
+    )
+    if index >= 85 and comfortably_within:
+        return "excellent"
+    if index >= 70:
+        return "good"
+    if index >= 50:
+        return "mixed"
+    return "poor" if index >= 30 else "very_poor"
+
+
+def primary_issue(parts):
+    burdens = {
+        field: sum(
+            weight * (100 - next(c["fit"] for c in part["checks"] if c["field"] == field))
+            for weight, part in zip(WINDOW_WEIGHTS, parts, strict=True)
+        )
+        * field_weight
+        for field, field_weight in CORE_WEIGHTS.items()
+    }
+    probability = (
+        sum(
+            weight * (100 - (part["checks"][-1]["fit"] if part["popPercent"] is not None else 100))
+            for weight, part in zip(WINDOW_WEIGHTS, parts, strict=True)
+        )
+        * 0.15
+    )
+    burdens["rain"] += probability
+    issue = max(burdens, key=burdens.get)
+    if issue == "temperature":
+        return (
+            "cold"
+            if sum(
+                weight * part["coldDiscomfort"]
+                for weight, part in zip(WINDOW_WEIGHTS, parts, strict=True)
+            )
+            >= sum(
+                weight * part["heatDiscomfort"]
+                for weight, part in zip(WINDOW_WEIGHTS, parts, strict=True)
+            )
+            else "heat"
+        )
+    return issue
 
 
 class GolfLimits(BaseModel):
@@ -137,28 +250,61 @@ def segment(rows, rain, context, name, start, end, limits):
     pop = period_pop(context, start, end)
     checks = []
 
-    def check(field, label, value, limit, scale):
+    def check(field, label, value, limit, fit):
         known = value is not None
         state = "unknown" if not known else "within" if value <= limit else "outside"
-        # 50 is the user's maximum tolerance, not a probability or a safety threshold.
-        fit = None if not known else max(0, min(100, 50 + 50 * (limit - value) / scale))
-        if known and field != "temperature" and value == limit == 0:
-            fit = 100
         checks.append({"field": field, "label": label, "state": state, "fit": fit})
+
+    temp_fit = scalar_fit(
+        rows, "temperatureC", start, end, lambda value: temperature_fit(value, limits)
+    )
+    wind_fit = scalar_fit(
+        rows,
+        "windKmh",
+        start,
+        end,
+        lambda value: maximum_fit(
+            value, limits.maxWindKmh, max(15, limits.maxWindKmh * 0.75), squared=True
+        ),
+    )
+    cold = scalar_fit(
+        rows,
+        "temperatureC",
+        start,
+        end,
+        lambda value: (
+            100
+            - temperature_fit(
+                min(value, (limits.minTemperatureC + limits.maxTemperatureC) / 2), limits
+            )
+        ),
+    )
+    heat = scalar_fit(
+        rows,
+        "temperatureC",
+        start,
+        end,
+        lambda value: (
+            100
+            - temperature_fit(
+                max(value, (limits.minTemperatureC + limits.maxTemperatureC) / 2), limits
+            )
+        ),
+    )
 
     if temperature:
         margin = min(
             temperature[0] - limits.minTemperatureC, limits.maxTemperatureC - temperature[1]
         )
-        check("temperature", "Temperature", -margin, 0, 5)
+        check("temperature", "Temperature", -margin, 0, temp_fit)
     else:
-        check("temperature", "Temperature", None, 0, 5)
+        check("temperature", "Temperature", None, 0, None)
     check(
         "wind",
         "Sustained wind",
         wind[1] if wind else None,
         limits.maxWindKmh,
-        max(10, limits.maxWindKmh),
+        wind_fit,
     )
     rain_uncertain = amount and amount["minimumMm"] <= limits.maxRainMm < amount["maximumMm"]
     check(
@@ -166,10 +312,18 @@ def segment(rows, rain, context, name, start, end, limits):
         "Precipitation amount",
         None if rain_uncertain or not amount else amount["maximumMm"],
         limits.maxRainMm,
-        max(2, limits.maxRainMm),
+        None
+        if rain_uncertain or not amount
+        else maximum_fit(amount["maximumMm"], limits.maxRainMm, max(1, limits.maxRainMm)),
     )
     check(
-        "pop", "Regional rain probability", pop, limits.maxPopPercent, max(20, limits.maxPopPercent)
+        "pop",
+        "Regional rain probability",
+        pop,
+        limits.maxPopPercent,
+        maximum_fit(pop, limits.maxPopPercent, max(20, (100 - limits.maxPopPercent) * 0.6))
+        if pop is not None
+        else None,
     )
     if pop is None:
         # A bulletin need not publish a numeric probability. This is an optional
@@ -186,6 +340,8 @@ def segment(rows, rain, context, name, start, end, limits):
         "popPercent": pop,
         "checks": checks,
         "rainTimingUncertain": bool(rain_uncertain),
+        "coldDiscomfort": cold,
+        "heatDiscomfort": heat,
     }
 
 
@@ -273,13 +429,17 @@ def assess_day(window, rows, rain, context, limits, run, now):
         else "within"
     )
     score = None
+    rating = None
+    issue = None
     if state in {"within", "outside"}:
-        # Unpublished PoP is optional, not converted to zero or considered a pass.
-        # Known PoP still contributes and can fail the saved probability limit.
-        fits = [min(c["fit"] for c in p["checks"] if c["fit"] is not None) for p in parts]
-        score = round(0.15 * fits[0] + 0.7 * fits[1] + 0.15 * fits[2])
-        if any(c["state"] == "outside" for c in parts[1]["checks"]):
-            score = min(49, score)
+        index = sum(
+            weight * segment_comfort(part)
+            for weight, part in zip(WINDOW_WEIGHTS, parts, strict=True)
+        )
+        score = round(index)  # Internal/backward-compatible index, hidden by the new client.
+        rating = outlook_rating(index, parts, outside)
+        if rating in {"mixed", "poor", "very_poor"}:
+            issue = primary_issue(parts)
     reasons = []
     if state == "invalid_time":
         reasons.append("This tee time does not exist on this date in the selected time zone.")
@@ -316,6 +476,8 @@ def assess_day(window, rows, rain, context, limits, run, now):
         "endTime": utc_text(start + 4 * HOUR),
         "state": state,
         "score": score,
+        "rating": rating,
+        "primaryIssue": issue,
         "scoreCoverage": "none" if score is None else "complete",
         "probabilityNote": None,
         "segments": parts,
@@ -450,10 +612,14 @@ def golf_outlook(point, regions, longitude, latitude, zone, windows, limits, now
             "PoP is nearby regional context, not a point or hourly probability."
         ),
         "scoreMeaning": (
-            "Weather-fit index, not a probability or safety guarantee. "
-            "50 is the tolerance boundary. Before/round/after weights are 15/70/15%; "
-            "a round limit breach caps the score below 50. "
-            "Missing temperature, wind or precipitation amount means no score. "
+            "Five outlooks: Excellent, Good, Mixed, Poor and Very poor. "
+            "Excellent means comfortably inside your preferences with little or no rain. "
+            "Good allows mild drawbacks or a brief small exceedance. "
+            "Temperature and wind comfort consider both severity and duration; "
+            "rain uses each window's complete accumulation. "
+            "A small breach does not cap the outlook. "
+            "The four-hour round has the most influence, with smaller before/after contributions. "
+            "Missing temperature, wind or precipitation amount means no outlook. "
             "The rain-chance preference applies when a regional percentage is published. "
             "Otherwise the assessment uses point-model temperature, wind and precipitation "
             "amounts, with regional forecasts as context."

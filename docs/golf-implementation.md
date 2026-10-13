@@ -60,7 +60,55 @@ finite numbers and an ordered temperature range.
   use private/no-store. Preferences are stored in the app, not a server profile;
   request parameters can still appear in normal service access logs.
 
-## Score contract: golf-fit-v3
+## Five-level outlook: golf-fit-v4 (2026-10-13)
+
+The iPhone displays Excellent, Good, Mixed, Poor or Very poor rather than a
+number. `rating` and `primaryIssue` are server-owned values. An internal `score`
+is retained for older clients and narrative consistency, but is hidden by the
+new client. The separate peak/range preference checks and `within`/`outside`
+state remain available in Round details. Incomplete, stale, started and invalid
+rounds have null rating/cause, never an unhappy face. An older server without a
+rating shows Update needed instead of mapping the old harsh index to new faces.
+
+Temperature and sustained-wind comfort are integrated over the actual covered
+time window using the existing native-step interpolation (maximum three-hour
+gaps). No missing interval is filled. Temperature receives full comfort at least
+5°C inside its preference boundaries, 65 at a boundary, and declines smoothly
+to zero 5°C outside. Wind receives 100 at calm, 65 at the saved maximum, and a
+continuous decline beyond it; its penalty considers duration rather than only
+the highest sample. Peak wind and gusts remain visible; gusts are not scored.
+
+Each window combines temperature, wind and rain by a weighted geometric mean
+(25%, 35%, 40%). Rain is 100 when dry and 65 at the saved amount, with a smooth
+decline beyond; conservative native accumulation/timing bounds are unchanged.
+There is no automatic below-50 cap for a small exceedance. Optional published
+regional probability adds a bounded risk penalty and cannot improve a poor
+point forecast or single-handedly reduce otherwise ideal point weather to zero.
+Unpublished probability remains omitted. Before/round/after retain 15/70/15%
+influence. Core data gaps still prevent an assessment.
+
+The hidden combined index gives Good at 70 or higher, Mixed at 50–69, Poor at
+30–49, and Very poor below 30. Excellent additionally requires an index of at
+least 85, no breached preferences in any window, comfort of at least 85 for
+temperature/wind/published probability, and at least 95 for precipitation.
+Otherwise a high-index day is Good. These are product preference bands, not
+calibrated probabilities or universal golfing limits.
+
+With defaults, stable 20°C, dry weather and no issued probability, 10 km/h wind
+is Excellent, 25 or 25.1 km/h is Good, 35 is Mixed, 40 is Poor and 50 is Very poor.
+A single hourly 40 km/h peak among otherwise 10 km/h samples remains Good; the
+peak still fails the preference check. Actual labels depend on all conditions
+and the selected tee time. The dominant weighted discomfort chooses wind, cold,
+heat or rain/rain-risk imagery only for Mixed or worse. Heat uses the plain face.
+
+The bundled artwork progresses from one wind wisp/two raindrops at Mixed to
+stronger weather cues, and from thermometer alone at Mixed cold to toque plus
+thermometer at Poor/Very poor. Rain adds an umbrella at Poor/Very poor. The AI
+only rewrites the supplied explanation; it cannot choose or override the label.
+This implementation is local until the API is deployed and a rebuilt iOS app
+is installed. Neither production services nor collection schedules were changed.
+
+## Legacy score contract: golf-fit-v3
 
 The score is a **weather-fit index**, not a calibrated probability or safety
 assessment. The app and LLM do not calculate or override it.

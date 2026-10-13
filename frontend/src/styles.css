@@ -154,7 +154,11 @@ h2 {
   place-items: center;
   border: 1px solid rgba(255, 214, 102, 0.28);
   border-radius: 9px;
-  background: linear-gradient(145deg, rgba(255, 211, 105, 0.2), rgba(86, 224, 210, 0.12));
+  background: linear-gradient(
+    145deg,
+    rgba(255, 211, 105, 0.2),
+    rgba(86, 224, 210, 0.12)
+  );
 }
 
 .forecast-page-link-icon svg {
@@ -294,6 +298,98 @@ h2 {
 
 .selection-grid .full-width {
   grid-column: 1 / -1;
+}
+
+.map-data-picker {
+  gap: 7px;
+  margin-bottom: 20px;
+  padding: 12px;
+  border: 1px solid rgba(86, 224, 210, 0.28);
+  border-radius: 11px;
+  background: linear-gradient(
+    145deg,
+    rgba(86, 224, 210, 0.1),
+    rgba(18, 56, 78, 0.32)
+  );
+  box-shadow: 0 10px 28px rgba(0, 8, 16, 0.16);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.map-data-picker-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.map-data-picker-heading strong {
+  color: #f2fbff;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.map-data-picker-heading small {
+  color: var(--cyan);
+  font:
+    8px 'DM Mono',
+    monospace;
+  white-space: nowrap;
+}
+
+.map-data-select {
+  position: relative;
+  display: block;
+}
+
+.map-data-select select {
+  min-height: 50px;
+  appearance: none;
+  padding: 11px 86px 11px 13px;
+  border-color: rgba(86, 224, 210, 0.55);
+  border-radius: 9px;
+  background: linear-gradient(135deg, #102d42, #0a1f30);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 5px 16px rgba(0, 8, 16, 0.22);
+  cursor: pointer;
+  font-weight: 650;
+}
+
+.map-data-select:hover select:not(:disabled) {
+  border-color: rgba(86, 224, 210, 0.9);
+  background: linear-gradient(135deg, #15364d, #0d273a);
+}
+
+.map-data-select-action {
+  position: absolute;
+  top: 50%;
+  right: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--cyan);
+  font:
+    700 9px 'DM Mono',
+    monospace;
+  letter-spacing: 0.05em;
+  pointer-events: none;
+  text-transform: uppercase;
+  transform: translateY(-50%);
+}
+
+.map-data-select-action::after {
+  content: '⌄';
+  font-size: 16px;
+  line-height: 0.8;
+}
+
+.map-data-picker-help {
+  color: #9fb8c9;
+  font-size: 9px;
+  font-weight: 400;
+  line-height: 1.4;
 }
 
 .hotspot-ramp {

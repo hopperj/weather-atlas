@@ -754,6 +754,21 @@
   font-weight: 600;
 }
 
+.hour-precipitation-values {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.forecast-refresh-status {
+  margin: 0;
+  min-height: 2.5em;
+  color: var(--forecast-muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
 .hour-pop {
   color: #0878c9;
   font-size: 10px;
