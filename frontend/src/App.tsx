@@ -75,6 +75,21 @@ const baseStyle = weatherBasemapStyle({
   rasterURL: import.meta.env.VITE_BASEMAP_TILE_URL,
 })
 
+function observingMapPoint() {
+  const query = new URLSearchParams(window.location.search)
+  if (query.get('astronomy') !== '1') return null
+  const latitude = Number(query.get('latitude'))
+  const longitude = Number(query.get('longitude'))
+  return query.has('latitude') &&
+    query.has('longitude') &&
+    Number.isFinite(latitude) &&
+    Number.isFinite(longitude) &&
+    Math.abs(latitude) <= 90 &&
+    Math.abs(longitude) <= 180
+    ? { latitude, longitude }
+    : null
+}
+
 function formatUtc(value: string, includeDate = true) {
   const date = new Date(value)
   return new Intl.DateTimeFormat('en-CA', {
@@ -519,11 +534,13 @@ export function App() {
   const fittedWildfireSnapshot = useRef('')
   const fittedCityForecast = useRef(false)
   const [mapReady, setMapReady] = useState(false)
-  const [coordinate, setCoordinate] = useState({ longitude: -96, latitude: 57 })
+  const [coordinate, setCoordinate] = useState(
+    () => observingMapPoint() ?? { longitude: -96, latitude: 57 },
+  )
   const [samplePoint, setSamplePoint] = useState<{
     longitude: number
     latitude: number
-  } | null>(null)
+  } | null>(observingMapPoint)
   const [controlsOpen, setControlsOpen] = useState(true)
   const [rangeStart, setRangeStart] = useState('')
   const [rangeEnd, setRangeEnd] = useState('')
@@ -738,6 +755,9 @@ export function App() {
       !selectableVariables.some((item) => item.code === selection.variable)
     ) {
       const preferred =
+        (observingMapPoint()
+          ? variables.find((item) => item.variableCode === 'total_cloud_cover')
+          : undefined) ??
         variables.find((item) => item.variableCode === 'air_temperature') ??
         variables[0] ??
         wildfireVariable
@@ -750,7 +770,13 @@ export function App() {
       compatibleProducts.length > 0 &&
       !compatibleProducts.some((item) => item.code === selection.product)
     ) {
-      selection.setProduct(compatibleProducts[0].code)
+      const seedProduct = observingMapPoint()
+        ? new URLSearchParams(window.location.search).get('product')
+        : null
+      selection.setProduct(
+        compatibleProducts.find((item) => item.code === seedProduct)?.code ??
+          compatibleProducts[0].code,
+      )
     }
   }, [compatibleProducts, selection])
 
@@ -768,7 +794,13 @@ export function App() {
       times.length > 0 &&
       !times.some((item) => item.validTime === selection.validTime)
     ) {
-      selection.setValidTime(times[0].validTime)
+      const seedTime = observingMapPoint()
+        ? new URLSearchParams(window.location.search).get('valid_time')
+        : null
+      selection.setValidTime(
+        times.find((item) => item.validTime === seedTime)?.validTime ??
+          times[0].validTime,
+      )
     }
   }, [times, selection])
 
@@ -1176,8 +1208,10 @@ export function App() {
       const map = new maplibregl.Map({
         container: mapContainer.current,
         style: baseStyle,
-        center: [-96, 57],
-        zoom: 2.8,
+        center: observingMapPoint()
+          ? [observingMapPoint()!.longitude, observingMapPoint()!.latitude]
+          : [-96, 57],
+        zoom: observingMapPoint() ? 8 : 2.8,
         minZoom: 1.8,
         maxZoom: 14,
         attributionControl: false,
@@ -1190,6 +1224,12 @@ export function App() {
         new maplibregl.AttributionControl({ compact: true }),
         'bottom-right',
       )
+      const observingPoint = observingMapPoint()
+      if (observingPoint) {
+        sampleMarker.current = new maplibregl.Marker({ color: '#56e0d2' })
+          .setLngLat([observingPoint.longitude, observingPoint.latitude])
+          .addTo(map)
+      }
       map.on('load', () => setMapReady(true))
       const updateMapViewport = () => {
         const center = map.getCenter()
@@ -1540,6 +1580,16 @@ export function App() {
           >
             <path d="m6 3.5 4.5 4.5L6 12.5" />
           </svg>
+        </a>
+        <a
+          className="forecast-page-link"
+          href={`/astronomy?latitude=${(samplePoint ?? coordinate).latitude}&longitude=${(samplePoint ?? coordinate).longitude}&name=Map%20location`}
+          aria-label="Open Astronomy at the selected map location"
+        >
+          <span className="forecast-page-link-copy">
+            <strong>Astronomy</strong>
+            <small>Clouds &amp; dark skies</small>
+          </span>
         </a>
         <div className={`run-status ${latestError ? 'error' : ''}`}>
           <span className="status-dot" />

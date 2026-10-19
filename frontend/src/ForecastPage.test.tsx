@@ -330,12 +330,15 @@ describe('forecast page', () => {
       'Current forecast precipitation',
     )
     expect(await within(precipitation).findByText('80%')).toBeTruthy()
+    expect(within(precipitation).getByText('Amount uncertain')).toBeTruthy()
+    expect(within(precipitation).queryByText('0 mm')).toBeNull()
     const strip = await screen.findByRole('region', {
       name: 'Scrollable 24-hour forecast',
     })
     const first = within(strip).getAllByRole('article')[0]
     expect(await within(first).findByText('POP 80%')).toBeTruthy()
-    expect(within(first).getByText('GDPS 0.0 mm')).toBeTruthy()
+    expect(within(first).getByText('Amount uncertain')).toBeTruthy()
+    expect(within(first).queryByText(/0\.0 mm/)).toBeNull()
     expect(within(first).getByRole('img', { name: 'Showers' })).toBeTruthy()
   })
 
@@ -352,6 +355,24 @@ describe('forecast page', () => {
     expect(
       screen.getByText(/Model estimate \(ECCC GDPS\), used only/),
     ).toBeTruthy()
+  })
+
+  it('shows uncertainty when current hourly POP exists without a covering regional period', async () => {
+    const future = {
+      ...region,
+      periods: [{ ...region.periods[0], start: '2026-09-06T14:00:00Z' }],
+    }
+    mocks.regions.mockResolvedValue({ regions: [future] })
+    mocks.officialHourly.mockResolvedValue({
+      ...officialHourly,
+      hours: officialHourly.hours.map((hour) => ({ ...hour, popPercent: 30 })),
+    })
+    mount()
+    const precipitation = await screen.findByLabelText(
+      'Current forecast precipitation',
+    )
+    expect(await within(precipitation).findByText('30%')).toBeTruthy()
+    expect(within(precipitation).getByText('Amount uncertain')).toBeTruthy()
   })
 
   it('shows rain wording and server amounts when every period omits POP', async () => {
@@ -374,6 +395,7 @@ describe('forecast page', () => {
     )
     expect(await within(precipitation).findByText('10.2 mm*')).toBeTruthy()
     expect(within(precipitation).getByText('Rain expected')).toBeTruthy()
+    expect(within(precipitation).queryByText('Amount uncertain')).toBeNull()
     expect(screen.queryByText('100%')).toBeNull()
     expect(mocks.precipitation).toHaveBeenCalledWith(
       region.id,
@@ -400,6 +422,7 @@ describe('forecast page', () => {
       'Current forecast precipitation',
     )
     expect(within(precipitation).getByText('Rain expected')).toBeTruthy()
+    expect(within(precipitation).getByText('Amount uncertain')).toBeTruthy()
     expect(screen.queryByText('0 mm')).toBeNull()
     expect(screen.queryByText('100%')).toBeNull()
   })
@@ -414,6 +437,62 @@ describe('forecast page', () => {
     mount()
     expect(await screen.findByText(String(display))).toBeTruthy()
   })
+
+  it.each([
+    [30, 0, 'Amount uncertain'],
+    [30, null, 'Amount uncertain'],
+    [30, 0.03, 'GDPS <0.1 mm'],
+    [30, 1.2, 'GDPS 1.2 mm'],
+    [0, 0, 'GDPS 0.0 mm'],
+  ])(
+    'labels hourly POP %s and model amount %s honestly',
+    async (pop, amount, expected) => {
+      mocks.officialHourly.mockResolvedValue({
+        ...officialHourly,
+        hours: officialHourly.hours.map((hour) => ({
+          ...hour,
+          popPercent: pop,
+        })),
+      })
+      mocks.hourly.mockResolvedValue({
+        ...hourly,
+        hours: hourly.hours.map((hour) => ({
+          ...hour,
+          precipitationMm: amount,
+        })),
+      })
+      mount()
+      const strip = await screen.findByRole('region', {
+        name: 'Scrollable 24-hour forecast',
+      })
+      const first = within(strip).getAllByRole('article')[0]
+      expect(await within(first).findByText(String(expected))).toBeTruthy()
+      expect(within(first).getByText(`POP ${pop}%`)).toBeTruthy()
+    },
+  )
+
+  it.each([null, '0 mm', '0.0 cm'])(
+    'does not pair a wet daily forecast with a zero amount (%s)',
+    async (issued) => {
+      const wet = {
+        ...region,
+        periods: [
+          {
+            ...region.periods[0],
+            popPercent: 30,
+            precipitationAmount: issued,
+            condition: 'Chance of showers',
+          },
+        ],
+      }
+      mocks.regions.mockResolvedValue({ regions: [wet] })
+      mocks.precipitation.mockResolvedValue(precipitationFor(wet, 0))
+      mount()
+      const totals = await screen.findByLabelText('Precipitation totals')
+      expect(await within(totals).findByText('Amount uncertain')).toBeTruthy()
+      expect(within(totals).queryByText(/^0/)).toBeNull()
+    },
+  )
 
   it('preserves official ranges and snow amounts without making a model request', async () => {
     const supplied = {
@@ -664,7 +743,7 @@ describe('forecast page', () => {
       ).toBeTruthy(),
     )
     expect(
-      within(cards.querySelector('article')!).getByText('GDPS 0.0 mm'),
+      within(cards.querySelector('article')!).getByText('Amount uncertain'),
     ).toBeTruthy()
   })
 

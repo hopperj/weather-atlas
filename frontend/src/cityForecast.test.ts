@@ -3,6 +3,9 @@ import {
   cityForecastInBounds,
   cityForecastTimes,
   forecastMetric,
+  hasPrecipitationRisk,
+  issuedPrecipitationAmountLabel,
+  precipitationAmountLabel,
   precipitationLikelihood,
 } from './cityForecast'
 import type { MapBounds } from './mapBounds'
@@ -86,6 +89,45 @@ describe('city forecast presentation', () => {
     }
     for (const pop of [-1, 101, NaN, Infinity]) {
       expect(precipitationLikelihood(pop, 'Rain')).toBe('Rain expected')
+    }
+  })
+
+  it('never invents an amount from POP or rounds a positive trace to zero', () => {
+    for (const pop of [1, 30, 80, 100]) {
+      for (const amount of [0, null, -1, NaN, Infinity]) {
+        expect(precipitationAmountLabel(amount, pop)).toBe('Amount uncertain')
+      }
+      expect(precipitationAmountLabel(0.001, pop)).toBe('<0.1 mm')
+      expect(precipitationAmountLabel(0.1, pop)).toBe('0.1 mm')
+      expect(precipitationAmountLabel(1.24, pop)).toBe('1.2 mm')
+    }
+    expect(precipitationAmountLabel(0, 0, 'Rain')).toBe('0.0 mm')
+    expect(precipitationAmountLabel(null, 0, 'Rain')).toBe('—')
+    expect(precipitationAmountLabel(0, null, 'Sunny')).toBe('0.0 mm')
+    expect(precipitationAmountLabel(null, null)).toBe('—')
+    expect(precipitationAmountLabel(0, null, 'Chance of showers')).toBe(
+      'Amount uncertain',
+    )
+    expect(hasPrecipitationRisk(0, 'Rain')).toBe(false)
+    expect(hasPrecipitationRisk(NaN, 'Rain')).toBe(true)
+    expect(hasPrecipitationRisk(null, 'No rain')).toBe(false)
+  })
+
+  it('preserves issued ranges and snow units but avoids a risk paired with a pure zero', () => {
+    for (const amount of ['0 mm', '0.0 mm', '0 cm', ' 0.00 MM ', '0']) {
+      expect(issuedPrecipitationAmountLabel(amount, 30)).toBe(
+        'Amount uncertain',
+      )
+      expect(issuedPrecipitationAmountLabel(amount, 0, 'Showers')).toBe(amount)
+    }
+    for (const amount of [
+      '0 to 2 mm',
+      '5 to 10 mm',
+      '2 cm',
+      '<0.1 mm',
+      'Trace',
+    ]) {
+      expect(issuedPrecipitationAmountLabel(amount, 30)).toBe(amount)
     }
   })
 })

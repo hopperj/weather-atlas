@@ -32,6 +32,12 @@ results preserved in the [research log](docs/smoke-validation-log.md).
 
 ## What is implemented
 
+- An [Astronomy / Clear sky preview](docs/astronomy.md) at `/astronomy` and in the
+  native clients: exact observing sites, total-cloud/weather timelines, server
+  Sun/Moon events and explainable observing windows. See the
+  [October 19 release and deployment notes](docs/release-2026-10-19.md) for rollout
+  status; layered clouds, seeing and transparency remain explicitly unavailable.
+
 - A native SwiftUI iPhone app in [weatheratlas-ios](../weatheratlas-ios/README.md),
   with server-backed model maps, daily/hourly forecasts, saved places, wind arrows,
   hotspots and collected radar/satellite playback. See the

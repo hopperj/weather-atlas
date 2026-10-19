@@ -5,7 +5,13 @@ import {
   type ForecastRegion,
   type PrecipitationForecast,
 } from './forecastApi'
-import { forecastMetric, precipitationLikelihood } from './cityForecast'
+import {
+  forecastMetric,
+  issuedPrecipitationAmountLabel,
+  precipitationAmountLabel,
+  precipitationLikelihood,
+  UNCERTAIN_PRECIPITATION_AMOUNT,
+} from './cityForecast'
 import { AppIcon } from './AppIcon'
 import {
   FORECAST_TIME_ZONE as TIME_ZONE,
@@ -180,22 +186,37 @@ function PrecipitationAmount({
   period,
   region,
   precipitation,
+  popPercent = period.popPercent,
 }: {
   period: Period
   region: ForecastRegion
   precipitation?: PrecipitationForecast
+  popPercent?: number | null
 }) {
   if (period.precipitationAmount !== null)
-    return <span>{period.precipitationAmount}</span>
+    return (
+      <span aria-describedby="model-precipitation-note">
+        {issuedPrecipitationAmountLabel(
+          period.precipitationAmount,
+          popPercent,
+          period.condition,
+        )}
+      </span>
+    )
   const estimate = modelEstimate(period, region, precipitation)
-  if (!estimate) return <>—</>
-  const amount = estimate.precipitationMm!
+  const label = precipitationAmountLabel(
+    estimate?.precipitationMm ?? null,
+    popPercent,
+    period.condition,
+  )
+  if (!estimate || label === UNCERTAIN_PRECIPITATION_AMOUNT)
+    return <span aria-describedby="model-precipitation-note">{label}</span>
   return (
     <span
       aria-describedby="model-precipitation-note"
       title={`ECCC GDPS model estimate for ${dateTime(period.start)} to ${dateTime(period.end)} Atlantic; model run ${estimate.runTime}. Sampled at the region's representative location.`}
     >
-      {amount > 0 && amount < 0.1 ? '<0.1' : amount.toFixed(1)} mm*
+      {label}*
     </span>
   )
 }
@@ -624,6 +645,15 @@ export function ForecastPage() {
             <a href="/forecast" aria-current="page">
               Forecast
             </a>
+            <a
+              href={
+                selected
+                  ? `/astronomy?${new URLSearchParams({ latitude: String(selected.latitude), longitude: String(selected.longitude), name: selected.locality || selected.name })}`
+                  : '/astronomy'
+              }
+            >
+              Astronomy
+            </a>
           </nav>
           <details className="forecast-settings">
             <summary>Settings</summary>
@@ -890,9 +920,17 @@ export function ForecastPage() {
                               period={currentPeriod}
                               region={selected}
                               precipitation={precipitation.data}
+                              popPercent={
+                                currentOfficialHour?.popPercent ??
+                                currentPeriod.popPercent
+                              }
                             />
                           ) : (
-                            '—'
+                            precipitationAmountLabel(
+                              null,
+                              currentOfficialHour?.popPercent ?? null,
+                              currentOfficialHour?.condition ?? '',
+                            )
                           )}
                         </strong>
                       </div>
@@ -1014,6 +1052,11 @@ export function ForecastPage() {
                         official?.condition ||
                         period?.condition ||
                         'Conditions unavailable'
+                      const amountLabel = precipitationAmountLabel(
+                        hour.precipitationMm,
+                        official?.popPercent ?? null,
+                        official?.condition ?? '',
+                      )
                       return (
                         <article
                           className={`hour-card${index === 0 ? ' hour-card-current' : ''}`}
@@ -1042,9 +1085,11 @@ export function ForecastPage() {
                                 : `POP ${official.popPercent.toFixed(0)}%`}
                             </span>
                             <span className="hour-precipitation">
-                              {hour.precipitationMm === null
-                                ? 'GDPS amount —'
-                                : `GDPS ${hour.precipitationMm.toFixed(1)} mm`}
+                              {amountLabel === UNCERTAIN_PRECIPITATION_AMOUNT
+                                ? amountLabel
+                                : amountLabel === '—'
+                                  ? 'GDPS amount —'
+                                  : `GDPS ${amountLabel}`}
                             </span>
                           </div>
                           <small>
@@ -1063,6 +1108,8 @@ export function ForecastPage() {
                       ` · Official issue ${dateTime(officialHourly.data.issuedAt)} AT`}
                     {firstHour?.runTime &&
                       ` · Model run ${dateTime(firstHour.runTime)} AT`}
+                    . “Amount uncertain” means precipitation is possible but no
+                    positive amount is quantified; POP is not an amount.
                   </p>
                 </>
               )}
@@ -1094,7 +1141,9 @@ export function ForecastPage() {
               <p className="forecast-note" id="model-precipitation-note">
                 * Model estimate (ECCC GDPS), used only when the ECCC bulletin
                 has no amount. It covers the full day or night period in mm of
-                water equivalent. A dash means an amount is unavailable.
+                water equivalent. “Amount uncertain” means precipitation is
+                possible but no positive amount is quantified. A dash means an
+                amount is unavailable without an indicated precipitation risk.
               </p>
               {precipitation.isLoading && (
                 <p className="forecast-note" role="status">

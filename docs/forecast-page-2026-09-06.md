@@ -98,7 +98,9 @@ collected by `eccc_city_forecasts_ingest`. Each region's remaining forecast
 periods are retained separately, including day/night conditions, high or low
 temperature, humidity, POP and explicitly issued precipitation amounts. Day
 and night are grouped under their Atlantic calendar date. Missing values are
-displayed as a dash; zero remains zero. Since 2026-09-07, missing precipitation
+displayed as a dash; numeric source values retain zero. The precipitation-risk
+presentation exception below avoids pairing positive POP with a displayed zero.
+Since 2026-09-07, missing precipitation
 amounts can be supplemented by starred model estimates as described below.
 The API does not discard late forecast
 periods just because a different region has a shorter horizon.
@@ -208,8 +210,10 @@ hourly forecast, and GDPS ingestion must be operating. Their snapshots are
 
 The dedicated `/forecast` page now supplements missing seven-day precipitation
 amounts from the collected GDPS rasters. Existing normalized bulletin amounts
-(including zero, ranges in mm, and snow depths in cm) are preserved verbatim and
-have no asterisk. An estimate appears as, for example, `6.2 mm*` or `0.0 mm*`.
+(including zero, ranges in mm, and snow depths in cm) are preserved in the data and
+have no asterisk. An estimate appears as, for example, `6.2 mm*` or, for a dry
+period, `0.0 mm*`. The risk-aware display rule below takes precedence for zero
+amounts paired with precipitation risk.
 Positive estimates below 0.1 mm display as `<0.1 mm*`. The explanation below
 the cards identifies GDPS and the units; hovering on a starred amount shows
 its forecast period and model initialization. This change does not alter the
@@ -393,3 +397,31 @@ checked at its normal desktop width and at a 390 by 844 phone viewport. No
 browser console errors or warnings were present. The frontend production build,
 lint, and all 124 tests across 17 files passed. This change required no backend
 schema migration, new package, credential, or ingestion change.
+
+### Risk-aware precipitation labels — 2026-10-19 (development)
+
+The current card, hourly cards, and day/night totals no longer display a zero
+amount beside a positive POP. If the amount is zero, missing, or invalid while
+precipitation is possible, they show **Amount uncertain** instead. This is a
+display label, not a replacement weather prediction. POP cannot be converted
+into millimetres. Positive amounts below 0.1 mm show `<0.1 mm`, including in the
+hourly strip, where they previously rounded to `0.0 mm`.
+
+Issued positive amounts, ranges, snow units and trace wording are preserved.
+Only a pure issued zero is replaced by the uncertainty label when risk is
+present; `0 to 2 mm` remains a range. An explicit 0% takes precedence over broader
+rain wording. If no numeric POP is issued, conservatively recognized wet wording
+can also establish risk. A true zero without an indicated risk remains zero.
+
+The current-card amount uses the POP displayed in that card, even when it comes
+from the more recent official hourly forecast rather than the regional period.
+Hourly risk uses only the matching official hour, never a day/night percentage.
+Source values, detailed model tables, API responses, totals and ETL are unchanged.
+The iOS client uses the same presentation policy. No production rollout is implied
+by this development change.
+
+Verification: all 150 frontend tests passed across 19 files (single-worker final
+run), along with the production frontend build, lint and formatting checks.
+Synthetic browser checks at 1440px and 390px verified uncertainty, positive and
+trace amounts, source labels and no horizontal/clipped amount text. No production
+service, API schema or ETL was changed.

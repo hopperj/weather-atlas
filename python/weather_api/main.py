@@ -52,6 +52,7 @@ from weather_ingest.flexpart_releases import (
 )
 from weather_tiles.rendering import resolve_asset_path
 
+from weather_api.astronomy import ObservingCriteria, build_forecast, collect_weather, site_zone
 from weather_api.forecast import (
     hourly_outlook,
     nearest_region,
@@ -735,6 +736,94 @@ async def forecast_official_hourly(
     )
 
 
+@app.get("/api/v1/astronomy/forecast", tags=["forecast"])
+async def astronomy_forecast(
+    request: Request,
+    repository: Annotated[CatalogueReader, Depends(get_repository)],
+    longitude: Annotated[float, Query(ge=-180, le=180, allow_inf_nan=False)],
+    latitude: Annotated[float, Query(ge=-90, le=90, allow_inf_nan=False)],
+    product: Literal["gdps", "rdps", "hrdps"] = "gdps",
+    nights: Annotated[int, Query(ge=1, le=7)] = 7,
+    mode: Literal["deep_sky", "lunar_planetary"] = "deep_sky",
+    max_cloud_percent: Annotated[float, Query(ge=0, le=100, allow_inf_nan=False)] = 30,
+    max_wind_kmh: Annotated[float, Query(ge=0, le=150, allow_inf_nan=False)] = 25,
+    max_rain_mm: Annotated[float, Query(ge=0, le=20, allow_inf_nan=False)] = 0,
+    minimum_minutes: Annotated[int, Query(ge=30, le=240)] = 60,
+) -> JSONResponse:
+    await _enforce_sample_rate_limit(request)
+    now = datetime.now(UTC)
+    criteria = ObservingCriteria(
+        maxCloudPercent=max_cloud_percent,
+        maxWindKmh=max_wind_kmh,
+        maxRainMm=max_rain_mm,
+        minimumMinutes=minimum_minutes,
+    )
+    identity = json.dumps(
+        [
+            longitude,
+            latitude,
+            product,
+            nights,
+            mode,
+            criteria.model_dump(),
+            int(now.timestamp()) // 120,
+        ],
+        sort_keys=True,
+    )
+    key = "weather:v1:astronomy:" + hashlib.sha256(identity.encode()).hexdigest()
+    cache = getattr(request.app.state, "redis", None)
+    if cache is not None:
+        try:
+            raw = await cache.get(key)
+            if raw:
+                return JSONResponse(json.loads(raw), headers={"Cache-Control": "private, no-store"})
+        except (RedisError, ValueError):
+            logger.warning("astronomy_cache_read_failed")
+    zone = await run_in_threadpool(site_zone, longitude, latitude)
+    start = datetime.combine(now.astimezone(zone).date(), clock_time(), zone).astimezone(UTC)
+    weather_identity = json.dumps([longitude, latitude, product, nights, start.isoformat()])
+    weather_key = (
+        "weather:v1:astronomy:grids:" + hashlib.sha256(weather_identity.encode()).hexdigest()
+    )
+    weather = None
+    if cache is not None:
+        try:
+            raw = await cache.get(weather_key)
+            if raw:
+                weather = json.loads(raw)
+        except (RedisError, ValueError):
+            logger.warning("astronomy_grid_cache_read_failed")
+    try:
+        async with asyncio.timeout(50):
+            if weather is None:
+                weather = await collect_weather(
+                    repository,
+                    _astronomy_sample,
+                    longitude,
+                    latitude,
+                    product,
+                    start,
+                    start + timedelta(days=nights + 1),
+                    now,
+                )
+                if cache is not None:
+                    try:
+                        await cache.setex(weather_key, 120, json.dumps(weather, allow_nan=False))
+                    except RedisError:
+                        logger.warning("astronomy_grid_cache_write_failed")
+            result = await run_in_threadpool(
+                build_forecast, weather, longitude, latitude, product, now, nights, mode, criteria
+            )
+    except TimeoutError as exc:
+        raise HTTPException(503, "Observing forecasts are taking too long; try again") from exc
+    if cache is not None:
+        try:
+            await cache.setex(key, 120, json.dumps(result, allow_nan=False))
+        except RedisError:
+            logger.warning("astronomy_cache_write_failed")
+    return JSONResponse(result, headers={"Cache-Control": "private, no-store"})
+
+
 @app.get("/api/v1/golf/outlook", tags=["forecast"])
 async def golf_forecast(
     request: Request,
@@ -1327,6 +1416,45 @@ def _sample_asset(path: Path, longitude: float, latitude: float) -> tuple[float 
     if np.ma.is_masked(value) or not np.isfinite(value):
         return None, True
     return float(value), False
+
+
+def _astronomy_raster_sample(path: Path, longitude: float, latitude: float) -> dict:
+    value, nodata = _sample_asset(path, longitude, latitude)
+    if nodata:
+        return {"value": None, "sample": None}
+    with rasterio.open(path) as dataset:
+        to_grid = Transformer.from_crs("EPSG:4326", dataset.crs, always_xy=True)
+        x, y = to_grid.transform(longitude, latitude)
+        row, column = dataset.index(x, y)
+        x, y = dataset.xy(row, column)
+        to_geo = Transformer.from_crs(dataset.crs, "EPSG:4326", always_xy=True)
+        lon, lat = to_geo.transform(x, y)
+        corners = [
+            to_geo.transform(*(dataset.transform * (c, r)))
+            for c, r in [(column, row), (column + 1, row), (column + 1, row + 1), (column, row + 1)]
+        ]
+        return {
+            "value": value,
+            "sample": {
+                "longitude": lon,
+                "latitude": lat,
+                "method": "nearest_cell",
+                "footprint": [[a, b] for a, b in corners],
+                "pixelSize": [abs(dataset.res[0]), abs(dataset.res[1])],
+                "crs": str(dataset.crs),
+            },
+        }
+
+
+async def _astronomy_sample(repository, **query):
+    asset = await repository.resolve_asset(
+        **{k: v for k, v in query.items() if k not in ("longitude", "latitude")}, style="default"
+    )
+    path = resolve_asset_path(settings.data_root, asset.relative_path)
+    result = await run_in_threadpool(
+        _astronomy_raster_sample, path, query["longitude"], query["latitude"]
+    )
+    return {**result, "unit": asset.unit}
 
 
 async def _resolve_and_sample(

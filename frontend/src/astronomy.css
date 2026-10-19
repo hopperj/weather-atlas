@@ -1,0 +1,355 @@
+.astronomy-page {
+  --astro-bg: #0b1325;
+  --astro-card: #142139;
+  --astro-line: #2b3d55;
+  --astro-text: #edf3fc;
+  --astro-muted: #a7b7cf;
+  --astro-accent: #9fd9e3;
+  min-height: 100vh;
+  background: var(--astro-bg);
+  color: var(--astro-text);
+  padding: 24px max(24px, calc((100vw - 1360px) / 2));
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color-scheme: dark;
+}
+.astronomy-page * {
+  box-sizing: border-box;
+}
+.astronomy-page a {
+  color: var(--astro-accent);
+}
+.astronomy-page button,
+.astronomy-page select,
+.astronomy-page input:not([type='checkbox']):not([type='range']) {
+  font: inherit;
+  color: inherit;
+  background: var(--astro-card);
+  border: 1px solid var(--astro-line);
+  border-radius: 10px;
+  padding: 9px 14px;
+}
+.astronomy-page button {
+  cursor: pointer;
+}
+.astronomy-page button:hover,
+.astronomy-page button[aria-pressed='true'] {
+  border-color: var(--astro-accent);
+  background: #253e57;
+}
+.astronomy-page button:focus-visible,
+.astronomy-page a:focus-visible,
+.astronomy-page input:focus-visible {
+  outline: 3px solid var(--astro-accent);
+  outline-offset: 3px;
+}
+.astronomy-page button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.astro-top,
+.astro-top > a,
+.astro-top nav,
+.astro-heading,
+.astro-actions,
+.astro-timeline-heading,
+.astro-picker header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+.astro-top > a {
+  text-decoration: none;
+  font-weight: 700;
+}
+.astro-top svg {
+  width: 36px;
+  height: 36px;
+}
+.astro-top nav {
+  font-size: 14px;
+}
+.astro-heading {
+  margin: 38px 0 24px;
+}
+.astro-heading h1 {
+  font-size: clamp(28px, 4vw, 44px);
+  margin: 2px 0;
+}
+.astro-heading h1 span {
+  font-weight: 300;
+  color: var(--astro-muted);
+}
+.astro-heading p {
+  margin: 4px 0;
+}
+.astro-eyebrow {
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  font-weight: 750;
+  color: var(--astro-accent);
+}
+.astro-card {
+  background: var(--astro-card);
+  border: 1px solid var(--astro-line);
+  border-radius: 18px;
+  padding: 22px;
+  margin-bottom: 18px;
+}
+.astro-card h2 {
+  margin: 0 0 8px;
+}
+.astro-site {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.astro-site p {
+  margin: 3px 0;
+  color: var(--astro-muted);
+  font-size: 14px;
+}
+.astro-saved {
+  flex-basis: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.astro-saved span {
+  display: flex;
+}
+.astro-controls {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr 1fr 1fr;
+  gap: 18px;
+  margin: 24px 0;
+}
+.astro-controls label,
+.astro-picker label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+}
+.astro-controls select {
+  max-width: 100%;
+}
+.astro-preview {
+  font-size: 14px;
+  color: var(--astro-muted);
+  border-left: 3px solid var(--astro-accent);
+  padding-left: 12px;
+}
+.astro-nights {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 10px 0 18px;
+}
+.astro-nights button {
+  min-width: 150px;
+  text-align: left;
+}
+.astro-nights span,
+.astro-nights small {
+  display: block;
+  color: var(--astro-muted);
+}
+.astro-summary {
+  background: linear-gradient(120deg, #1d3552, #17213c);
+  padding: 28px;
+}
+.astro-summary h2 {
+  font-size: 32px;
+}
+.astro-muted {
+  color: var(--astro-muted);
+  font-size: 13px;
+}
+.astro-events {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+.astro-events .astro-card {
+  padding: 18px;
+}
+.astro-events span,
+.astro-events strong,
+.astro-events small {
+  display: block;
+}
+.astro-events span {
+  font-size: 13px;
+  color: var(--astro-muted);
+}
+.astro-events strong {
+  font-size: 17px;
+  margin-top: 8px;
+}
+.astro-events small {
+  font-size: 12px;
+  color: var(--astro-muted);
+}
+.astro-table-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.astro-table {
+  border-collapse: separate;
+  border-spacing: 3px;
+  font-size: 13px;
+  text-align: center;
+}
+.astro-table th:first-child {
+  position: sticky;
+  left: 0;
+  background: var(--astro-card);
+  z-index: 1;
+  text-align: left;
+  min-width: 140px;
+}
+.astro-table th {
+  font-weight: 600;
+}
+.astro-table th small {
+  display: block;
+  color: var(--astro-muted);
+  font-size: 11px;
+}
+.astro-table td {
+  background: #213149;
+  border-radius: 6px;
+  min-width: 100px;
+}
+.astro-table td button,
+.astro-table thead button {
+  border: 0;
+  background: none;
+  min-width: 80px;
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+}
+.astro-table .astro-clear {
+  background: #20483f;
+}
+.astro-table .astro-cloudy {
+  background: #55443a;
+}
+.astro-close {
+  float: right;
+}
+.astro-modal {
+  position: fixed;
+  inset: 0;
+  background: #000b;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+.astro-picker {
+  width: min(800px, 100%);
+  max-height: 95vh;
+  overflow: auto;
+  border-radius: 18px;
+  padding: 20px;
+  background: var(--astro-bg);
+  border: 1px solid var(--astro-line);
+}
+.astro-picker-map {
+  height: 40vh;
+  min-height: 220px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.astro-picker form {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+.astro-picker form p {
+  grid-column: 1/-1;
+}
+.astro-picker input {
+  width: 100%;
+}
+.astro-picker form button {
+  grid-column: 1/-1;
+}
+.astronomy-red {
+  --astro-bg: #090302;
+  --astro-card: #170807;
+  --astro-line: #49201b;
+  --astro-text: #c95d4d;
+  --astro-muted: #a14d42;
+  --astro-accent: #db6553;
+}
+.astronomy-red .astro-summary {
+  background: #210d0a;
+}
+.astronomy-red .astro-table td {
+  background: #28100d;
+}
+.astronomy-red .astro-table .astro-clear {
+  background: #321612;
+}
+.astronomy-red .astro-table .astro-cloudy {
+  background: #4a1d16;
+}
+.astronomy-red .astro-picker-map {
+  filter: sepia(1) saturate(2) brightness(0.5);
+}
+@media (max-width: 850px) {
+  .astro-controls {
+    grid-template-columns: 1fr 1fr;
+  }
+  .astro-events {
+    grid-template-columns: 1fr 1fr;
+  }
+  .astro-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .astro-actions {
+    flex-wrap: wrap;
+  }
+  .astro-top {
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 500px) {
+  .astronomy-page {
+    padding: 18px 12px;
+  }
+  .astro-controls {
+    grid-template-columns: 1fr;
+  }
+  .astro-card {
+    padding: 16px;
+  }
+  .astro-events {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .astro-events strong {
+    font-size: 14px;
+  }
+  .astro-picker form {
+    grid-template-columns: 1fr 1fr;
+  }
+  .astro-picker label:first-child {
+    grid-column: 1/-1;
+  }
+  .astro-top nav {
+    gap: 16px;
+  }
+  .astro-table th:first-child {
+    min-width: 115px;
+  }
+}

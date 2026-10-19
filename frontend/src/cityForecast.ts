@@ -121,3 +121,46 @@ export function precipitationLikelihood(
   }
   return `${kind} ${possible ? 'possible' : 'expected'}`
 }
+
+export const UNCERTAIN_PRECIPITATION_AMOUNT = 'Amount uncertain'
+
+export function hasPrecipitationRisk(
+  popPercent: number | null,
+  condition = '',
+): boolean {
+  // An issued zero takes precedence over broader precipitation wording.
+  if (
+    popPercent !== null &&
+    Number.isFinite(popPercent) &&
+    popPercent >= 0 &&
+    popPercent <= 100
+  )
+    return popPercent > 0
+  return precipitationLikelihood(null, condition) !== null
+}
+
+/** Presentation only: never turn a probability into invented millimetres. */
+export function precipitationAmountLabel(
+  millimetres: number | null,
+  popPercent: number | null,
+  condition = '',
+): string {
+  if (millimetres !== null && Number.isFinite(millimetres) && millimetres > 0)
+    return millimetres < 0.1 ? '<0.1 mm' : `${millimetres.toFixed(1)} mm`
+  if (hasPrecipitationRisk(popPercent, condition))
+    return UNCERTAIN_PRECIPITATION_AMOUNT
+  return millimetres === 0 ? '0.0 mm' : '—'
+}
+
+export function issuedPrecipitationAmountLabel(
+  amount: string,
+  popPercent: number | null,
+  condition = '',
+): string {
+  // Preserve ranges, trace amounts and snow units. Only a pure zero conflicts
+  // with a precipitation risk; "0 to 2 mm" is not a zero amount.
+  const isZero = /^0+(?:[.,]0+)?\s*(?:mm|cm)?$/i.test(amount.trim())
+  return isZero && hasPrecipitationRisk(popPercent, condition)
+    ? UNCERTAIN_PRECIPITATION_AMOUNT
+    : amount
+}

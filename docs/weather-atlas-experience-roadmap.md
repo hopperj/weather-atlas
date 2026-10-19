@@ -3,6 +3,11 @@
 Updated 2026-09-13. Planning only: this document does not activate ingestion,
 change clients, deploy services, or request device permissions.
 
+Implementation update (2026-10-19): a development-only **total-cloud Astronomy
+preview** is now implemented in the API, web, iOS and Android clients. See
+[implementation, limitations and release gates](astronomy.md). The layered-cloud,
+seeing and transparency portions below remain planned, not delivered or deployed.
+
 This records the Windy-inspired recommendations discussed with the user and adds
 the requested astronomy observing-conditions screen. It complements, rather than
 replaces, the existing platform implementation and operations plans.
