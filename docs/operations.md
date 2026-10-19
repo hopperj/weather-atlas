@@ -23,10 +23,13 @@ separate from production. The old Mac collectors remain stopped after migration;
 do not resume them with the queue identity now used by sparky. No services,
 credentials or routing were changed by this environment designation.
 
-Public routing was still directed at the old Mac at the migration verification;
-the production designation is not a DNS/router cutover. Confirm the current route
-before treating the public hostname as a production verification target. See the
-[migration record](sparky-migration.md) for the last verified state.
+Public routing was still directed at the old Mac during the September migration
+verification. On **2026-10-19**, a uniquely marked public HTTPS request was
+confirmed in sparky's Caddy access log, verifying that the public hostname reached
+sparky at that check. No routing was changed during that deployment. Reconfirm
+the current route for future operations; a production designation alone is not
+a DNS/router cutover. See the [migration record](sparky-migration.md) and
+[October deployment verification](release-2026-10-19.md).
 
 All commands below run from the repository root. Application database migrations
 remain explicit operator actions. Starting or restarting Compose directly never

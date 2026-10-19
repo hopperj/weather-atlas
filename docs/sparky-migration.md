@@ -1,5 +1,22 @@
 # Sparky migration (2026-09-22)
 
+## 2026-10-19 current routing and application deployment check
+
+A uniquely marked request to public `https://weatheratlas.ioresearch.ca` appeared
+in sparky's Caddy access log. The public hostname therefore reached sparky at
+this check, superseding the September observations of routing to the old Mac.
+No DNS/router/firewall change was made in this task; the date/method of the
+intervening routing change was not established. The September sections below are
+historical records, not instructions to repeat their transfer/cutover steps.
+
+The production checkout was clean, the expected NFS source was mounted at
+`/home/hopperj/weather-atlas/data`, and existing services were healthy. The
+authorized Astronomy deployment pulled the new main commit and rebuilt/recreated
+only the API and frontend. Readiness, existing hourly forecasts and actual
+GDPS/RDPS/HRDPS Astronomy point responses passed through public HTTPS. See the
+[release verification](release-2026-10-19.md) for commits, coverage and timings.
+No collector/database restart, migration, data sync or local ETL startup occurred.
+
 ## 2026-09-24 environment designation and boot verification
 
 The user designated **sparky as production** and **the local Mac (wolf359) as

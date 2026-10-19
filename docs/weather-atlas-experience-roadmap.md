@@ -3,8 +3,10 @@
 Updated 2026-09-13. Planning only: this document does not activate ingestion,
 change clients, deploy services, or request device permissions.
 
-Implementation update (2026-10-19): a development-only **total-cloud Astronomy
-preview** is now implemented in the API, web, iOS and Android clients. See
+Implementation update (2026-10-19): a **total-cloud Astronomy preview** is
+implemented in the API, web, iOS and Android clients. The API/web preview is
+deployed on sparky; native clients require new builds. See the
+[dated deployment verification](release-2026-10-19.md) and
 [implementation, limitations and release gates](astronomy.md). The layered-cloud,
 seeing and transparency portions below remain planned, not delivered or deployed.
 
